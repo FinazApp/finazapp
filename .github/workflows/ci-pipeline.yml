@@ -1,55 +1,74 @@
-name: Pipeline de integración continua
+name: CI Pipeline
 
 on:
   push:
     branches:
+      - main
       - dev
   pull_request:
     branches:
+      - main
       - dev
 
 jobs:
-  construir-backend:
+  backend:
+    name: Backend CI (ASP.NET Core)
+    runs-on: ubuntu-latest
+    
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD: "YourStrong!Passw0rd"
+          ACCEPT_EULA: "Y"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "exit 0" 
+          --health-interval 10s
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore backend dependencies
+        run: dotnet restore ./finaz-app.Server/finaz-app.Server.csproj
+
+      - name: Build backend
+        run: dotnet build --no-restore ./finaz-app.Server/finaz-app.Server.csproj
+
+      - name: Run backend tests
+        run: dotnet test ./finaz-app.Tests/finaz-app.Tests.csproj --no-build --verbosity normal
+
+  frontend:
+    name: Frontend CI (React + TypeScript)
     runs-on: ubuntu-latest
 
     steps:
-    - name: Descargar el código
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Configurar .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
-    - name: Restaurar paquetes NuGet
-      run: dotnet restore ./finaz-app.Server
+      - name: Install frontend dependencies
+        run: |
+          cd finaz-app.client
+          npm install
 
-    - name: Construir backend
-      run: dotnet build ./finaz-app.Server --configuration Release
+      - name: Run frontend tests (Jest)
+        run: |
+          cd finaz-app.client
+          npm test -- --coverage
 
-    - name: Ejecutar pruebas de backend
-      run: dotnet test ./finaz-app.Tests --no-build --verbosity normal
-
-    - name: Probar la API con Postman
-      run: newman run finazapp/Pruebas de API-FinazApp.postman_collection.json
-
-  construir-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Descargar el código
-      uses: actions/checkout@v3
-
-    - name: Configurar Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20.x'
-
-    - name: Instalar dependencias del frontend
-      run: cd finaz-app.client && npm install
-
-    - name: Ejecutar pruebas con Jest y React Testing Library
-      run: cd finaz-app.client && npm test
-
-    - name: Ejecutar pruebas end-to-end con Cypress
-      run: cd finaz-app.client && npx cypress run
+      - name: Run frontend e2e tests (Cypress)
+        run: |
+          cd finaz-app.client
+          npm run cypress:run
