@@ -24,13 +24,13 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Restore .NET dependencies
-        run: dotnet restore ./finaz-app.Server/Finazapp.Api.csproj
+        run: dotnet restore ./finaz-app.Server/finaz-app.Server.csproj
 
       - name: Build .NET project
-        run: dotnet build ./finaz-app.Server/Finazapp.Api.csproj --configuration Release
+        run: dotnet build ./finaz-app.Server/finaz-app.Server.csproj --configuration Release
 
       - name: Run .NET tests
-        run: dotnet test ./finaz-app.Tests/Finazapp.Api.Tests.csproj --configuration Release
+        run: dotnet test ./finaz-app.Tests/finaz-app.Tests.csproj --configuration Release
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
