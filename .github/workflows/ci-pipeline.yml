@@ -45,7 +45,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd finaz-app.client
-          npm test -- --coverage
+          npm test
 
       - name: Build frontend
         run: |
