@@ -1,74 +1,55 @@
-name: CI Pipeline
+name: CI Pipeline for FinazApp
 
 on:
   push:
     branches:
-      - main
       - dev
+      - main
   pull_request:
     branches:
-      - main
       - dev
+      - main
 
 jobs:
-  backend:
-    name: Backend CI (ASP.NET Core)
+  build:
     runs-on: ubuntu-latest
-    
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        env:
-          SA_PASSWORD: "YourStrong!Passw0rd"
-          ACCEPT_EULA: "Y"
-        ports:
-          - 1433:1433
-        options: >-
-          --health-cmd "exit 0" 
-          --health-interval 10s
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        dotnet-version: [8.0.x]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore backend dependencies
-        run: dotnet restore ./finaz-app.Server/finaz-app.Server.csproj
-
-      - name: Build backend
-        run: dotnet build --no-restore ./finaz-app.Server/finaz-app.Server.csproj
-
-      - name: Run backend tests
-        run: dotnet test ./finaz-app.Tests/finaz-app.Tests.csproj --no-build --verbosity normal
-
-  frontend:
-    name: Frontend CI (React + TypeScript)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
 
-      - name: Install frontend dependencies
-        run: |
-          cd finaz-app.client
-          npm install
+      - name: Install dependencies for frontend
+        working-directory: ./Finazapp.Frontend
+        run: npm install
 
-      - name: Run frontend tests (Jest)
-        run: |
-          cd finaz-app.client
-          npm test -- --coverage
+      - name: Run tests for frontend
+        working-directory: ./Finazapp.Frontend
+        run: npm run test -- --watchAll=false
 
-      - name: Run frontend e2e tests (Cypress)
-        run: |
-          cd finaz-app.client
-          npm run cypress:run
+      - name: Run Cypress tests
+        working-directory: ./Finazapp.Frontend
+        run: npm run cypress:run
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install dependencies for backend
+        run: dotnet restore ./Finazapp.Api/Finazapp.Api.csproj
+
+      - name: Build backend
+        run: dotnet build ./Finazapp.Api/Finazapp.Api.csproj --configuration Release --no-restore
+
+      - name: Run tests for backend
+        run: dotnet test ./Finazapp.Api.Tests/Finazapp.Api.Tests.csproj --no-build --verbosity normal
