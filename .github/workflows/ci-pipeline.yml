@@ -11,19 +11,6 @@ on:
 jobs:
   construir-backend:
     runs-on: ubuntu-latest
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        env:
-          SA_PASSWORD: "f1naz@pp"
-          ACCEPT_EULA: "Y"
-        ports:
-          - 1433:1433
-        options: > 
-          --health-cmd "exit 0" 
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - name: Descargar el código
