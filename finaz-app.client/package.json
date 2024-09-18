@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "react-scripts test",
     "build": "tsc -b && vite build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
