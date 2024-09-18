@@ -1,5 +1,6 @@
-export default {
-    preset: 'ts-jest',
-    testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+/** @type {import('jest').Config} */
+const config = {
+    verbose: true,
 };
+
+module.exports = config;
