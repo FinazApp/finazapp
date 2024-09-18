@@ -1,0 +1,10 @@
+{
+	"info": {
+		"_postman_id": "d4f6c1cb-95a8-475f-aa7d-fbf37647f9f0",
+		"name": "Pruebas de API/FinazApp",
+		"description": "Colección designada a las pruebas de API de la aplicación FinazApp, un sistema de finanzas con recomendaciones personalizadas según el hábito financiero del usuario.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38402588"
+	},
+	"item": []
+}
