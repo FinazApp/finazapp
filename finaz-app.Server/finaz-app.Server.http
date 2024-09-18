@@ -1,0 +1,6 @@
+@finaz_app.Server_HostAddress = http://localhost:5163
+
+GET {{finaz_app.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
