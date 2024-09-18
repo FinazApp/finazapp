@@ -1,0 +1,68 @@
+name: Pipeline de integración continua
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  construir-backend:
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          SA_PASSWORD: "f1naz@pp"
+          ACCEPT_EULA: "Y"
+        ports:
+          - 1433:1433
+        options: > 
+          --health-cmd "exit 0" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Descargar el código
+      uses: actions/checkout@v3
+
+    - name: Configurar .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar paquetes NuGet
+      run: dotnet restore ./finaz-app.Server
+
+    - name: Construir backend
+      run: dotnet build ./finaz-app.Server --configuration Release
+
+    - name: Ejecutar pruebas de backend
+      run: dotnet test ./finaz-app.Tests --no-build --verbosity normal
+
+    - name: Probar la API con Postman
+      run: newman run finazapp/Pruebas de API-FinazApp.postman_collection.json
+
+  construir-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Descargar el código
+      uses: actions/checkout@v3
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+
+    - name: Instalar dependencias del frontend
+      run: cd finaz-app.client && npm install
+
+    - name: Ejecutar pruebas con Jest y React Testing Library
+      run: cd finaz-app.client && npm test
+
+    - name: Ejecutar pruebas end-to-end con Cypress
+      run: cd finaz-app.client && npx cypress run
