@@ -1,68 +1,82 @@
-import { Button } from "@components";
-import { useEffect, useState } from "react";
 import React from "react";
+import { Box, Divider, Flex } from "styled-system/jsx";
+import { FormatNumber } from "@ark-ui/react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
-interface Forecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
+import { Heading, MainLayout, RadioButtonGroup, Text } from "@components";
+
+export interface IStatCardProps {
+  title: string;
 }
 
+const StatCard = ({ title }: IStatCardProps) => {
+  return (
+    <Flex flexDirection="column" flex={1} px="4" py="5" bg="red.5" borderRadius="lg">
+      <Text as="span" size="md" fontWeight="bold">
+        {title}
+      </Text>
+      <Box mt="3">
+        <Heading as="h3" size="3xl">
+          <FormatNumber value={5000000} />
+        </Heading>
+        <Flex alignItems="center">
+          <IconArrowUpRight
+            size="20"
+            stroke={2}
+            style={{ height: 20, width: 20, color: "green" }}
+          />
+          <Text size="sm" fontWeight="500" color="green" mr="2">
+            32%
+          </Text>
+          <Text size="sm" fontWeight="500">
+            from the last week
+          </Text>
+        </Flex>
+      </Box>
+    </Flex>
+  );
+};
+
 function App() {
-  const [forecasts, setForecasts] = useState<Forecast[]>();
-
-  async function populateWeatherData() {
-    const response = await fetch("weatherforecast");
-    const data = await response.json();
-    setForecasts(data);
-  }
-
-  useEffect(() => {
-    populateWeatherData();
-  }, []);
-
-  const contents =
-    forecasts === undefined ? (
-      <p>
-        <em>
-          Loading... Please refresh once the ASP.NET backend has started. See{" "}
-          <a href="https://aka.ms/jspsintegrationreact">
-            https://aka.ms/jspsintegrationreact
-          </a>{" "}
-          for more details.
-        </em>
-      </p>
-    ) : (
-      <table className="table table-striped" aria-labelledby="tableLabel">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-          </tr>
-        </thead>
-        <tbody>
-          {forecasts.map((forecast) => (
-            <tr key={forecast.date}>
-              <td>{forecast.date}</td>
-              <td>{forecast.temperatureC}</td>
-              <td>{forecast.temperatureF}</td>
-              <td>{forecast.summary}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
+  const options = [
+    { value: "Este Mes" },
+    { value: "Ultimo Mes" },
+    { value: "Ultimo trimestre" },
+    { value: "Ultimo año" },
+  ];
 
   return (
-    <div>
-      <h1 id="tableLabel">Weather forecast</h1>
-      <p>This component demonstrates fetching data from the server.</p>
-      {contents}
-      <Button>Perdido</Button>
-    </div>
+    <MainLayout>
+      <Flex justifyContent="space-between" alignItems="center">
+        <Box>
+          <Text as="span" fontWeight="500" color="neutral.11" size="sm">
+            Bienvenido de nuevo,
+          </Text>
+          <Heading as="h1" size="2xl">
+            Johan Sierra Linares
+          </Heading>
+        </Box>
+        <RadioButtonGroup.Root defaultValue="Este Mes">
+          {options.map((option, id) => (
+            <RadioButtonGroup.Item key={id} value={option.value}>
+              <RadioButtonGroup.ItemControl />
+              <RadioButtonGroup.ItemText>
+                {option.value}
+              </RadioButtonGroup.ItemText>
+              <RadioButtonGroup.ItemHiddenInput />
+            </RadioButtonGroup.Item>
+          ))}
+        </RadioButtonGroup.Root>
+      </Flex>
+      {/* Stats */}
+      <Divider />
+      <Flex justifyContent="space-between" flexWrap="wrap" gap="5">
+        <StatCard title="Gastos" />
+        <StatCard title="Balance" />
+        <StatCard title="Ingresos" />
+        <StatCard title="Ingresos" />
+      </Flex>
+    </MainLayout>
   );
 }
 
