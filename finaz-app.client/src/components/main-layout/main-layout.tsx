@@ -1,5 +1,6 @@
 import React from "react";
 import { Flex } from "styled-system/jsx";
+
 import { Sidebar } from "../sidebar";
 
 export type IMainLayoutProps = React.PropsWithChildren;

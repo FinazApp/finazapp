@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Divider, Flex } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
+import { Box, Divider, Flex } from "styled-system/jsx";
 import { IconArrowUpRight } from "@tabler/icons-react";
 
 import { Heading, MainLayout, RadioButtonGroup, Text } from "@components";
