@@ -1,12 +1,12 @@
 import React from 'react';
 import { IconHome } from "@tabler/icons-react";
 import { Box, Flex } from "styled-system/jsx";
-
 import { NavLink } from "../navlink";
 import { Avatar, Heading } from "../park-ui";
 
+
 const Sidebar = () => {
-    
+
   return (
     <Flex
       p="4"

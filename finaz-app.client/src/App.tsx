@@ -2,7 +2,6 @@ import React from "react";
 import { FormatNumber } from "@ark-ui/react";
 import { Box, Divider, Flex } from "styled-system/jsx";
 import { IconArrowUpRight } from "@tabler/icons-react";
-
 import { Heading, MainLayout, RadioButtonGroup, Text } from "@components";
 
 export interface IStatCardProps {
