@@ -8,5 +8,6 @@ export { Avatar } from "./avatar";
 export { Button } from "./button";
 export { Heading } from "./heading";
 export { Spinner } from "./spinner";
+export { IconButton } from "./icon-button";
 export { ToggleGroup } from "./toggle-group";
 export { RadioButtonGroup } from "./radio-button-group";
