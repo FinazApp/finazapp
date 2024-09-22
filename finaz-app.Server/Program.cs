@@ -1,6 +1,18 @@
+using finaz_app.Server.Models;
+using finaz_app.Server.Models.DTOs;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Inyección Cadena de Conexión
+
+var connectionString = builder.Configuration.GetConnectionString("AppConnection");
+
+builder.Services.AddDbContext<FinanzAppContext>(op => op.UseSqlServer(connectionString));
+
+// añadir autoMapper
+
+builder.Services.AddAutoMapper(typeof(MapeoPerfiles));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -20,6 +32,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(ops =>
+{
+    ops.AllowAnyHeader();
+    ops.AllowAnyMethod();
+    ops.AllowAnyOrigin();
+});
 
 app.UseAuthorization();
 
