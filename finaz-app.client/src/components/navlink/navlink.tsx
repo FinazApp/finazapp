@@ -1,27 +1,32 @@
 import React from "react";
+import { Icon } from "@tabler/icons-react";
+import { NavLink as NavLinkRRD } from "react-router-dom";
+
 import { Button } from "../park-ui";
 
 export interface INavLinkProps {
+  to: string;
   title: string;
-  isActive?: boolean;
-  icon: React.ReactNode;
+  icon: Icon;
 }
 
-const NavLink = ({ title, icon, isActive }: INavLinkProps) => {
+const NavLink = ({ title, icon: IconLink, to }: INavLinkProps) => {
   return (
-    <Button
-      gap="2"
-      variant="subtle"
-      borderRadius="md"
-      justifyContent="start"
-      _hover={{
-        colorPalette: "blue"
-      }}
-      colorPalette={isActive ? "blue": undefined} 
-    >
-      {icon}
-      {title}
-    </Button>
+    <NavLinkRRD to={to} style={{ width: "100%" }}>
+      {({ isActive }) => (
+        <Button
+          gap="2"
+          width="full"
+          variant={isActive ? "solid" : "subtle"}
+          fontWeight="normal"
+          justifyContent="start"
+          _hover={{ colorPalette: "blue" }}
+        >
+          <IconLink size="22" style={{ width: 22, height: 22 }} />
+          {title}
+        </Button>
+      )}
+    </NavLinkRRD>
   );
 };
 

@@ -1,13 +1,16 @@
 export { Card } from "./card";
 export { Menu } from "./menu";
 export { Text } from "./text";
+export { Table } from "./table";
 export { Alert } from "./alert";
 export { Input } from "./input";
 export { Field } from "./field";
 export { Avatar } from "./avatar";
+export { Select } from "./select";
 export { Button } from "./button";
 export { Heading } from "./heading";
 export { Spinner } from "./spinner";
+export { Pagination } from "./pagination";
 export { IconButton } from "./icon-button";
 export { ToggleGroup } from "./toggle-group";
 export { RadioButtonGroup } from "./radio-button-group";

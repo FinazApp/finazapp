@@ -1,42 +1,41 @@
 import React from "react";
 import { IconHome } from "@tabler/icons-react";
 import { Box, Flex } from "styled-system/jsx";
-import { NavLink } from "../navlink";
-import { Avatar, Heading } from "../park-ui";
 
+import { NavLink } from "../navlink";
+import { Avatar, Heading, Text } from "../park-ui";
 
 const Sidebar = () => {
   return (
     <Flex
-      p="4"
       w="64"
       h="full"
       bg="Background"
+      boxShadow="lg"
       flexDirection="column"
       justifyContent="space-between"
     >
-      <Flex flexDir="column" gap="5">
+      <Box p="4">
         <Heading as="h2" size="2xl">
           FinazApp
         </Heading>
-        <Flex id="Navbar" flexDir="column" flex={1} gap="2">
-          <NavLink
-            title="Inicio"
-            icon={<IconHome stroke={2} size="20" style={{ width: 20, height: 20 }} />}
-          />
-          <NavLink
-            title="Ingresos"
-            icon={<IconHome stroke={2} size="20" style={{ width: 20, height: 20 }} />}
-          />
-          <NavLink
-            title="Gastos"
-            icon={<IconHome stroke={2} size="20" style={{ width: 20, height: 20 }} />}
-          />
-        </Flex>
-      </Flex>
-      <Box bg="yellow" p="2">
-        <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
       </Box>
+      <Flex id="Navbar" flexDir="column" flex={1} gap="2" px="4">
+        <NavLink to="/" title="Inicio" icon={IconHome} />
+        <NavLink to="/incomes" title="Ingresos" icon={IconHome} />
+        <NavLink to="/expenses" title="Gastos" icon={IconHome} />
+      </Flex>
+      <Flex px="4" py="2" _hover={{ bg: "red" }} gap="2">
+        <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
+        <Box>
+          <Text size="sm" fontWeight="semibold">
+            Johan Sierra Linares
+          </Text>
+          <Text size="xs" color="neutral.10">
+            johan@finazapp.com
+          </Text>
+        </Box>
+      </Flex>
     </Flex>
   );
 };

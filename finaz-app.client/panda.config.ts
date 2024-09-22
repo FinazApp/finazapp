@@ -7,10 +7,10 @@ export default defineConfig({
 
   presets: ['@pandacss/preset-base', '@park-ui/panda-preset',
     createPreset({
-      accentColor: 'blue',
+      accentColor: 'grass',
       grayColor: 'neutral',
       borderRadius: 'sm',
-    })
+    }),
   ],
 
   // Where to look for your css declarations
