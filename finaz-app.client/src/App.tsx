@@ -1,62 +1,115 @@
 import React from "react";
 import { FormatNumber } from "@ark-ui/react";
-import { Box, Divider, Flex } from "styled-system/jsx";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { Box, Divider, Flex, Grid } from "styled-system/jsx";
+import { IconArrowDownRight, IconArrowUpRight } from "@tabler/icons-react";
 
-import { Heading, MainLayout, RadioButtonGroup, Text } from "@components";
+import { Text, Card, Heading, MainLayout, RadioButtonGroup } from "@components";
 
 export interface IStatCardProps {
   title: string;
+  value: number;
+  data: {
+    percent: number;
+    type: "down" | "up";
+  };
 }
 
-const StatCard = ({ title }: IStatCardProps) => {
+const StatCard = ({ title, value, data }: IStatCardProps) => {
   return (
-    <Flex flexDirection="column" flex={1} px="4" py="5" bg="red.5" borderRadius="lg">
-      <Text as="span" size="md" fontWeight="bold">
-        {title}
-      </Text>
-      <Box mt="3">
-        <Heading as="h3" size="3xl">
-          <FormatNumber value={5000000} />
-        </Heading>
-        <Flex alignItems="center">
-          <IconArrowUpRight
-            size="20"
-            stroke={2}
-            style={{ height: 20, width: 20, color: "green" }}
-          />
-          <Text size="sm" fontWeight="500" color="green" mr="2">
-            32%
-          </Text>
-          <Text size="sm" fontWeight="500">
-            from the last week
-          </Text>
-        </Flex>
-      </Box>
-    </Flex>
+    <Card.Root>
+      <Flex flexDirection="column" px="4" py="5" borderRadius="lg">
+        <Text as="span" size="md" color="neutral.11" fontWeight="medium">
+          {title}
+        </Text>
+        <Box mt="2">
+          <Heading as="h3" fontWeight="semibold" size="3xl">
+            <FormatNumber value={value} style="currency" currency="USD" />
+          </Heading>
+          {data && (
+            <Flex alignItems="center">
+              {data.type === "down" ? (
+                <IconArrowDownRight
+                  size="20"
+                  stroke={2}
+                  style={{ height: 20, width: 20, color: "red" }}
+                />
+              ) : (
+                <IconArrowUpRight
+                  size="20"
+                  stroke={2}
+                  style={{ height: 20, width: 20, color: "green" }}
+                />
+              )}
+              <Text
+                mr="2"
+                size="sm"
+                fontWeight="500"
+                color={data.type === "down" ? "red" : "green"}
+              >
+                {data.percent}%
+              </Text>
+              <Text size="sm" fontWeight="500">
+                desde la ultima semana
+              </Text>
+            </Flex>
+          )}
+        </Box>
+      </Flex>
+    </Card.Root>
   );
 };
 
 function App() {
+  const [filter, setFilter] = React.useState("Este Mes");
+
   const options = [
     { value: "Este Mes" },
     { value: "Ultimo Mes" },
-    { value: "Ultimo trimestre" },
     { value: "Ultimo año" },
+  ];
+
+  const stats: IStatCardProps[] = [
+    {
+      title: "Balance",
+      value: 500000,
+      data: {
+        type: "down",
+        percent: 5,
+      },
+    },
+    {
+      title: "Gastos",
+      value: 500000,
+      data: {
+        type: "up",
+        percent: 5,
+      },
+    },
+    {
+      title: "Ingresos",
+      value: 500000,
+      data: {
+        type: "down",
+        percent: 5,
+      },
+    },
   ];
 
   return (
     <MainLayout>
       <Flex justifyContent="space-between" alignItems="center">
         <Box>
-          <Text as="span" fontWeight="500" color="neutral.11" size="sm">
+          <Text as="span" fontWeight="medium" color="neutral.11" size="md">
             Bienvenido de nuevo,
           </Text>
-          <Heading as="h1" size="2xl">
+          <Heading as="h1" size="3xl">
             Johan Sierra Linares
           </Heading>
         </Box>
-        <RadioButtonGroup.Root defaultValue="Este Mes">
+        <RadioButtonGroup.Root
+          value={filter}
+          onValueChange={(details) => setFilter(details.value)}
+        >
           {options.map((option, id) => (
             <RadioButtonGroup.Item key={id} value={option.value}>
               <RadioButtonGroup.ItemControl />
@@ -68,14 +121,12 @@ function App() {
           ))}
         </RadioButtonGroup.Root>
       </Flex>
-      {/* Stats */}
       <Divider />
-      <Flex justifyContent="space-between" flexWrap="wrap" gap="5">
-        <StatCard title="Gastos" />
-        <StatCard title="Balance" />
-        <StatCard title="Ingresos" />
-        <StatCard title="Ingresos" />
-      </Flex>
+      <Grid columns={3} columnGap="5">
+        {stats.map((stat) => (
+          <StatCard {...stat} />
+        ))}
+      </Grid>
     </MainLayout>
   );
 }
