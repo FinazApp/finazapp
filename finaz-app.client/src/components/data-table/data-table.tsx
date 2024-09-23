@@ -42,7 +42,7 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
   });
 
   return (
-    <Table.Root size="sm">
+    <Table.Root variant="outline" size="sm">
       <Table.Head>
         {table.getHeaderGroups().map((headerGroup) => (
           <Table.Row key={headerGroup.id}>
@@ -59,7 +59,7 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
           </Table.Row>
         ))}
       </Table.Head>
-      <Table.Body overflow="auto">
+      <Table.Body>
         {table.getRowModel().rows.map((row) => (
           <Table.Row key={row.id}>
             {row.getVisibleCells().map((cell) => (

@@ -1,10 +1,10 @@
 import React from "react";
 import { faker } from "@faker-js/faker";
-import { Box } from "styled-system/jsx";
+import { Box, Flex } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
+import { IconClick, IconPlus } from "@tabler/icons-react";
 
-import { IconPlus } from "@tabler/icons-react";
 import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
 
 type Product = {
@@ -44,6 +44,20 @@ const columns = [
         currency="USD"
         value={info.getValue() ?? 0}
       />
+    ),
+  }),
+  columnHelper.accessor("id", {
+    id: "id",
+    header: () => <IconClick size="20" style={{ height: 20, width: 20 }} />,
+    cell: () => (
+      <Flex gap="2" justifyContent="center">
+        <Button size="xs" variant="ghost" colorPalette="accent">
+          Editar
+        </Button>
+        <Button size="xs" variant="ghost" colorPalette="red">
+          Eliminar
+        </Button>
+      </Flex>
     ),
   }),
 ];

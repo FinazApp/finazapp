@@ -18,7 +18,6 @@ const NavLink = ({ title, icon: IconLink, to }: INavLinkProps) => {
           gap="2"
           width="full"
           variant={isActive ? "solid" : "subtle"}
-          fontWeight="normal"
           justifyContent="start"
           _hover={{ colorPalette: "blue" }}
         >

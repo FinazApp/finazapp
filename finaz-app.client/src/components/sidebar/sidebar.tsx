@@ -1,6 +1,6 @@
 import React from "react";
-import { IconHome } from "@tabler/icons-react";
 import { Box, Flex } from "styled-system/jsx";
+import { IconCurrencyDollar, IconHome2, IconPigMoney } from "@tabler/icons-react";
 
 import { NavLink } from "../navlink";
 import { Avatar, Heading, Text } from "../park-ui";
@@ -21,9 +21,9 @@ const Sidebar = () => {
         </Heading>
       </Box>
       <Flex id="Navbar" flexDir="column" flex={1} gap="2" px="4">
-        <NavLink to="/" title="Inicio" icon={IconHome} />
-        <NavLink to="/incomes" title="Ingresos" icon={IconHome} />
-        <NavLink to="/expenses" title="Gastos" icon={IconHome} />
+        <NavLink to="/" title="Inicio" icon={IconHome2} />
+        <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
+        <NavLink to="/expenses" title="Gastos" icon={IconCurrencyDollar} />
       </Flex>
       <Flex px="4" py="2" _hover={{ bg: "red" }} gap="2">
         <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
