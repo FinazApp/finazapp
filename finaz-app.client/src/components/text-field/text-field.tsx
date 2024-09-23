@@ -1,6 +1,5 @@
 import React from "react";
 import { useField } from "formik";
-
 import { Field } from "../park-ui";
 
 export interface ITextFieldProps {
@@ -10,7 +9,12 @@ export interface ITextFieldProps {
   placeholder: string;
 }
 
-const TextField = ({ name, label, helperText, placeholder }: ITextFieldProps) => {
+const TextField = ({
+  name,
+  label,
+  helperText,
+  placeholder,
+}: ITextFieldProps) => {
   const [field, { touched, error }] = useField({ name });
 
   return (

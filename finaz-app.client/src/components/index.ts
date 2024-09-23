@@ -7,3 +7,4 @@ export * from "./data-table";
 export * from "./main-layout";
 export * from "./number-field";
 export * from "./income-form-drawer";
+export * from "./bill-form-drawer";
