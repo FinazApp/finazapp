@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "finaz-app.Server", "finaz-a
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "finaz-app.client", "finaz-app.client\finaz-app.client.esproj", "{63E93D40-A132-4DF8-B550-19440D162BFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "finaz-app.Tests", "Tests\finaz-app.Tests.csproj", "{95C0DE4A-1ED9-44CB-B6E5-776FA0CF64CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "finaz-app.Tests", "finaz-app.Tests\finaz-app.Tests.csproj", "{5DA45C36-2F8E-422D-B9A8-F368752AAC39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,10 @@ Global
 		{63E93D40-A132-4DF8-B550-19440D162BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63E93D40-A132-4DF8-B550-19440D162BFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{63E93D40-A132-4DF8-B550-19440D162BFB}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{95C0DE4A-1ED9-44CB-B6E5-776FA0CF64CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95C0DE4A-1ED9-44CB-B6E5-776FA0CF64CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95C0DE4A-1ED9-44CB-B6E5-776FA0CF64CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95C0DE4A-1ED9-44CB-B6E5-776FA0CF64CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DA45C36-2F8E-422D-B9A8-F368752AAC39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DA45C36-2F8E-422D-B9A8-F368752AAC39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DA45C36-2F8E-422D-B9A8-F368752AAC39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DA45C36-2F8E-422D-B9A8-F368752AAC39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
