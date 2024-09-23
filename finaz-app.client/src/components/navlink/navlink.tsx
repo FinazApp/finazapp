@@ -12,7 +12,7 @@ export interface INavLinkProps {
 
 const NavLink = ({ title, icon: IconLink, to }: INavLinkProps) => {
   return (
-    <NavLinkRRD to={to} style={{ width: "100%" }}>
+    <NavLinkRRD to={to}>
       {({ isActive }) => (
         <Button
           gap="2"

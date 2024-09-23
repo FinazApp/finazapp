@@ -4,7 +4,8 @@ import { Box } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { DataTable, Header } from "@components";
+import { IconPlus } from "@tabler/icons-react";
+import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
 
 type Product = {
   id: number;
@@ -48,12 +49,28 @@ const columns = [
 ];
 
 const IncomesPage = () => {
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
   return (
     <>
-      <Header title="Ingresos" subtitle="Listado de" />
+      <Header
+        title="Ingresos"
+        subtitle="Listado de"
+        rightContent={
+          <Button
+            variant="subtle"
+            colorPalette="accent"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <IconPlus size="22" style={{ height: 22, width: 22 }} />
+            Crear nuevo ingreso
+          </Button>
+        }
+      />
       <Box bg="Background" borderRadius="lg" boxShadow="lg">
         <DataTable<Product> data={products} columns={columns} />
       </Box>
+      <IncomeFormDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
     </>
   );
 };
