@@ -7,7 +7,7 @@ using finaz_app.Server.Models.DTOs;
 using AutoMapper;
 using System.Threading.Tasks;
 
-namespace finaz_app.Tests
+namespace finaz_app.Tests.ControllersTests
 {
     public class IngresosControllerTests
     {
@@ -36,7 +36,8 @@ namespace finaz_app.Tests
 
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
-            Assert.Equal("Ingreso Test", ((Ingreso)createdResult.Value).Nombre);
+            var createdIngreso = Assert.IsType<Ingreso>(createdResult.Value);
+            Assert.Equal("Ingreso Test", createdIngreso.Nombre);
         }
 
         [Fact]
