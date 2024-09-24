@@ -43,7 +43,7 @@ const Drawer = ({
           <ParkDrawer.Body>{children}</ParkDrawer.Body>
           <ParkDrawer.Footer gap="3">
             <ParkDrawer.CloseTrigger asChild>
-              <Button type="button" variant="outline">
+              <Button type="reset" variant="outline">
                 {cancelText}
               </Button>
             </ParkDrawer.CloseTrigger>

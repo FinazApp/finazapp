@@ -1,18 +1,13 @@
 import React from "react";
 import { faker } from "@faker-js/faker";
-import { Box, Flex } from "styled-system/jsx";
+import { Box } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
+import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconClick, IconPlus } from "@tabler/icons-react";
 
 import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
 
-type Product = {
-  id: number;
-  price: number;
-  name: string;
-  category: string;
-};
+type Product = { id: number; name: string; price: number; category: string };
 
 const products: Product[] = Array.from({ length: 50 }, (_, index) => {
   return {
@@ -46,20 +41,6 @@ const columns = [
       />
     ),
   }),
-  columnHelper.accessor("id", {
-    id: "id",
-    header: () => <IconClick size="20" style={{ height: 20, width: 20 }} />,
-    cell: () => (
-      <Flex gap="2" justifyContent="center">
-        <Button size="xs" variant="ghost" colorPalette="accent">
-          Editar
-        </Button>
-        <Button size="xs" variant="ghost" colorPalette="red">
-          Eliminar
-        </Button>
-      </Flex>
-    ),
-  }),
 ];
 
 const IncomesPage = () => {
@@ -69,7 +50,7 @@ const IncomesPage = () => {
     <>
       <Header
         title="Ingresos"
-        subtitle="Listado de"
+        subtitle="{{breadcrumb}}"
         rightContent={
           <Button
             variant="subtle"
@@ -82,7 +63,23 @@ const IncomesPage = () => {
         }
       />
       <Box bg="Background" borderRadius="lg" boxShadow="lg">
-        <DataTable<Product> data={products} columns={columns} />
+        <DataTable<Product>
+          data={products}
+          columns={columns}
+          tableActions={[
+            {
+              title: "Editar",
+              icon: IconPencil,
+              onClick: () => {},
+            },
+            {
+              icon: IconTrash,
+              title: "Eliminar",
+              onClick: () => {},
+              colorPalette: "red",
+            },
+          ]}
+        />
       </Box>
       <IncomeFormDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
     </>

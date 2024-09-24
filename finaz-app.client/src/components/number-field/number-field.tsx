@@ -6,15 +6,16 @@ import { Field, NumberInputProps, NumberInput } from "../park-ui";
 
 export interface INumberFieldProps extends NumberInputProps {
   name: string;
+  label: string;
   helperText?: string;
 }
 
-const NumberField = ({ name, helperText, ...props }: INumberFieldProps) => {
+const NumberField = ({ name, label, helperText, ...props }: INumberFieldProps) => {
   const [field, { touched, error }, { setValue }] = useField({ name });
 
   return (
     <Field.Root invalid={touched && !!error}>
-      <Field.Label>Monto</Field.Label>
+      <Field.Label>{label}</Field.Label>
       <Field.Input asChild>
         <NumberInput
           {...props}

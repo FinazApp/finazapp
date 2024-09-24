@@ -2,6 +2,7 @@ import React from "react";
 import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import { Flex } from "styled-system/jsx";
+
 import { Drawer } from "../drawer";
 import { TextField } from "../text-field";
 import { NumberField } from "../number-field";
@@ -39,7 +40,7 @@ const BillFormDrawer = ({ open, onOpenChange }: IBillFormDrawerProps) => {
         <Form onSubmit={formik.handleSubmit}>
           <Drawer
             open={open}
-            submitText="Crear"
+            submitText="Crear gasto"
             title="Crear un nuevo gasto"
             subtitle="Rellena los datos"
             onOpenChange={(details) => onOpenChange(details.open)}
@@ -55,7 +56,7 @@ const BillFormDrawer = ({ open, onOpenChange }: IBillFormDrawerProps) => {
                 name="categoria"
                 placeholder="Ej: Hogar"
               />
-              <NumberField name="monto" min={0} />
+              <NumberField label="Monto" name="monto" min={0} />
             </Flex>
           </Drawer>
         </Form>

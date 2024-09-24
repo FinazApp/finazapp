@@ -37,10 +37,10 @@ const IncomeFormDrawer = ({ open, onOpenChange }: IIncomeFormDrawerProps) => {
       }}
     >
       {(formik) => (
-        <Form onSubmit={formik.handleSubmit}>
+        <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
           <Drawer
             open={open}
-            submitText="Crear"
+            submitText="Crear ingreso"
             title="Crear un nuevo ingreso"
             subtitle="Rellena el formulario"
             onOpenChange={(details) => onOpenChange(details.open)}
@@ -48,7 +48,7 @@ const IncomeFormDrawer = ({ open, onOpenChange }: IIncomeFormDrawerProps) => {
             <Flex flexDir="column" flex={1} gap={3}>
               <TextField label="Nombre" name="nombre" placeholder="Ej: Alexander" />
               <TextField label="Categoría" name="categoria" placeholder="Hogar" />
-              <NumberField name="monto" min={0} />
+              <NumberField label="Monto" name="monto" min={0} />
             </Flex>
           </Drawer>
         </Form>

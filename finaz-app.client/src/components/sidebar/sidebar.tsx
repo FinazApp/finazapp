@@ -29,7 +29,7 @@ const Sidebar = () => {
         <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
         <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
       </Flex>
-      <Flex px="4" py="2" _hover={{ bg: "red" }} gap="2">
+      <Flex px="4" py="2" _hover={{ bg: "neutral.3" }} cursor="pointer" gap="2">
         <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
         <Box>
           <Text size="sm" fontWeight="semibold">

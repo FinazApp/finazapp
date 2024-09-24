@@ -1,7 +1,13 @@
 import React from "react";
 import { Grid } from "styled-system/jsx";
 
-import { RadioButtonGroup, IKPICardProps, KPICard, Header } from "@components";
+import {
+  RadioButtonGroup,
+  IKPICardProps,
+  KPICard,
+  Header,
+  Card,
+} from "@components";
 
 const DashboardPage = () => {
   const [filter, setFilter] = React.useState("Este Mes");
@@ -61,10 +67,18 @@ const DashboardPage = () => {
           </RadioButtonGroup.Root>
         }
       />
-      <Grid columns={3} columnGap="5">
+      <Grid columns={{ sm: 1, md: 2, lg: 3 }} columnGap={5} rowGap={5}>
         {stats.map((stat) => (
           <KPICard {...stat} />
         ))}
+      </Grid>
+      <Grid columns={3} columnGap={5} rowGap={5}>
+        <Card.Root h="full" p="2">
+          {`{{charts}}`}
+        </Card.Root>
+        <Card.Root h="full" columnSpan="all" p="2">
+          {`{{table}}`}
+        </Card.Root>
       </Grid>
     </>
   );
