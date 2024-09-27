@@ -17,7 +17,7 @@ const Header = ({ subtitle, title, rightContent }: IHeaderProps) => {
           <Text as="span" fontWeight="medium" color="neutral.11" size="md">
             {subtitle}
           </Text>
-          <Heading as="h1" size="3xl">
+          <Heading as="h1" size={["2xl", "3xl"]}>
             {title}
           </Heading>
         </Box>
