@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
@@ -21,6 +22,7 @@ namespace finaz_app.Server.Controllers
 
         // GET: api/Usuarios
         [HttpGet]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UsuariosDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UsuariosDTO>>> GetUsuarios()

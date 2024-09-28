@@ -6,8 +6,8 @@
 
         public string Nombre { get; set; } = null!;
 
-        public string? Tipo { get; set; }
-
         public string? Descripcion { get; set; }
+
+        public virtual UsuariosDTO? Usuario { get; set; }
     }
 }

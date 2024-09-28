@@ -12,15 +12,18 @@ public partial class Categoria
 
     public string Nombre { get; set; } = null!;
 
-    public string? Tipo { get; set; }
-
     public string? Descripcion { get; set; }
 
     public int? Estado { get; set; }
+
+    public int? UsuarioId { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
 
     [JsonIgnore]
     public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+
+    [JsonIgnore]
+    public virtual Usuario? Usuario { get; set; }
 }

@@ -17,6 +17,10 @@ public partial class Usuario
     public string? PasswordHash { get; set; }
 
     public int? Estado { get; set; }
+    public string? Rol { get; set; }
+
+    [JsonIgnore]
+    public virtual ICollection<Categoria> Categoria { get; set; } = new List<Categoria>();
 
     [JsonIgnore]
     public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();

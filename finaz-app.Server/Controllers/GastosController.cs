@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "usuario, admin")]
     public class GastosController : ControllerBase
     {
         private readonly FinanzAppContext _context;

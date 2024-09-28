@@ -32,12 +32,14 @@ public partial class FinanzAppContext : DbContext
         {
             entity.HasKey(e => e.CategoriaId).HasName("CAT_CategoriaID_PK");
 
-            entity.Property(e => e.CategoriaId)
-            .ValueGeneratedOnAdd()
-            .HasColumnName("CategoriaID");
+            entity.Property(e => e.CategoriaId).HasColumnName("CategoriaID");
             entity.Property(e => e.Descripcion).HasMaxLength(100);
             entity.Property(e => e.Nombre).HasMaxLength(100);
-            entity.Property(e => e.Tipo).HasMaxLength(100);
+            entity.Property(e => e.UsuarioId).HasColumnName("UsuarioID");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Categoria)
+                .HasForeignKey(d => d.UsuarioId)
+                .HasConstraintName("CAT_USR_USUARIOID_FK");
         });
 
         modelBuilder.Entity<Gasto>(entity =>
@@ -88,12 +90,13 @@ public partial class FinanzAppContext : DbContext
 
             entity.HasIndex(e => e.Correo, "UQ__Usuarios__60695A19A3DBD5FB").IsUnique();
 
-            entity.Property(e => e.UsuarioId)
-            .ValueGeneratedOnAdd()
-            .HasColumnName("UsuarioID");
+            entity.Property(e => e.UsuarioId).HasColumnName("UsuarioID");
             entity.Property(e => e.Correo).HasMaxLength(100);
             entity.Property(e => e.Nombre).HasMaxLength(100);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.Rol)
+                .HasMaxLength(10)
+                .HasDefaultValue("usuario");
         });
 
         OnModelCreatingPartial(modelBuilder);
