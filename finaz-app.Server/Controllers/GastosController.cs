@@ -6,23 +6,43 @@ using Microsoft.EntityFrameworkCore;
 using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
+    /// <summary>
+    /// Controlador API para la gestión de gastos en FinanzApp.
+    /// </summary>
+    /// <remarks>
+    /// Este controlador maneja las operaciones CRUD para los gastos, como listar, obtener, 
+    /// crear, actualizar y eliminar gastos.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "usuario, admin")]
     public class GastosController : ControllerBase
     {
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor del controlador GastosController.
+        /// </summary>
+        /// <param name="context">Contexto de la base de datos de FinanzApp.</param>
+        /// <param name="mapper">Instancia de AutoMapper para mapear entidades a DTOs.</param>
         public GastosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: api/Gastoes
+        /// <summary>
+        /// Obtiene todos los gastos.
+        /// </summary>
+        /// <returns>Una lista de objetos GastosDTO.</returns>
+        /// <response code="200">Devuelve la lista de gastos.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="403">Prohibido.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GastosDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -42,12 +62,19 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                // Manejo de error
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
 
-        // GET: api/Gastoes/5
+        /// <summary>
+        /// Obtiene un gasto específico por su ID.
+        /// </summary>
+        /// <param name="id">ID del gasto a obtener.</param>
+        /// <returns>El objeto GastosDTO correspondiente al ID proporcionado.</returns>
+        /// <response code="200">Devuelve el gasto solicitado.</response>
+        /// <response code="404">No se encontró el gasto.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="403">Prohibido.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GastosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -73,7 +100,15 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // PUT: api/Gastoes/5
+        /// <summary>
+        /// Actualiza un gasto existente.
+        /// </summary>
+        /// <param name="id">ID del gasto a actualizar.</param>
+        /// <param name="gasto">Objeto Gasto con los datos actualizados.</param>
+        /// <returns>Resultado de la operación.</returns>
+        /// <response code="204">Gasto actualizado correctamente.</response>
+        /// <response code="400">El ID proporcionado no coincide con el ID del gasto.</response>
+        /// <response code="404">No se encontró el gasto.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,7 +145,13 @@ namespace finaz_app.Server.Controllers
             return NoContent();
         }
 
-        // POST: api/Gastoes
+        /// <summary>
+        /// Crea un nuevo gasto.
+        /// </summary>
+        /// <param name="gasto">Objeto Gasto a crear.</param>
+        /// <returns>El objeto Gasto creado.</returns>
+        /// <response code="201">Gasto creado correctamente.</response>
+        /// <response code="400">Solicitud incorrecta.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Gasto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -129,7 +170,13 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // DELETE: api/Gastoes/5
+        /// <summary>
+        /// Elimina un gasto existente por su ID.
+        /// </summary>
+        /// <param name="id">ID del gasto a eliminar.</param>
+        /// <returns>Resultado de la operación.</returns>
+        /// <response code="204">Gasto eliminado correctamente.</response>
+        /// <response code="404">No se encontró el gasto.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -154,6 +201,11 @@ namespace finaz_app.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Verifica si un gasto existe en la base de datos.
+        /// </summary>
+        /// <param name="id">ID del gasto a verificar.</param>
+        /// <returns>True si el gasto existe, de lo contrario false.</returns>
         private bool GastoExists(int id)
         {
             try
