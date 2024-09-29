@@ -1,5 +1,8 @@
 ﻿namespace finaz_app.Server.Models.DTOs
 {
+    /// <summary>
+    /// Representa un objeto de transferencia de datos (DTO) para un ingreso.
+    /// </summary>
     public class IngresosDTO
     {
         public int IngresosId { get; set; }
