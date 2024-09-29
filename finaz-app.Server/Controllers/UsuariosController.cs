@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
+    /// <summary>
+    /// Controlador para gestionar las operaciones CRUD de los usuarios en el sistema.
+    /// </summary>
+    /// <remarks>
+    /// Este controlador permite realizar operaciones como obtener, crear, modificar y eliminar usuarios.
+    /// Algunas rutas están protegidas para que solo usuarios con el rol de "admin" puedan acceder.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
@@ -14,13 +21,23 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor del controlador de usuarios.
+        /// </summary>
+        /// <param name="context">El contexto de la base de datos para FinanzApp.</param>
+        /// <param name="mapper">Instancia de IMapper para mapear entidades a DTOs.</param>
         public UsuariosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: api/Usuarios
+        /// <summary>
+        /// Obtiene todos los usuarios.
+        /// </summary>
+        /// <returns>Devuelve una lista de usuarios en formato DTO.</returns>
+        /// <response code="200">Operación exitosa, devuelve la lista de usuarios.</response>
+        /// <response code="500">Error interno del servidor al obtener los usuarios.</response>
         [HttpGet]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UsuariosDTO>), StatusCodes.Status200OK)]
@@ -40,7 +57,14 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // GET: api/Usuarios/5
+        /// <summary>
+        /// Obtiene un usuario específico por ID.
+        /// </summary>
+        /// <param name="id">El ID del usuario a obtener.</param>
+        /// <returns>Devuelve el usuario en formato DTO.</returns>
+        /// <response code="200">Operación exitosa, devuelve el usuario.</response>
+        /// <response code="404">Usuario no encontrado.</response>
+        /// <response code="500">Error interno del servidor al obtener el usuario.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,7 +88,16 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // PUT: api/Usuarios/5
+        /// <summary>
+        /// Actualiza un usuario existente.
+        /// </summary>
+        /// <param name="id">El ID del usuario a actualizar.</param>
+        /// <param name="usuario">Objeto de usuario con los datos actualizados.</param>
+        /// <returns>Devuelve un código de éxito o error.</returns>
+        /// <response code="204">El usuario se actualizó exitosamente.</response>
+        /// <response code="400">El ID del usuario no coincide con el parámetro proporcionado.</response>
+        /// <response code="404">Usuario no encontrado.</response>
+        /// <response code="500">Error interno del servidor al actualizar el usuario.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -101,7 +134,14 @@ namespace finaz_app.Server.Controllers
             return NoContent();
         }
 
-        // POST: api/Usuarios
+        /// <summary>
+        /// Crea un nuevo usuario.
+        /// </summary>
+        /// <param name="usuario">El objeto de usuario a crear.</param>
+        /// <returns>Devuelve el usuario creado y su ID.</returns>
+        /// <response code="201">El usuario se creó exitosamente.</response>
+        /// <response code="400">Datos de entrada inválidos.</response>
+        /// <response code="500">Error interno del servidor al crear el usuario.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -120,7 +160,14 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // DELETE: api/Usuarios/5
+        /// <summary>
+        /// Elimina un usuario existente.
+        /// </summary>
+        /// <param name="id">El ID del usuario a eliminar.</param>
+        /// <returns>Devuelve un código de éxito o error.</returns>
+        /// <response code="204">El usuario se eliminó exitosamente.</response>
+        /// <response code="404">Usuario no encontrado.</response>
+        /// <response code="500">Error interno del servidor al eliminar el usuario.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -145,6 +192,11 @@ namespace finaz_app.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Verifica si un usuario existe en la base de datos.
+        /// </summary>
+        /// <param name="id">El ID del usuario a verificar.</param>
+        /// <returns>True si el usuario existe, false en caso contrario.</returns>
         private bool UsuarioExists(int id)
         {
             try
@@ -157,4 +209,5 @@ namespace finaz_app.Server.Controllers
             }
         }
     }
+
 }

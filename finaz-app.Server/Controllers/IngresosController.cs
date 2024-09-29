@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
+    /// <summary>
+    /// Controlador API para la gestión de ingresos en FinanzApp.
+    /// </summary>
+    /// <remarks>
+    /// Este controlador maneja las operaciones CRUD para los ingresos, como listar, obtener, 
+    /// crear, actualizar y eliminar ingresos.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "usuario, admin")]
@@ -15,13 +22,25 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor del controlador IngresosController.
+        /// </summary>
+        /// <param name="context">Contexto de la base de datos de FinanzApp.</param>
+        /// <param name="mapper">Instancia de AutoMapper para mapear entidades a DTOs.</param>
         public IngresosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: api/Ingresoes
+        /// <summary>
+        /// Obtiene todos los ingresos.
+        /// </summary>
+        /// <returns>Una lista de objetos IngresosDTO.</returns>
+        /// <response code="200">Devuelve la lista de ingresos.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="403">Prohibido.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<IngresosDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -32,8 +51,8 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var ingresos = await _context.Ingresos
-                    .Include(g => g.Usuario)
-                    .Include(g => g.Categoria)
+                    .Include(i => i.Usuario)
+                    .Include(i => i.Categoria)
                     .ToListAsync();
 
                 var ingresosDTO = _mapper.Map<IEnumerable<IngresosDTO>>(ingresos);
@@ -42,12 +61,20 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                // Manejo de error
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
 
-        // GET: api/Ingresoes/5
+        /// <summary>
+        /// Obtiene un ingreso específico por su ID.
+        /// </summary>
+        /// <param name="id">ID del ingreso a obtener.</param>
+        /// <returns>El objeto IngresosDTO correspondiente al ID proporcionado.</returns>
+        /// <response code="200">Devuelve el ingreso solicitado.</response>
+        /// <response code="404">No se encontró el ingreso.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="403">Prohibido.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(IngresosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,12 +97,20 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                // Manejo de error
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al obtener el ingreso: {ex.Message}");
             }
         }
 
-        // PUT: api/Ingresoes/5
+        /// <summary>
+        /// Actualiza un ingreso existente.
+        /// </summary>
+        /// <param name="id">ID del ingreso a actualizar.</param>
+        /// <param name="ingreso">Objeto Ingreso con los datos actualizados.</param>
+        /// <returns>Resultado de la operación.</returns>
+        /// <response code="204">Ingreso actualizado correctamente.</response>
+        /// <response code="400">El ID proporcionado no coincide con el ID del ingreso.</response>
+        /// <response code="404">No se encontró el ingreso.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -113,7 +148,14 @@ namespace finaz_app.Server.Controllers
             return NoContent();
         }
 
-        // POST: api/Ingresoes
+        /// <summary>
+        /// Crea un nuevo ingreso.
+        /// </summary>
+        /// <param name="ingreso">Objeto Ingreso a crear.</param>
+        /// <returns>El objeto Ingreso creado.</returns>
+        /// <response code="201">Ingreso creado correctamente.</response>
+        /// <response code="400">Solicitud incorrecta.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Ingreso), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -133,7 +175,14 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        // DELETE: api/Ingresoes/5
+        /// <summary>
+        /// Elimina un ingreso existente por su ID.
+        /// </summary>
+        /// <param name="id">ID del ingreso a eliminar.</param>
+        /// <returns>Resultado de la operación.</returns>
+        /// <response code="204">Ingreso eliminado correctamente.</response>
+        /// <response code="404">No se encontró el ingreso.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -159,6 +208,11 @@ namespace finaz_app.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Verifica si un ingreso existe en la base de datos.
+        /// </summary>
+        /// <param name="id">ID del ingreso a verificar.</param>
+        /// <returns>True si el ingreso existe, de lo contrario false.</returns>
         private bool IngresoExists(int id)
         {
             try
