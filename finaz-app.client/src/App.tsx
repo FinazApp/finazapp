@@ -5,7 +5,7 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 
-import { MainLayout } from "@components";
+import { ErrorBoundary, MainLayout } from "@components";
 import { DashboardPage, IncomesPage, BillsPage } from "@pages";
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
     {
       path: "/",
       element: <MainLayout withOutlet />,
+      errorElement: <ErrorBoundary />,
       children: [
         {
           path: "",
