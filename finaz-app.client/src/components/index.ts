@@ -8,3 +8,4 @@ export * from "./main-layout";
 export * from "./number-field";
 export * from "./income-form-drawer";
 export * from "./bill-form-drawer";
+export * from "../pages/Register";

@@ -5,7 +5,7 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 
-import { MainLayout } from "@components";
+import { MainLayout, RegisterPage } from "@components";
 import { DashboardPage, IncomesPage, BillPage } from "@pages";
 
 function App() {
@@ -26,6 +26,10 @@ function App() {
         {
           path: "bills",
           element: <BillPage />,
+        },
+        {
+          path: "register",
+          element: <RegisterPage />,
         },
       ],
     },
