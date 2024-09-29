@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
 
+/// <summary>
+/// Representa una categoría de gastos o ingresos en la aplicación.
+/// </summary>
 public partial class Categoria
 {
     [BindNever]

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
-
+/// <summary>
+/// Representa un usuario en la aplicación.
+/// </summary>
 public partial class Usuario
 {
     [BindNever]
