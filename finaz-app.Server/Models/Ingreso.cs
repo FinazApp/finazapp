@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
 
+/// <summary>
+/// Representa un ingreso en la aplicación.
+/// </summary>
 public partial class Ingreso
 {
     [BindNever]
