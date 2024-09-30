@@ -7,6 +7,7 @@ import {
 
 import { MainLayout, RegisterPage } from "@components";
 import { DashboardPage, IncomesPage, BillPage } from "@pages";
+import { LoginPage } from "./pages/Login";
 
 function App() {
   const routes: RouteObject[] = [
@@ -30,6 +31,10 @@ function App() {
         {
           path: "register",
           element: <RegisterPage />,
+        },
+        {
+          path: "login",
+          element: <LoginPage />,
         },
       ],
     },

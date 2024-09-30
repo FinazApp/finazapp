@@ -5,12 +5,9 @@ import { Input } from "src/components/park-ui/styled/field";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const validationSchema = Yup.object({
     nombre: Yup.string().required("El nombre de usuario es obligatorio"),
-    correo: Yup.string()
-      .email("Correo inválido")
-      .required("El correo es obligatorio"),
     contrasena: Yup.string()
       .min(6, "La contraseña debe tener al menos 6 caracteres")
       .required("La contraseña es obligatoria"),
@@ -19,23 +16,23 @@ const RegisterPage = () => {
   const formik = useFormik({
     initialValues: {
       nombre: "",
-      correo: "",
       contrasena: "",
     },
     validationSchema,
     onSubmit: (values) => {
       console.log("Datos enviados:", values);
-      // johan brega Aquí puedes manejar el envío del formulario
+      // Aquí puedes manejar el envío del formulario
     },
   });
 
   return (
     <Box
       display="flex"
-      justifyContent="center"
+      justifyContent="space-between"
       alignItems="center"
       minHeight="100vh"
       bgColor="#f5f5f5"
+      padding="0 40px"
     >
       <Box
         width="470px"
@@ -53,7 +50,7 @@ const RegisterPage = () => {
             fontWeight: "bold",
           }}
         >
-          CREAR CUENTA
+          INICIAR SESIÓN
         </h1>
         <p
           style={{
@@ -62,8 +59,9 @@ const RegisterPage = () => {
             color: "grey",
           }}
         >
-          Rellena para crear una nueva cuenta
+          Bienvenido/a, rellena para ingresar
         </p>
+
         <form onSubmit={formik.handleSubmit}>
           <label
             htmlFor="nombre"
@@ -93,32 +91,6 @@ const RegisterPage = () => {
               }}
             >
               {formik.errors.nombre}
-            </p>
-          ) : null}
-
-          <label
-            htmlFor="correo"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            Correo Electrónico:
-          </label>
-          <Input
-            id="correo"
-            name="correo"
-            type="email"
-            placeholder="Correo Electrónico"
-            value={formik.values.correo}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            style={{
-              width: "97%",
-              marginBottom: "16px",
-              backgroundColor: "white",
-            }}
-          />
-          {formik.touched.correo && formik.errors.correo ? (
-            <p style={{ color: "red", marginBottom: "16px" }}>
-              {formik.errors.correo}
             </p>
           ) : null}
 
@@ -155,7 +127,7 @@ const RegisterPage = () => {
             background="black"
             style={{ width: "97%" }}
           >
-            Registrarte
+            INICIAR SESIÓN
           </Button>
         </form>
         <p
@@ -166,17 +138,37 @@ const RegisterPage = () => {
             fontSize: "13px",
           }}
         >
-          ¿Ya tienes cuenta?{" "}
+          ¿No te has registrado aun?{" "}
           <a
             href="#"
             style={{ fontSize: "14px", color: "black", fontWeight: "600" }}
           >
-            Iniciar sesión!
+            Regístrate!
           </a>
         </p>
+      </Box>
+
+      <Box
+        width="66%"
+        display="flex"
+        justifyContent="right"
+        alignItems="center"
+        padding="5px"
+        margin="-60px"
+        height="105vh" // Asegura que el contenedor tenga la altura completa de la ventana
+      >
+        <img
+          src="src/assets/imag.jpeg"
+          alt="Imagen a la derecha"
+          style={{
+            maxWidth: "100%",
+            height: "100%",
+            //objectFit: "cover",
+          }}
+        />
       </Box>
     </Box>
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
