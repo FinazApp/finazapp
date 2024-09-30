@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 import { ErrorBoundary, MainLayout } from "@components";
-import { DashboardPage, IncomesPage, BillsPage, RegisterPage } from "@pages";
+import { DashboardPage, IncomesPage, BillsPage, RegisterPage, LoginPage } from "@pages";
 
 function App() {
   const routes: RouteObject[] = [
@@ -31,8 +31,14 @@ function App() {
       ],
     },
     {
+      id: "register-page",
       path: "register",
       element: <RegisterPage />,
+    },
+    {
+      id: "login-page",
+      path: "login",
+      element: <LoginPage />,
     },
   ];
 

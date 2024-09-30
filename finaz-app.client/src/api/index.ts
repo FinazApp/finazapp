@@ -1,1 +1,1 @@
-export { default as RegisterApi } from "./register-api";
+export { default as AuthApi } from "./auth-api";

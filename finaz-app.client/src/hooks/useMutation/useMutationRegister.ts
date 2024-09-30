@@ -1,12 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { Tags } from "@core";
-import { RegisterApi } from "@api";
+import { AuthApi } from "@api";
 
 export const useRegister = () => {
   return useMutation({
-    mutationFn: RegisterApi.register,
+    mutationFn: AuthApi.register,
     mutationKey: [Tags.REGISTER_USER, Tags.MUTATION_CREATE],
+  });
+};
+
+
+export const useLogin = () => {
+  return useMutation({
+    mutationFn: AuthApi.login,
+    mutationKey: [Tags.LOGIN_USER, Tags.MUTATION_CREATE],
   });
 };
 
