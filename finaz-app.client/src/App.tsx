@@ -18,19 +18,18 @@ function App() {
         {
           path: "",
           index: true,
+          id: "dashboard-page",
           element: <DashboardPage />,
         },
         {
           path: "incomes",
+          id: "incomes-page",
           element: <IncomesPage />,
         },
         {
           path: "bills",
+          id: "bills-page",
           element: <BillsPage />,
-        },
-        {
-          path: "login",
-          element: <LoginPage />,
         },
       ],
     },
