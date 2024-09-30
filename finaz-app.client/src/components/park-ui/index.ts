@@ -1,6 +1,7 @@
 export * from "./card";
 export * from "./menu";
 export * from "./text";
+export * from "./link";
 export * from "./table";
 export * from "./alert";
 export * from "./input";

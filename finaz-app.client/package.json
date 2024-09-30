@@ -16,7 +16,11 @@
   "dependencies": {
     "@ark-ui/react": "^3.12.1",
     "@tabler/icons-react": "^3.17.0",
+    "@tanstack/query-sync-storage-persister": "^5.56.2",
+    "@tanstack/react-query": "^5.56.2",
+    "@tanstack/react-query-persist-client": "^5.56.2",
     "@tanstack/react-table": "^8.20.5",
+    "axios": "^1.7.7",
     "formik": "^2.4.6",
     "radash": "^12.1.0",
     "react": "^18.3.1",
