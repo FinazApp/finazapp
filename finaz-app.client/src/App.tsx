@@ -28,6 +28,10 @@ function App() {
           path: "bills",
           element: <BillsPage />,
         },
+        {
+          path: "login",
+          element: <LoginPage />,
+        },
       ],
     },
     {
