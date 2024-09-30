@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 import { ErrorBoundary, MainLayout } from "@components";
-import { DashboardPage, IncomesPage, BillsPage } from "@pages";
+import { DashboardPage, IncomesPage, BillsPage, RegisterPage } from "@pages";
 
 function App() {
   const routes: RouteObject[] = [
@@ -29,6 +29,10 @@ function App() {
           element: <BillsPage />,
         },
       ],
+    },
+    {
+      path: "register",
+      element: <RegisterPage />,
     },
   ];
 
