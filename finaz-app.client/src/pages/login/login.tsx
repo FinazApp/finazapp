@@ -31,7 +31,7 @@ const LoginPage = () => {
           boxShadow="lg"
           bg="Background"
           borderRadius="lg"
-          px={{ mdDown: 6, lg: 8 }}
+          px={{ mdDown: 6, md: 6, lg: 8 }}
         >
           <Box mb="5">
             <Heading as="h1" textAlign="center" fontSize="3xl">
