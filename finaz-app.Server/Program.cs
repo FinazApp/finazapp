@@ -27,6 +27,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false
         };
+
+        // Extraer el token de las cookies
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Verifica si hay cookies
+                var token = context.Request.Cookies["JWT"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // añadir autoMapper
@@ -48,6 +63,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUIConfiguration();
 }
 
+// Middleware personalizado para extraer el JWT de la cookie
+app.UseMiddleware<JwtFromCookieMiddleware>();
 app.UseHttpsRedirection();
 app.UseCorsConfiguration();
 app.UseCookiesConfiguration();

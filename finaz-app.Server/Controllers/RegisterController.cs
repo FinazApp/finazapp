@@ -43,7 +43,7 @@ namespace finaz_app.Server.Controllers
         /// <response code="400">Los campos de entrada son inválidos, por ejemplo, el rol o el formato del correo no son válidos.</response>
         /// <response code="409">Conflicto, el nombre de usuario o correo electrónico ya está en uso.</response>
         /// <response code="500">Error interno del servidor, relacionado con la base de datos o el proceso de registro.</response>
-        [HttpPost("Registrar")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

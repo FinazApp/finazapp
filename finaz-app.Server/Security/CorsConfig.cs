@@ -29,9 +29,20 @@ namespace finaz_app.Server.Security
                     builder.AllowAnyMethod();
 
                     /// <summary>
-                    /// Permite cualquier origen en las solicitudes CORS.
+                    /// Permite una lista de origen en las solicitudes CORS.
                     /// </summary>
-                    builder.AllowAnyOrigin();
+                    builder.WithOrigins("http://127.0.0.1:3000", "https://localhost:3000",
+                        "http://localhost:80",
+                            "http://localhost:443",
+                            "http://localhost:4000",
+                            "http://localhost:5000",
+                            "http://localhost:8000",
+                            "http://localhost:8080");
+
+                    /// <summary>
+                    /// Habilita el envío de credenciales de autenticación en las solicitudes HTTP. Esto permite que las credenciales (como cookies o autenticación básica) sean enviadas en el encabezado (header) de las solicitudes.
+                    /// </summary>
+                    builder.AllowCredentials();
                 });
             });
         }
