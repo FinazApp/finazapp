@@ -26,6 +26,11 @@ jobs:
       - name: Restore .NET dependencies
         run: dotnet restore ./finaz-app.Server/finaz-app.Server.csproj
 
+      - name: Create HTTPS Development Certificate
+        run: |
+          mkdir -p $HOME/.aspnet/https
+          dotnet dev-certs https --trust --export-path "$HOME/.aspnet/https/finaz-app.client.pem" --format Pem --no-password
+
       - name: Build .NET project
         run: dotnet build ./finaz-app.Server/finaz-app.Server.csproj --configuration Release
 
