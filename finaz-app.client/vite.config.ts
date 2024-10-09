@@ -28,6 +28,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     ], { stdio: 'inherit' });
 
     if (result.status !== 0) {
+        console.error("Error creating certificate:", result.stderr.toString());
         throw new Error("Could not create certificate.");
     }
 }
