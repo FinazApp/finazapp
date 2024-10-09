@@ -225,5 +225,46 @@ namespace finaz_app.Server.Controllers
                 return false;
             }
         }
+
+        /// <summary>
+        /// Genera un reporte de ingresos en un rango de fechas.
+        /// </summary>
+        /// <param name="fechaInicio">Fecha de inicio del reporte.</param>
+        /// <param name="fechaFin">Fecha de fin del reporte.</param>
+        /// <returns>Un resumen con los ingresos en el periodo seleccionado.</returns>
+        [HttpGet("reportes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GenerarReporte(DateTime fechaInicio, DateTime fechaFin)
+        {
+            if (fechaInicio > fechaFin)
+            {
+                return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+            }
+
+            try
+            {
+                // Obtener los ingresos en el rango de fechas
+                var ingresos = await _context.Ingresos
+                    .Where(i => i.FechaCreacion >= fechaInicio && i.FechaCreacion <= fechaFin)
+                    .ToListAsync();
+
+                // Calcular el total de ingresos
+                var totalIngresos = ingresos.Sum(i => i.Monto);
+
+                // Crear un objeto resumen
+                var reporte = new 
+                {
+                    TotalIngresos = totalIngresos,
+                    DetallesIngresos = ingresos
+                };
+
+                return Ok(reporte);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al generar el reporte: {ex.Message}");
+            }
+        }
     }
 }
