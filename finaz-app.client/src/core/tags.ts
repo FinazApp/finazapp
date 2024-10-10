@@ -1,4 +1,7 @@
+export const BILLS = "BILLS";
+export const INCOMES = "INCOMES";
 export const LOGIN_USER = "LOGIN_USER";
+export const CATEGORIES = "CATEGORIES";
 export const REGISTER_USER = "REGISTER_USER";
 
 //--------------------------------------------------------------------------------------//

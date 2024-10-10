@@ -15,18 +15,3 @@ export const DrawersReducer = (
 
   return state;
 };
-
-type ModalAction =
-  | { type: "CLOSE_MODAL" }
-  | { type: "OPEN_MODAL"; payload: number };
-
-export const ModalsReducer = (
-  state: ReducerState,
-  action: ModalAction,
-): ReducerState => {
-  if (action.type === "OPEN_MODAL")
-    return { ...state, open: true, id: action.payload };
-  if (action.type === "CLOSE_MODAL") return { id: 0, open: false };
-
-  return state;
-};

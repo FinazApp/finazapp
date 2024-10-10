@@ -1,38 +1,29 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
 import { Box } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
+import { Reducers } from "@core";
+import { IBills } from "@interfaces";
+import { useFetchBills } from "@hooks";
 import { Button, DataTable, Header, BillFormDrawer } from "@components";
 
-type Product = { id: number; price: number; name: string; category: string };
-
-const products: Product[] = Array.from({ length: 50 }, (_, index) => {
-  return {
-    id: index,
-    price: parseInt(faker.commerce.price(), 10),
-    name: faker.commerce.product(),
-    category: faker.helpers.arrayElement(["Hogar", "Vehículo", "Supermercado"]),
-  };
-});
-
-const columnHelper = createColumnHelper<Product>();
+const columnHelper = createColumnHelper<IBills>();
 
 const columns = [
-  columnHelper.accessor("name", {
-    id: "name",
+  columnHelper.accessor("nombre", {
+    id: "nombre",
     header: "Nombre",
     cell: (info) => <b>{info.getValue()}</b>,
   }),
-  columnHelper.accessor("category", {
+  columnHelper.accessor("categoria.nombre", {
     id: "category",
     header: "Categoría",
   }),
-  columnHelper.accessor("price", {
-    id: "price",
-    header: "Precio",
+  columnHelper.accessor("monto", {
+    id: "amount",
+    header: "Monto",
     cell: (info) => (
       <FormatNumber
         style="currency"
@@ -44,7 +35,13 @@ const columns = [
 ];
 
 const BillsPage = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const bills = useFetchBills();
+  console.log("🚀 ~ BillsPage ~ bills:", bills)
+
+  const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
+    id: 0,
+    open: false,
+  });
 
   return (
     <>
@@ -55,7 +52,7 @@ const BillsPage = () => {
           <Button
             variant="subtle"
             colorPalette="accent"
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => dispatch({ type: "OPEN_DRAWER", payload: 0 })}
           >
             <IconPlus size="22" style={{ height: 22, width: 22 }} />
             Crear nuevo gasto
@@ -63,14 +60,15 @@ const BillsPage = () => {
         }
       />
       <Box bg="Background" borderRadius="lg" boxShadow="lg">
-        <DataTable<Product>
-          data={products}
+        <DataTable<IBills>
+          data={bills.data ?? []}
           columns={columns}
-          tableActions={[
+          tableActions={(data) => [
             {
               title: "Editar",
               icon: IconPencil,
-              onClick: () => {},
+              onClick: () =>
+                dispatch({ type: "OPEN_DRAWER", payload: data.gastosId }),
             },
             {
               icon: IconTrash,
@@ -81,7 +79,11 @@ const BillsPage = () => {
           ]}
         />
       </Box>
-      <BillFormDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+      <BillFormDrawer
+        id={state.id}
+        open={state.open}
+        onOpenChange={() => dispatch({ type: "CLOSE_DRAWER" })}
+      />
     </>
   );
 };
