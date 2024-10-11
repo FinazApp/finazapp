@@ -74,7 +74,7 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var categoria = await _context.Categorias.FindAsync(id);
+                var categoria = await _context.Categorias.Include(g => g.Usuario).SingleOrDefaultAsync(a => a.CategoriaId == id);
                 var categoriasDTO = _mapper.Map<CategoriasDTO>(categoria);
 
                 if (categoriasDTO == null)
