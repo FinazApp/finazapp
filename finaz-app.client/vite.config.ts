@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { env } from 'process';
-import { defineConfig } from 'vite';
 import child_process from 'child_process';
 import plugin from '@vitejs/plugin-react';
+import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -39,25 +39,39 @@ const target = env.ASPNETCORE_HTTPS_PORT
         ? env.ASPNETCORE_URLS.split(';')[0]
         : 'https://localhost:7111';
 
-export default defineConfig({
-    plugins: [plugin(), tsconfigPaths({ root: './' })],
-    resolve: {
-        alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
-        }
-    },
-    server: {
-        proxy: {
-            '/api': {
-                target,
-                changeOrigin: true,
-                secure: false,
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), "");
+
+    return {
+        define: {
+            "process.env.SERVER_URL": JSON.stringify(
+                env.SERVER_URL,
+            ),
+        },
+        plugins: [plugin(), tsconfigPaths({ root: './' })],
+        resolve: {
+            alias: {
+                '@': fileURLToPath(new URL('./src', import.meta.url))
             }
         },
-        port: 5173,
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
+        server: {
+            proxy: {
+                '^/swagger': {
+                    target,
+                    secure: false
+                },
+                '^/api': {
+                    target,
+                    secure: false,
+                    changeOrigin: true,
+                }
+            },
+            port: 5173,
+            https: {
+                key: fs.readFileSync(keyFilePath),
+                cert: fs.readFileSync(certFilePath),
+            }
         }
     }
 });
