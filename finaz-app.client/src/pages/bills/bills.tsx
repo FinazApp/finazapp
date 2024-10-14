@@ -6,8 +6,9 @@ import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { IBills } from "@interfaces";
-import { useFetchBills } from "@hooks";
+import { useDeleteBills, useFetchBills } from "@hooks";
 import { Button, DataTable, Header, BillFormDrawer } from "@components";
+import toast from "react-hot-toast";
 
 const columnHelper = createColumnHelper<IBills>();
 
@@ -36,7 +37,7 @@ const columns = [
 
 const BillsPage = () => {
   const bills = useFetchBills();
-  console.log("🚀 ~ BillsPage ~ bills:", bills)
+  const deleteBill = useDeleteBills();
 
   const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
     id: 0,
@@ -73,7 +74,13 @@ const BillsPage = () => {
             {
               icon: IconTrash,
               title: "Eliminar",
-              onClick: () => {},
+              onClick: () => {
+                return toast.promise(deleteBill.mutateAsync(data.gastosId), {
+                  error: (e) => e,
+                  loading: `Eliminando gasto ${data.nombre}...`,
+                  success: `Gasto ${data.nombre} eliminado correctamente.`
+                });
+              },
               colorPalette: "red",
             },
           ]}

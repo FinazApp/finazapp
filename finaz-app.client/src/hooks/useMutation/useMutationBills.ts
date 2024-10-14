@@ -24,4 +24,13 @@ export const useUpdateBills = () => {
   });
 };
 
-
+export const useDeleteBills = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: BillsApi.delete,
+    mutationKey: [Tags.BILLS, Tags.MUTATION_DELETE],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [Tags.BILLS] })
+    }
+  });
+};

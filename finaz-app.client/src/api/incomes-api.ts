@@ -1,4 +1,3 @@
-
 import { Endpoints } from "@core";
 import { IIncomes, IIncomesCreate, IIncomesUpdate } from "@interfaces";
 
@@ -9,8 +8,12 @@ const IncomesApi = {
         const result = await API().post(Endpoints.INCOMES, data);
         return result.data;
     },
+    delete: async (id: number) => {
+        const result = await API().delete(`${Endpoints.INCOMES}/${id}`);
+        return result.data;
+    },
     update: async (data: Partial<IIncomesUpdate>) => {
-        const result = await API().patch(Endpoints.INCOMES, data);
+        const result = await API().patch(`${Endpoints.INCOMES}/${data.ingresosId}`, data);
         return result.data;
     },
     getAll: async () => {

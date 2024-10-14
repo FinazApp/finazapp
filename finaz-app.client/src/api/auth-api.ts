@@ -1,4 +1,3 @@
-
 import { Endpoints } from "@core";
 import { ILoginUser, IRegisterUser } from "@interfaces";
 

@@ -24,4 +24,15 @@ export const useUpdateIncomes = () => {
   });
 };
 
+export const useDeleteIncomes = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: IncomesApi.delete,
+    mutationKey: [Tags.INCOMES, Tags.MUTATION_DELETE],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [Tags.INCOMES] })
+    }
+  });
+};
+
 

@@ -33,7 +33,6 @@ const GastosSchema = Yup.object().shape({
 
 const model = {
   from: (data: IBills): FormValues => {
-    console.log(data);
     return {
       monto: data.monto,
       nombre: data.nombre,
@@ -51,7 +50,6 @@ const model = {
 };
 
 const BillFormDrawer = ({ id, open, onOpenChange }: IBillFormDrawerProps) => {
-  console.log("🚀 ~ BillFormDrawer ~ id:", id)
   const bills = useFetchOneBills(id);
   const createBills = useCreateBills();
   const updateBills = useUpdateBills();
@@ -82,15 +80,18 @@ const BillFormDrawer = ({ id, open, onOpenChange }: IBillFormDrawerProps) => {
       onSubmit={(values, actions) => {
         if (id) {
           return toast.promise(
-            updateBills.mutateAsync(values, {
-              onSettled: () => {
-                actions.setSubmitting(false);
-              },
-              onSuccess: () => {
-                onOpenChange(false);
-                actions.resetForm();
-              },
-            }),
+            updateBills.mutateAsync(
+              { ...model.to(values), gastosId: id },
+              {
+                onSettled: () => {
+                  actions.setSubmitting(false);
+                },
+                onSuccess: () => {
+                  onOpenChange(false);
+                  actions.resetForm();
+                },
+              }
+            ),
             {
               error: (e) => e,
               loading: "Actualizando el ingreso...",
@@ -100,18 +101,15 @@ const BillFormDrawer = ({ id, open, onOpenChange }: IBillFormDrawerProps) => {
         }
 
         return toast.promise(
-          createBills.mutateAsync(
-            { ...values, categoriaId: values.categoriaId ?? 0, usuarioId: 24 },
-            {
-              onSettled: () => {
-                actions.setSubmitting(false);
-              },
-              onSuccess: () => {
-                onOpenChange(false);
-                actions.resetForm();
-              },
-            }
-          ),
+          createBills.mutateAsync(model.to(values), {
+            onSettled: () => {
+              actions.setSubmitting(false);
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              actions.resetForm();
+            },
+          }),
           {
             error: (e) => e,
             loading: "Creando un nuevo ingreso...",
@@ -124,9 +122,9 @@ const BillFormDrawer = ({ id, open, onOpenChange }: IBillFormDrawerProps) => {
         <Form onSubmit={formik.handleSubmit}>
           <Drawer
             open={open}
-            submitText="Crear gasto"
-            title="Crear un nuevo gasto"
-            subtitle="Rellena los datos"
+            subtitle="Rellena el formulario"
+            submitText={id ? "Guardar gasto" : "Crear gasto"}
+            title={id ? "Editar gasto" : "Crear un nuevo gasto"}
             onOpenChange={(details) => onOpenChange(details.open)}
           >
             <Flex flexDir="column" flex={1} gap={3}>

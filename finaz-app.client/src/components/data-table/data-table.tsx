@@ -108,7 +108,7 @@ const DataTable = <T extends object>({
                       title={title}
                       variant="ghost"
                       onClick={onClick}
-                      colorPalette={colorPalette ?? "accent"}
+                      colorPalette={colorPalette || "accent"}
                     >
                       <ActionIcon size="20" style={{ height: 20, width: 20 }} />
                     </IconButton>

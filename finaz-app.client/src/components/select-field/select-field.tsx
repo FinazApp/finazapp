@@ -36,7 +36,6 @@ const SelectField = ({
         value={[field.value]}
         positioning={{ sameWidth: true }}
         onValueChange={(details) => {
-          console.log(details.value);
           setValue(details.value[0], true);
         }}
       >

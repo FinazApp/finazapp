@@ -6,8 +6,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
-import { useFetchIncomes } from "@hooks";
+import { useDeleteIncomes, useFetchIncomes } from "@hooks";
 import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
+import toast from "react-hot-toast";
 
 const columnHelper = createColumnHelper<IIncomes>();
 
@@ -36,6 +37,7 @@ const columns = [
 
 const IncomesPage = () => {
   const incomes = useFetchIncomes();
+  const deleteIncome = useDeleteIncomes();
 
   const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
     id: 0,
@@ -72,7 +74,13 @@ const IncomesPage = () => {
             {
               icon: IconTrash,
               title: "Eliminar",
-              onClick: () => {},
+              onClick: () => {
+                return toast.promise(deleteIncome.mutateAsync(data.ingresosId), {
+                  error: (e) => e,
+                  loading: `Eliminando ingreso ${data.nombre}...`,
+                  success: `Ingreso ${data.nombre} eliminado correctamente.`
+                });
+              },
               colorPalette: "red",
             },
           ]}

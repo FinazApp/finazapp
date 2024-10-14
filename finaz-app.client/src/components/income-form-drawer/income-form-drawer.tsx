@@ -33,7 +33,6 @@ const IngresoSchema = Yup.object().shape({
 
 const model = {
   from: (data: IIncomes): FormValues => {
-    console.log(data);
     return {
       monto: data.monto,
       nombre: data.nombre,
@@ -59,7 +58,7 @@ const IncomeFormDrawer = ({
   const categories = useFetchCategories();
   const createIncomes = useCreateIncomes();
   const updateIncomes = useUpdateIncomes();
-  
+
   const categoriesOptions = React.useMemo(() => {
     if (!categories.data?.length) return [];
     return categories.data.map((category) => {
@@ -85,15 +84,18 @@ const IncomeFormDrawer = ({
       onSubmit={(values, actions) => {
         if (id) {
           return toast.promise(
-            updateIncomes.mutateAsync(values, {
-              onSettled: () => {
-                actions.setSubmitting(false);
-              },
-              onSuccess: () => {
-                onOpenChange(false);
-                actions.resetForm();
-              },
-            }),
+            updateIncomes.mutateAsync(
+              { ...model.to(values), ingresosId: id },
+              {
+                onSettled: () => {
+                  actions.setSubmitting(false);
+                },
+                onSuccess: () => {
+                  onOpenChange(false);
+                  actions.resetForm();
+                },
+              }
+            ),
             {
               error: (e) => e,
               loading: "Actualizando el ingreso...",
@@ -103,18 +105,15 @@ const IncomeFormDrawer = ({
         }
 
         return toast.promise(
-          createIncomes.mutateAsync(
-            { ...values, categoriaId: values.categoriaId ?? 0, usuarioId: 24 },
-            {
-              onSettled: () => {
-                actions.setSubmitting(false);
-              },
-              onSuccess: () => {
-                onOpenChange(false);
-                actions.resetForm();
-              },
-            }
-          ),
+          createIncomes.mutateAsync(model.to(values), {
+            onSettled: () => {
+              actions.setSubmitting(false);
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              actions.resetForm();
+            },
+          }),
           {
             error: (e) => e,
             loading: "Creando un nuevo ingreso...",
@@ -127,8 +126,8 @@ const IncomeFormDrawer = ({
         <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
           <Drawer
             open={open}
-            submitText="Crear ingreso"
-            title="Crear un nuevo ingreso"
+            submitText={id ? "Guardar ingreso" : "Crear ingreso"}
+            title={id ? "Editar ingreso" : "Crear un nuevo ingreso"} 
             subtitle="Rellena el formulario"
             onOpenChange={(details) => onOpenChange(details.open)}
           >

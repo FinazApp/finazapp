@@ -6,6 +6,7 @@ export * from "./table";
 export * from "./alert";
 export * from "./input";
 export * from "./field";
+export * from "./dialog";
 export * from "./avatar";
 export * from "./select";
 export * from "./button";
