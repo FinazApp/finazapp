@@ -22,8 +22,10 @@ public partial class Ingreso
     public decimal? Monto { get; set; }
 
     public int? Estado { get; set; }
+
     [JsonIgnore]
     public virtual Categoria? Categoria { get; set; }
+
     [JsonIgnore]
     public virtual Usuario? Usuario { get; set; }
 }
