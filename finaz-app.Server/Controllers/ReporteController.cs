@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Linq;
+using finaz_app.Server.Models;  // Asegúrate de usar el namespace correcto
 
-namespace TuProyecto.Controllers
+namespace finaz_app.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class ReporteController : ControllerBase
     {
-        private readonly TuDbContext _context;
+        private readonly FinanzAppContext _context;
 
-        public ReporteController(TuDbContext context)
+        // Constructor con inyección de dependencias
+        public ReporteController(FinanzAppContext context)
         {
             _context = context;
         }
