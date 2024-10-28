@@ -8,6 +8,7 @@ using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using finaz_app.Server.Security.JWT;
 
 namespace finaz_app.Server.Controllers
 {
@@ -52,37 +53,16 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                // Borrador
-                // Obtener el JWT de la cookie
-                var jwtCookie = Request.Cookies["JWT"]; 
+                var userIDT = JwtHelper.ObtenerIdDeJwt(HttpContext);
 
-                if (string.IsNullOrEmpty(jwtCookie))
+                if (userIDT == null)
                 {
-                    return Unauthorized("No se ha proporcionado un JWT válido en la cookie.");
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
                 }
-
-                // Validar y extraer el ID de usuario del JWT
-                var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadToken(jwtCookie) as JwtSecurityToken;
-
-                if (token == null)
-                {
-                    return Unauthorized("El JWT no es válido.");
-                }
-
-                var idToken = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-
-                if (string.IsNullOrEmpty(idToken))
-                {
-                    return Unauthorized("No se ha proporcionado un ID de usuario válido en el JWT.");
-                }
-
-                var parseToken = int.Parse(idToken); 
 
                 var gastos = await _context.Gastos
-                    .Include(g => g.Usuario)
                     .Include(g => g.Categoria)
-                    .Where(g => g.UsuarioId == parseToken) 
+                    .Where(g => g.CreadoPor == userIDT || g.CreadoPor == null) 
                     .ToListAsync();
 
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
@@ -119,7 +99,6 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var gasto = await _context.Gastos
-                    .Include(g => g.Usuario)
                     .Include(g => g.Categoria)
                     .SingleOrDefaultAsync(a => a.GastosId == id);
 

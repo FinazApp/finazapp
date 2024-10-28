@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace finaz_app.Server.Models;
-/// <summary>
-/// Proporciona acceso a los datos de la aplicación a través de Entity Framework Core.
-/// </summary>
+
 public partial class FinanzAppContext : DbContext
 {
     public FinanzAppContext()
@@ -26,7 +24,9 @@ public partial class FinanzAppContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer("Name=ConnectionStrings:AppConnection");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("data source=.\\MSSQLSERVER03;initial catalog=FinanzApp;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;MultipleActiveResultSets=true");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Categoria>(entity =>
@@ -42,20 +42,15 @@ public partial class FinanzAppContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Nombre).HasMaxLength(100);
-            entity.Property(e => e.UsuarioId).HasColumnName("UsuarioID");
 
             entity.HasOne(d => d.CreadoPorNavigation).WithMany(p => p.CategoriaCreadoPorNavigations)
                 .HasForeignKey(d => d.CreadoPor)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("CAT_USR_CreadoPor_FK");
 
             entity.HasOne(d => d.ModificadoPorNavigation).WithMany(p => p.CategoriaModificadoPorNavigations)
                 .HasForeignKey(d => d.ModificadoPor)
                 .HasConstraintName("CAT_USR_ModificadoPor_FK");
-
-            entity.HasOne(d => d.Usuario).WithMany(p => p.CategoriaUsuarios)
-                .HasForeignKey(d => d.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("CAT_USR_USUARIOID_FK");
         });
 
         modelBuilder.Entity<Gasto>(entity =>
@@ -72,7 +67,6 @@ public partial class FinanzAppContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Nombre).HasMaxLength(100);
-            entity.Property(e => e.UsuarioId).HasColumnName("UsuarioID");
 
             entity.HasOne(d => d.Categoria).WithMany(p => p.Gastos)
                 .HasForeignKey(d => d.CategoriaId)
@@ -80,16 +74,12 @@ public partial class FinanzAppContext : DbContext
 
             entity.HasOne(d => d.CreadoPorNavigation).WithMany(p => p.GastoCreadoPorNavigations)
                 .HasForeignKey(d => d.CreadoPor)
-                .HasConstraintName("GTS_USR_CreadoPor_FK");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("GST_USR_CreadoPor_FK");
 
             entity.HasOne(d => d.ModificadoPorNavigation).WithMany(p => p.GastoModificadoPorNavigations)
                 .HasForeignKey(d => d.ModificadoPor)
                 .HasConstraintName("GTS_USR_ModificadoPor_FK");
-
-            entity.HasOne(d => d.Usuario).WithMany(p => p.GastoUsuarios)
-                .HasForeignKey(d => d.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("GST_USR_UsuarioID_FK");
         });
 
         modelBuilder.Entity<Ingreso>(entity =>
@@ -106,7 +96,6 @@ public partial class FinanzAppContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Nombre).HasMaxLength(100);
-            entity.Property(e => e.UsuarioId).HasColumnName("UsuarioID");
 
             entity.HasOne(d => d.Categoria).WithMany(p => p.Ingresos)
                 .HasForeignKey(d => d.CategoriaId)
@@ -114,16 +103,12 @@ public partial class FinanzAppContext : DbContext
 
             entity.HasOne(d => d.CreadoPorNavigation).WithMany(p => p.IngresoCreadoPorNavigations)
                 .HasForeignKey(d => d.CreadoPor)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("ING_USR_CreadoPor_FK");
 
             entity.HasOne(d => d.ModificadoPorNavigation).WithMany(p => p.IngresoModificadoPorNavigations)
                 .HasForeignKey(d => d.ModificadoPor)
                 .HasConstraintName("ING_USR_ModificadoPor_FK");
-
-            entity.HasOne(d => d.Usuario).WithMany(p => p.IngresoUsuarios)
-                .HasForeignKey(d => d.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("ING_USR_UsuarioID_FK");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
