@@ -4,6 +4,9 @@ using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Core;
+using Microsoft.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
 
 namespace finaz_app.Server.Controllers
 {
@@ -66,6 +69,7 @@ namespace finaz_app.Server.Controllers
         /// <response code="404">Usuario no encontrado.</response>
         /// <response code="500">Error interno del servidor al obtener el usuario.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UsuariosDTO>> GetUsuario(int id)
@@ -99,17 +103,42 @@ namespace finaz_app.Server.Controllers
         /// <response code="404">Usuario no encontrado.</response>
         /// <response code="500">Error interno del servidor al actualizar el usuario.</response>
         [HttpPatch("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> PutUsuario(int id, Usuario request)
         {
-            if (id != usuario.UsuarioId)
+            var existingUser = await _context.Usuarios.FindAsync(id);
+            if (existingUser == null)
+                return NotFound("Usuario no encontrado.");
+
+            var nombreExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Nombre == request.Nombre && u.UsuarioId != id);
+            if (nombreExistente != null)
+                return Conflict("El nombre ya está en uso.");
+
+            if (!string.IsNullOrWhiteSpace(request.Nombre))
+                existingUser.Nombre = request.Nombre;
+
+            if (!string.IsNullOrWhiteSpace(request.Correo))
             {
-                return BadRequest("El ID del usuario no coincide.");
+                if (!new EmailAddressAttribute().IsValid(request.Correo))
+                    return BadRequest("El correo electrónico no es válido.");
+                existingUser.Correo = request.Correo;
             }
 
-            _context.Entry(usuario).State = EntityState.Modified;
+            if (!string.IsNullOrWhiteSpace(request.PasswordHash))
+                existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
+
+            if (!string.IsNullOrWhiteSpace(request.Rol))
+                existingUser.Rol = request.Rol;
+
+            if ((request.Estado) != null)
+                existingUser.Estado = request.Estado;
+
+            _context.Entry(existingUser).State = EntityState.Modified;
 
             try
             {
@@ -118,17 +147,22 @@ namespace finaz_app.Server.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!UsuarioExists(id))
+                    return NotFound("Usuario no encontrado durante la actualización.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error de concurrencia al actualizar el usuario.");
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+            {
+                return sqlEx.Number switch
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error de concurrencia al actualizar el usuario.");
-                }
+                    2627 => Conflict("El correo electrónico ya está en uso."), 
+                    547 => BadRequest("Violación de integridad referencial."), 
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, $"Error en la base de datos: {sqlEx.Message}")
+                };
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el usuario: {ex.Message}");
+                var detalle = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el usuario: {ex.Message}. Detalle: {detalle}");
             }
 
             return NoContent();
@@ -142,6 +176,7 @@ namespace finaz_app.Server.Controllers
         /// <response code="201">El usuario se creó exitosamente.</response>
         /// <response code="400">Datos de entrada inválidos.</response>
         /// <response code="500">Error interno del servidor al crear el usuario.</response>
+        /**
         [HttpPost]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -159,6 +194,7 @@ namespace finaz_app.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el usuario: {ex.Message}");
             }
         }
+        */
 
         /// <summary>
         /// Elimina un usuario existente.
@@ -186,9 +222,17 @@ namespace finaz_app.Server.Controllers
 
                 return NoContent();
             }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el usuario en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}");
+            }
+            catch (SqlException sqlEx)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error SQL al eliminar el usuario: {sqlEx.Message}, Código de error: {sqlEx.Number}");
+            }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el usuario: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error inesperado al eliminar el usuario: {ex.Message}");
             }
         }
 

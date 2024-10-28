@@ -85,7 +85,10 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var ingreso = await _context.Ingresos.FindAsync(id);
+                var ingreso = await _context.Ingresos
+                    .Include(i => i.Usuario)
+                    .Include(i => i.Categoria)
+                    .SingleOrDefaultAsync(a => a.IngresosId == id);
 
                 if (ingreso == null)
                 {

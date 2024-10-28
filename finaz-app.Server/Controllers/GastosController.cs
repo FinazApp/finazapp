@@ -84,7 +84,10 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var gasto = await _context.Gastos.FindAsync(id);
+                var gasto = await _context.Gastos
+                    .Include(g => g.Usuario)
+                    .Include(g => g.Categoria)
+                    .SingleOrDefaultAsync(a => a.GastosId == id);
 
                 if (gasto == null)
                 {

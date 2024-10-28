@@ -40,7 +40,7 @@ namespace finaz_app.Server.Controllers
         /// <response code="400">Datos de inicio de sesión inválidos o vacíos.</response>
         /// <response code="401">Credenciales incorrectas.</response>
         /// <response code="500">Error interno del servidor durante el proceso de autenticación.</response>
-        [HttpPost("Login")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
