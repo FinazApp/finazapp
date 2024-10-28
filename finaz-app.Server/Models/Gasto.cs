@@ -23,6 +23,8 @@ namespace finaz_app.Server.Models
 
         public bool isDeleted { get; set; }  // Campo para indicar si el gasto está eliminado
 
+        public int? Estado { get; set; }  // Campo para indicar el estado del gasto (pendiente, confirmado, etc.)
+
         public string CreadoPor { get; set; } = null!;  // Campo para el usuario que creó el gasto
 
         public DateTime FechaCreacion { get; set; }  // Campo para la fecha de creación
