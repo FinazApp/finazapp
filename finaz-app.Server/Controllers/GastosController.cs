@@ -7,6 +7,7 @@ using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace finaz_app.Server.Controllers
 {
@@ -51,20 +52,53 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
+                // Borrador
+                // Obtener el JWT de la cookie
+                var jwtCookie = Request.Cookies["JWT"]; 
+
+                if (string.IsNullOrEmpty(jwtCookie))
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido en la cookie.");
+                }
+
+                // Validar y extraer el ID de usuario del JWT
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(jwtCookie) as JwtSecurityToken;
+
+                if (token == null)
+                {
+                    return Unauthorized("El JWT no es válido.");
+                }
+
+                var idToken = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+                if (string.IsNullOrEmpty(idToken))
+                {
+                    return Unauthorized("No se ha proporcionado un ID de usuario válido en el JWT.");
+                }
+
+                var parseToken = int.Parse(idToken); 
+
                 var gastos = await _context.Gastos
                     .Include(g => g.Usuario)
                     .Include(g => g.Categoria)
+                    .Where(g => g.UsuarioId == parseToken) 
                     .ToListAsync();
 
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
 
                 return Ok(gastosDTO);
             }
+            catch (FormatException)
+            {
+                return BadRequest("El ID de usuario no tiene el formato correcto.");
+            }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
+
 
         /// <summary>
         /// Obtiene un gasto específico por su ID.
