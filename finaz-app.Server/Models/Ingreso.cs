@@ -23,9 +23,19 @@ public partial class Ingreso
 
     public int? Estado { get; set; }
 
-    [JsonIgnore]
+    public int? CreadoPor { get; set; }
+
+    public DateTime? FechaCreacion { get; set; }
+
+    public int? ModificadoPor { get; set; }
+
+    public DateTime? FechaModificado { get; set; }
+
     public virtual Categoria? Categoria { get; set; }
 
-    [JsonIgnore]
+    public virtual Usuario? CreadoPorNavigation { get; set; }
+
+    public virtual Usuario? ModificadoPorNavigation { get; set; }
+
     public virtual Usuario? Usuario { get; set; }
 }

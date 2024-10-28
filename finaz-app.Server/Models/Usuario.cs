@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
-/// <summary>
-/// Representa un usuario en la aplicación.
-/// </summary>
+
 public partial class Usuario
 {
     [BindNever]
@@ -20,14 +18,33 @@ public partial class Usuario
     public string? PasswordHash { get; set; }
 
     public int? Estado { get; set; }
+
     public string? Rol { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<Categoria> Categoria { get; set; } = new List<Categoria>();
-
+    public virtual ICollection<Categoria> CategoriaCreadoPorNavigations { get; set; } = new List<Categoria>();
+    
     [JsonIgnore]
-    public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
-
+    public virtual ICollection<Categoria> CategoriaModificadoPorNavigations { get; set; } = new List<Categoria>();
+    
     [JsonIgnore]
-    public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+    public virtual ICollection<Categoria> CategoriaUsuarios { get; set; } = new List<Categoria>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Gasto> GastoCreadoPorNavigations { get; set; } = new List<Gasto>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Gasto> GastoModificadoPorNavigations { get; set; } = new List<Gasto>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Gasto> GastoUsuarios { get; set; } = new List<Gasto>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Ingreso> IngresoCreadoPorNavigations { get; set; } = new List<Ingreso>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Ingreso> IngresoModificadoPorNavigations { get; set; } = new List<Ingreso>();
+    
+    [JsonIgnore]
+    public virtual ICollection<Ingreso> IngresoUsuarios { get; set; } = new List<Ingreso>();
 }

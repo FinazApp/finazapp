@@ -2,12 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
 namespace finaz_app.Server.Models;
 
-/// <summary>
-/// Representa una categoría de gastos o ingresos en la aplicación.
-/// </summary>
 public partial class Categoria
 {
     [BindNever]
@@ -21,11 +17,24 @@ public partial class Categoria
 
     public int? UsuarioId { get; set; }
 
+    public int? CreadoPor { get; set; }
+
+    public DateTime? FechaCreacion { get; set; }
+
+    public int? ModificadoPor { get; set; }
+
+    public DateTime? FechaModificado { get; set; }
+
+    public virtual Usuario? CreadoPorNavigation { get; set; }
+
     [JsonIgnore]
     public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
 
     [JsonIgnore]
     public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+
+    [JsonIgnore]
+    public virtual Usuario? ModificadoPorNavigation { get; set; }
 
     [JsonIgnore]
     public virtual Usuario? Usuario { get; set; }

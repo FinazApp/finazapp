@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
-/// <summary>
-/// Representa un gasto en la aplicación.
-/// </summary>
+
 public partial class Gasto
 {
     [BindNever]
@@ -22,8 +18,22 @@ public partial class Gasto
 
     public int? Estado { get; set; }
 
+    public int? CreadoPor { get; set; }
+
+    public DateTime? FechaCreacion { get; set; }
+
+    public int? ModificadoPor { get; set; }
+
+    public DateTime? FechaModificado { get; set; }
+
     [JsonIgnore]
     public virtual Categoria? Categoria { get; set; }
+
+    [JsonIgnore]
+    public virtual Usuario? CreadoPorNavigation { get; set; }
+
+    [JsonIgnore]
+    public virtual Usuario? ModificadoPorNavigation { get; set; }
 
     [JsonIgnore]
     public virtual Usuario? Usuario { get; set; }
