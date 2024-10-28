@@ -23,6 +23,8 @@ public partial class Ingreso
 
     public bool isDeleted { get; set; }  // Campo para indicar si el ingreso está eliminado
 
+    public int? Estado { get; set; }  // Campo para indicar el estado del ingreso
+
     public string CreadoPor { get; set; } = null!;  // Campo para el usuario que creó el ingreso
 
     public DateTime FechaCreacion { get; set; }  // Campo para la fecha de creación
