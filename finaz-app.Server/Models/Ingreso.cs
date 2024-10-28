@@ -21,13 +21,15 @@ public partial class Ingreso
 
     public decimal? Monto { get; set; }
 
-    public int? Estado { get; set; }
+    public bool isDeleted { get; set; }  // Campo para indicar si el ingreso está eliminado
 
-    // Nueva propiedad para la fecha de creación del ingreso
-    public DateTime FechaCreacion { get; set; } 
+    public string CreadoPor { get; set; } = null!;  // Campo para el usuario que creó el ingreso
 
-    // Nueva propiedad para indicar si el registro está eliminado
-    public bool isDeleted { get; set; } 
+    public DateTime FechaCreacion { get; set; }  // Campo para la fecha de creación
+
+    public string? ModificadoPor { get; set; }  // Campo para el usuario que modificó el ingreso
+
+    public DateTime? FechaModificado { get; set; }  // Campo para la fecha de modificación
 
     [JsonIgnore]
     public virtual Categoria? Categoria { get; set; }
