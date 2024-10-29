@@ -19,7 +19,7 @@ namespace finaz_app.Server.Controllers
         }
 
         [HttpGet("reporte-csv")]
-        public IActionResult GenerarReporteCsv(DateTime fechaInicio, DateTime fechaFin)
+        public IActionResult GenerarReporteCsv(DateOnly fechaInicio, DateOnly fechaFin)
         {
             if (fechaInicio == default || fechaFin == default)
             {

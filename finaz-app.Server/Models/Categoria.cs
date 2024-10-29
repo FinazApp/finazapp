@@ -22,11 +22,11 @@ public partial class Categoria
 
     public int? CreadoPor { get; set; }
     [BindNever]
-    public DateTime? FechaCreacion { get; set; }
+    public DateOnly? FechaCreacion { get; set; }
 
     public int? ModificadoPor { get; set; }
     [BindNever]
-    public DateTime? FechaModificado { get; set; }
+    public DateOnly? FechaModificado { get; set; }
     [JsonIgnore]
     public virtual Usuario? CreadoPorNavigation { get; set; }
     [JsonIgnore]

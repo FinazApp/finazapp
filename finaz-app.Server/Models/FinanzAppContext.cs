@@ -24,8 +24,7 @@ public partial class FinanzAppContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("data source=.\\MSSQLSERVER03;initial catalog=FinanzApp;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;MultipleActiveResultSets=true");
+            => optionsBuilder.UseSqlServer("Name=ConnectionStrings:AppConnection");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,12 +34,8 @@ public partial class FinanzAppContext : DbContext
 
             entity.Property(e => e.CategoriaId).HasColumnName("CategoriaID");
             entity.Property(e => e.Descripcion).HasMaxLength(100);
-            entity.Property(e => e.FechaCreacion)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.FechaModificado)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(CONVERT([date],getdate()))");
+            entity.Property(e => e.FechaModificado).HasDefaultValueSql("(CONVERT([date],getdate()))");
             entity.Property(e => e.Nombre).HasMaxLength(100);
 
             entity.HasOne(d => d.CreadoPorNavigation).WithMany(p => p.CategoriaCreadoPorNavigations)
@@ -59,12 +54,8 @@ public partial class FinanzAppContext : DbContext
 
             entity.Property(e => e.GastosId).HasColumnName("GastosID");
             entity.Property(e => e.CategoriaId).HasColumnName("CategoriaID");
-            entity.Property(e => e.FechaCreacion)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.FechaModificado)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(CONVERT([date],getdate()))");
+            entity.Property(e => e.FechaModificado).HasDefaultValueSql("(CONVERT([date],getdate()))");
             entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Nombre).HasMaxLength(100);
 
@@ -88,12 +79,8 @@ public partial class FinanzAppContext : DbContext
 
             entity.Property(e => e.IngresosId).HasColumnName("IngresosID");
             entity.Property(e => e.CategoriaId).HasColumnName("CategoriaID");
-            entity.Property(e => e.FechaCreacion)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.FechaModificado)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(CONVERT([date],getdate()))");
+            entity.Property(e => e.FechaModificado).HasDefaultValueSql("(CONVERT([date],getdate()))");
             entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Nombre).HasMaxLength(100);
 

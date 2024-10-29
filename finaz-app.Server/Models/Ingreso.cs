@@ -25,11 +25,11 @@ public partial class Ingreso
     public bool IsDeleted => Estado == 0;
 
     [BindNever]
-    public DateTime? FechaCreacion { get; set; }
+    public DateOnly? FechaCreacion { get; set; }
 
     public int? ModificadoPor { get; set; }
     [BindNever]
-    public DateTime? FechaModificado { get; set; }
+    public DateOnly? FechaModificado { get; set; }
     [JsonIgnore]
     public virtual Categoria? Categoria { get; set; }
     [JsonIgnore]
