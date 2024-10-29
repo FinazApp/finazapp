@@ -1,0 +1,1 @@
+"AppConnection": "Data Source=localhost;Initial Catalog=FinanzApp;User Id=sa; Password={PASSWORD_HERE};MultipleActiveResultSets=True;TrustServerCertificate=true; Connection Timeout=5000;"
