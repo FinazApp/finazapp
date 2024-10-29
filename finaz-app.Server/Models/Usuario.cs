@@ -1,33 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
-/// <summary>
-/// Representa un usuario en la aplicación.
-/// </summary>
+
 public partial class Usuario
 {
     [BindNever]
-    [JsonIgnore]
     public int UsuarioId { get; set; }
 
-    public string? Nombre { get; set; }
+    public required string Nombre { get; set; }
 
-    public string? Correo { get; set; }
+    public required string Correo { get; set; }
 
-    public string? PasswordHash { get; set; }
+    public required string PasswordHash { get; set; }
 
-    public int? Estado { get; set; }
-    public string? Rol { get; set; }
+    public required int Estado { get; set; } = 1;
 
-    [JsonIgnore]
-    public virtual ICollection<Categoria> Categoria { get; set; } = new List<Categoria>();
+    [NotMapped]
+    public bool IsDeleted => Estado == 0;
 
-    [JsonIgnore]
-    public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
+    public required string Rol { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+    public virtual ICollection<Categoria> CategoriaCreadoPorNavigations { get; set; } = new List<Categoria>();
+    [JsonIgnore]
+    public virtual ICollection<Categoria> CategoriaModificadoPorNavigations { get; set; } = new List<Categoria>();
+    [JsonIgnore]
+    public virtual ICollection<Gasto> GastoCreadoPorNavigations { get; set; } = new List<Gasto>();
+    [JsonIgnore]
+    public virtual ICollection<Gasto> GastoModificadoPorNavigations { get; set; } = new List<Gasto>();
+    [JsonIgnore]
+    public virtual ICollection<Ingreso> IngresoCreadoPorNavigations { get; set; } = new List<Ingreso>();
+    [JsonIgnore]
+    public virtual ICollection<Ingreso> IngresoModificadoPorNavigations { get; set; } = new List<Ingreso>();
 }

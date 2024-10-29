@@ -11,6 +11,5 @@
 
         public string? Descripcion { get; set; }
 
-        public virtual UsuariosDTO? Usuario { get; set; }
     }
 }

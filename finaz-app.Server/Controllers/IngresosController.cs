@@ -4,6 +4,7 @@ using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using finaz_app.Server.Security.JWT;
 
 namespace finaz_app.Server.Controllers
 {
@@ -50,9 +51,16 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
                 var ingresos = await _context.Ingresos
-                    .Include(i => i.Usuario)
                     .Include(i => i.Categoria)
+                    .Where(g => g.CreadoPor == userID || g.CreadoPor == null)
                     .ToListAsync();
 
                 var ingresosDTO = _mapper.Map<IEnumerable<IngresosDTO>>(ingresos);
@@ -86,7 +94,6 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var ingreso = await _context.Ingresos
-                    .Include(i => i.Usuario)
                     .Include(i => i.Categoria)
                     .SingleOrDefaultAsync(a => a.IngresosId == id);
 
