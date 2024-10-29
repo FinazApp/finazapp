@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
@@ -14,7 +15,10 @@ public partial class Categoria
 
     public string? Descripcion { get; set; }
 
-    public int? Estado { get; set; }
+    public int Estado { get; set; }
+
+    [NotMapped]
+    public bool IsDeleted => Estado == 1;
 
     public int? CreadoPor { get; set; }
     [BindNever]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace finaz_app.Server.Models;
@@ -10,7 +11,7 @@ public partial class Ingreso
     [BindNever]
     public int IngresosId { get; set; }
 
-    public int? CreadoPor { get; set; }
+    public int CreadoPor { get; set; }
 
     public int? CategoriaId { get; set; }
 
@@ -18,7 +19,11 @@ public partial class Ingreso
 
     public decimal? Monto { get; set; }
 
-    public int? Estado { get; set; }
+    public int Estado { get; set; }
+
+    [NotMapped]
+    public bool IsDeleted => Estado == 0;
+
     [BindNever]
     public DateTime? FechaCreacion { get; set; }
 
