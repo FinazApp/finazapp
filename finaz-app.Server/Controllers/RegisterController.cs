@@ -87,6 +87,7 @@ namespace finaz_app.Server.Controllers
                     Nombre = request.Nombre,
                     Correo = request.Correo,
                     PasswordHash = passwordHash,
+                    Estado = request.Estado,
                     Rol = request.Rol
                 };
 

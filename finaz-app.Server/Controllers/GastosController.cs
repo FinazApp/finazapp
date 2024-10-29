@@ -7,6 +7,8 @@ using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using finaz_app.Server.Security.JWT;
 
 namespace finaz_app.Server.Controllers
 {
@@ -51,20 +53,32 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
+                var userIDT = JwtHelper.ObtenerIdDeJwt(HttpContext);
+
+                if (userIDT == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
                 var gastos = await _context.Gastos
-                    .Include(g => g.Usuario)
                     .Include(g => g.Categoria)
+                    .Where(g => g.CreadoPor == userIDT || g.CreadoPor == null) 
                     .ToListAsync();
 
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
 
                 return Ok(gastosDTO);
             }
+            catch (FormatException)
+            {
+                return BadRequest("El ID de usuario no tiene el formato correcto.");
+            }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
+
 
         /// <summary>
         /// Obtiene un gasto específico por su ID.
@@ -85,7 +99,6 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var gasto = await _context.Gastos
-                    .Include(g => g.Usuario)
                     .Include(g => g.Categoria)
                     .SingleOrDefaultAsync(a => a.GastosId == id);
 

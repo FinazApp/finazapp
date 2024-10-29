@@ -11,8 +11,6 @@
 
         public decimal? Monto { get; set; }
 
-        public virtual UsuariosDTO? Usuario { get; set; }
-
         public virtual CategoriasDTO? Categoria { get; set; }
     }
 }
