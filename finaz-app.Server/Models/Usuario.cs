@@ -22,6 +22,8 @@ public partial class Usuario
     public int? Estado { get; set; }
     public string? Rol { get; set; }
 
+    public bool isDeleted { get; set; }  // Nuevo campo agregado para indicar si el usuario está eliminado
+
     [JsonIgnore]
     public virtual ICollection<Categoria> Categoria { get; set; } = new List<Categoria>();
 
