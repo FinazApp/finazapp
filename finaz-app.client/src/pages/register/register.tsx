@@ -1,6 +1,8 @@
 import React from "react";
 import * as Yup from "yup";
+import toast from "react-hot-toast";
 import { Form, Formik } from "formik";
+import { useNavigate } from "react-router";
 import { Box, Flex } from "styled-system/jsx";
 
 import { useRegister } from "@hooks";
@@ -8,16 +10,17 @@ import { IRegisterUser } from "@interfaces";
 import { Button, Heading, Link, Text, TextField } from "@components";
 
 const validationSchema = Yup.object({
-  nombre: Yup.string().required("El nombre es obligatorio"),
-  correo: Yup.string()
+  Nombre: Yup.string().required("El nombre es obligatorio"),
+  CorreoElectronico: Yup.string()
     .email("Correo inválido")
     .required("El correo es obligatorio"),
-  passwordHash: Yup.string()
+  PasswordHash: Yup.string()
     .min(6, "La contraseña debe tener al menos 6 caracteres")
     .required("La contraseña es obligatoria"),
 });
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useRegister();
 
   return (
@@ -40,17 +43,25 @@ const RegisterPage = () => {
         </Box>
         <Formik<IRegisterUser>
           initialValues={{
-            correo: "",
-            nombre: "",
-            passwordHash: "",
+            Nombre: "",
+            isDeleted: false,
+            PasswordHash: "",
+            CorreoElectronico: "",
           }}
           onSubmit={async (values) => {
-            const result = await mutateAsync({
-              ...values,
-              rol: "admin",
-              estado: 1,
-            } as never); // TODO: CUANDO ARREGLEN EL BACKEND
-            console.log("Datos recibidos:", result);
+            toast.promise(
+              mutateAsync(values, {
+                onSuccess: () => {
+                  navigate("/login");
+                },
+              }),
+              {
+                error: (result) => `${result}`,
+                loading: "Registrando usuario...",
+                success: (result) =>
+                  `${result.message ?? ""}. Redireccionando al inicio de sesión.`,
+              }
+            );
           }}
           validationSchema={validationSchema}
         >
@@ -58,20 +69,20 @@ const RegisterPage = () => {
             <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
               <Flex gap={5} flexDir="column">
                 <TextField
-                  name="nombre"
+                  name="Nombre"
                   label="Nombre completo"
                   placeholder="Ej. Jesimiel Martes"
                 />
                 <TextField
                   type="email"
-                  name="correo"
+                  name="CorreoElectronico"
                   label="Correo Electrónico"
                   placeholder="jesimiel@finazapp.com"
                 />
                 <TextField
                   type="password"
                   label="Contraseña"
-                  name="passwordHash"
+                  name="PasswordHash"
                   placeholder="**********"
                 />
                 <Button type="submit" variant="solid" loading={isPending}>

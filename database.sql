@@ -1,9 +1,10 @@
 CREATE TABLE Usuarios (
+    isDeleted BIT NOT NULL
     UsuarioId INT PRIMARY KEY,
+    Rol NVARCHAR(255) NOT NULL,
     Nombre NVARCHAR(255) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     CorreoElectronico NVARCHAR(255) NOT NULL,
-    isDeleted BIT NOT NULL
 );
 
 CREATE TABLE Categorias (

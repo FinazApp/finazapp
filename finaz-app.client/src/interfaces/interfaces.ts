@@ -1,7 +1,8 @@
 export interface IRegisterUser {
-    nombre: string;
-    correo: string;
-    passwordHash: string;
+    Nombre: string;
+    isDeleted: boolean;
+    PasswordHash: string;
+    CorreoElectronico: string;
 }
 
 export interface ILoginUser {
