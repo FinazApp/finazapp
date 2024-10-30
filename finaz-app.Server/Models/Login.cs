@@ -2,7 +2,8 @@
 {
     public class Login
     {
-        public required string Email { get; set; }
-        public required string HashContraseña { get; set; }
+        public required string CorreoElectronico { get; set; }
+
+        public required string PasswordHash { get; set; }
     }
 }

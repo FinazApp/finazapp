@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
+/*
+
 namespace finaz_app.Server.Controllers
 {
     [Route("api/[controller]")]
@@ -69,3 +71,5 @@ namespace finaz_app.Server.Controllers
         }
     }
 }
+
+*/

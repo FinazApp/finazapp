@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using finaz_app.Server.Models;
 using AutoMapper;
@@ -11,10 +15,6 @@ namespace finaz_app.Server.Controllers
     /// <summary>
     /// Controlador API para la gestión de ingresos en FinanzApp.
     /// </summary>
-    /// <remarks>
-    /// Este controlador maneja las operaciones CRUD para los ingresos, como listar, obtener, 
-    /// crear, actualizar y eliminar ingresos.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "usuario, admin")]
@@ -23,11 +23,6 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Constructor del controlador IngresosController.
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos de FinanzApp.</param>
-        /// <param name="mapper">Instancia de AutoMapper para mapear entidades a DTOs.</param>
         public IngresosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
@@ -37,11 +32,6 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Obtiene todos los ingresos.
         /// </summary>
-        /// <returns>Una lista de objetos IngresosDTO.</returns>
-        /// <response code="200">Devuelve la lista de ingresos.</response>
-        /// <response code="401">No autorizado.</response>
-        /// <response code="403">Prohibido.</response>
-        /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<IngresosDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -60,11 +50,10 @@ namespace finaz_app.Server.Controllers
 
                 var ingresos = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .Where(g => g.CreadoPor == userID || g.CreadoPor == null)
+                    .Where(i => i.CreadoPor == userID || i.CreadoPor == null)
                     .ToListAsync();
 
                 var ingresosDTO = _mapper.Map<IEnumerable<IngresosDTO>>(ingresos);
-
                 return Ok(ingresosDTO);
             }
             catch (Exception ex)
@@ -76,13 +65,6 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Obtiene un ingreso específico por su ID.
         /// </summary>
-        /// <param name="id">ID del ingreso a obtener.</param>
-        /// <returns>El objeto IngresosDTO correspondiente al ID proporcionado.</returns>
-        /// <response code="200">Devuelve el ingreso solicitado.</response>
-        /// <response code="404">No se encontró el ingreso.</response>
-        /// <response code="401">No autorizado.</response>
-        /// <response code="403">Prohibido.</response>
-        /// <response code="500">Error interno del servidor.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(IngresosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,7 +77,7 @@ namespace finaz_app.Server.Controllers
             {
                 var ingreso = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .SingleOrDefaultAsync(a => a.IngresosId == id);
+                    .SingleOrDefaultAsync(i => i.IngresoId == id);
 
                 if (ingreso == null)
                 {
@@ -114,13 +96,6 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Actualiza un ingreso existente.
         /// </summary>
-        /// <param name="id">ID del ingreso a actualizar.</param>
-        /// <param name="ingreso">Objeto Ingreso con los datos actualizados.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Ingreso actualizado correctamente.</response>
-        /// <response code="400">El ID proporcionado no coincide con el ID del ingreso.</response>
-        /// <response code="404">No se encontró el ingreso.</response>
-        /// <response code="500">Error interno del servidor.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -128,15 +103,25 @@ namespace finaz_app.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutIngreso(int id, Ingreso ingreso)
         {
-            if (id != ingreso.IngresosId)
+            if (id != ingreso.IngresoId)
             {
                 return BadRequest("El ID del ingreso no coincide.");
             }
 
-            _context.Entry(ingreso).State = EntityState.Modified;
-
             try
             {
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                ingreso.ModificadoPor = userID.Value;
+                ingreso.FechaModificado = DateTime.UtcNow;
+                ingreso.CreadoPor = userID.Value;
+
+                _context.Entry(ingreso).State = EntityState.Modified;
+
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -152,7 +137,8 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el ingreso: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el ingreso: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
 
             return NoContent();
@@ -161,11 +147,6 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Crea un nuevo ingreso.
         /// </summary>
-        /// <param name="ingreso">Objeto Ingreso a crear.</param>
-        /// <returns>El objeto Ingreso creado.</returns>
-        /// <response code="201">Ingreso creado correctamente.</response>
-        /// <response code="400">Solicitud incorrecta.</response>
-        /// <response code="500">Error interno del servidor.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Ingreso), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -174,25 +155,40 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                ingreso.CreadoPor = userID.Value;
+                ingreso.ModificadoPor = userID.Value;
+                ingreso.FechaCreacion = DateTime.UtcNow;
+                ingreso.FechaModificado = DateTime.UtcNow;
+
                 _context.Ingresos.Add(ingreso);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetIngreso), new { id = ingreso.IngresosId }, ingreso);
+                return CreatedAtAction(nameof(GetIngreso), new { id = ingreso.IngresoId }, ingreso);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el ingreso: {dbEx.Message} - Detalles: {dbEx.InnerException?.Message}");
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el ingreso: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el ingreso: {ex.Message} - Detalles: {ex.InnerException?.Message}");
             }
         }
 
         /// <summary>
         /// Elimina un ingreso existente por su ID.
         /// </summary>
-        /// <param name="id">ID del ingreso a eliminar.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Ingreso eliminado correctamente.</response>
-        /// <response code="404">No se encontró el ingreso.</response>
-        /// <response code="500">Error interno del servidor.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -207,31 +203,38 @@ namespace finaz_app.Server.Controllers
                     return NotFound();
                 }
 
-                _context.Ingresos.Remove(ingreso);
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                ingreso.ModificadoPor = userID.Value;
+                ingreso.FechaModificado = DateTime.UtcNow;
+                ingreso.isDeleted = true;
+                _context.Entry(ingreso).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el ingreso: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
         }
 
         /// <summary>
         /// Verifica si un ingreso existe en la base de datos.
         /// </summary>
-        /// <param name="id">ID del ingreso a verificar.</param>
-        /// <returns>True si el ingreso existe, de lo contrario false.</returns>
         private bool IngresoExists(int id)
         {
             try
             {
-                return _context.Ingresos.Any(e => e.IngresosId == id);
+                return _context.Ingresos.Any(e => e.IngresoId == id);
             }
             catch (Exception)
             {
-                // Manejo de error al consultar existencia
                 return false;
             }
         }
