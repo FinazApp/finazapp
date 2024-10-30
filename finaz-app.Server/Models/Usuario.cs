@@ -11,18 +11,18 @@ public partial class Usuario
     [BindNever]
     public int UsuarioId { get; set; }
 
-    public required string Nombre { get; set; }
+    public string? Nombre { get; set; }
 
-    public required string Correo { get; set; }
+    public string? Correo { get; set; }
 
-    public required string PasswordHash { get; set; }
+    public string? PasswordHash { get; set; }
 
-    public required int Estado { get; set; } = 1;
+    public int? Estado { get; set; } = 1;
 
     [NotMapped]
     public bool IsDeleted => Estado == 0;
 
-    public required string Rol { get; set; }
+    public string? Rol { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<Categoria> CategoriaCreadoPorNavigations { get; set; } = new List<Categoria>();

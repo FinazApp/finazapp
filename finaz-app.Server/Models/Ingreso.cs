@@ -11,7 +11,7 @@ public partial class Ingreso
     [BindNever]
     public int IngresosId { get; set; }
 
-    public int CreadoPor { get; set; }
+    public int? CreadoPor { get; set; }
 
     public int? CategoriaId { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Ingreso
 
     public decimal? Monto { get; set; }
 
-    public int Estado { get; set; }
+    public int? Estado { get; set; }
 
     [NotMapped]
     public bool IsDeleted => Estado == 0;
