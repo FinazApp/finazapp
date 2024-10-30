@@ -25,6 +25,7 @@ ALTER TABLE Categorias ADD CONSTRAINT UQ_Nombre_UsuarioId UNIQUE (Nombre, Usuari
 CREATE TABLE Gastos (
     GastoId INT PRIMARY KEY,
     CategoriaId INT,
+    Fecha DATETIME NOT NULL,
     Nombre NVARCHAR(255) NOT NULL,
     Monto DECIMAL(18, 2) NOT NULL,
     isDeleted BIT NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE Gastos (
 CREATE TABLE Ingresos (
     IngresoId INT PRIMARY KEY,
     CategoriaId INT,
+    Fecha DATETIME NOT NULL,
     Nombre NVARCHAR(255) NOT NULL,
     Monto DECIMAL(18, 2) NOT NULL,
     isDeleted BIT NOT NULL,
