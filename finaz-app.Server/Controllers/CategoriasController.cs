@@ -57,8 +57,8 @@ namespace finaz_app.Server.Controllers
                 }
 
                 var categorias = await _context.Categorias
-                    .Where(g => g.CreadoPor == userID || g.CreadoPor == null)
-                    .Where(g => g.Estado != 0)
+                    .Where(c => c.CreadoPor == userID || c.CreadoPor == null)
+                    .Where(c => !c.isDeleted)
                     .ToListAsync();
 
                 var categoriasDTO = _mapper.Map<IEnumerable<CategoriasDTO>>(categorias);
@@ -78,22 +78,21 @@ namespace finaz_app.Server.Controllers
         /// <response code="200">Devuelve la categoría solicitada.</response>
         /// <response code="404">Categoría no encontrada.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(IEnumerable<CategoriasDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(CategoriasDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CategoriasDTO>> GetCategoria(int id)
         {
             try
             {
-                var categoria = await _context.Categorias.SingleOrDefaultAsync(a => a.CategoriaId == id);
-                var categoriasDTO = _mapper.Map<CategoriasDTO>(categoria);
+                var categoria = await _context.Categorias
+                    .SingleOrDefaultAsync(a => a.CategoriaId == id && !a.isDeleted);
 
-                if (categoriasDTO == null)
+                if (categoria == null)
                 {
-                    return NotFound();
+                    return NotFound($"No se encontró la categoría con ID = {id}");
                 }
 
+                var categoriasDTO = _mapper.Map<CategoriasDTO>(categoria);
                 return Ok(categoriasDTO);
             }
             catch (Exception ex)
@@ -121,10 +120,29 @@ namespace finaz_app.Server.Controllers
         {
             if (id != categoria.CategoriaId)
             {
-                return BadRequest("El ID del usuario no coincide.");
+                return BadRequest("El ID de la categoría no coincide.");
             }
 
-            _context.Entry(categoria).State = EntityState.Modified;
+            var existingCategoria = await _context.Categorias.FindAsync(id);
+            if (existingCategoria == null || existingCategoria.isDeleted)
+            {
+                return NotFound($"No se encontró la categoría con ID = {id}");
+            }
+
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+
+            existingCategoria.Nombre = categoria.Nombre;
+            existingCategoria.Descripcion = categoria.Descripcion;
+            existingCategoria.isSystem = categoria.isSystem;
+            existingCategoria.ModificadoPor = userID.Value;
+            existingCategoria.FechaModificado = DateTime.UtcNow;
+            existingCategoria.CreadoPor = userID.Value;
+
+            _context.Entry(existingCategoria).State = EntityState.Modified;
 
             try
             {
@@ -134,11 +152,11 @@ namespace finaz_app.Server.Controllers
             {
                 if (!CategoriaExists(id))
                 {
-                    return NotFound($"No se encontró el usuario con ID = {id}");
+                    return NotFound($"No se encontró la categoría con ID = {id}");
                 }
                 else
                 {
-                    return StatusCode(500, "Ocurrió un error al actualizar el usuario.");
+                    return StatusCode(500, "Ocurrió un error al actualizar la categoría.");
                 }
             }
             catch (Exception ex)
@@ -169,18 +187,29 @@ namespace finaz_app.Server.Controllers
 
             try
             {
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                categoria.ModificadoPor = userID.Value;
+                categoria.CreadoPor = userID.Value;
+                categoria.FechaCreacion = DateTime.UtcNow;
+                categoria.isDeleted = false;
+
                 _context.Categorias.Add(categoria);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetCategoria", new { id = categoria.CategoriaId }, categoria);
+                return CreatedAtAction(nameof(GetCategoria), new { id = categoria.CategoriaId }, categoria);
             }
-            catch (DbUpdateException dbEx)
+            catch (DbUpdateException dbEx) when (dbEx.InnerException != null)
             {
-                return StatusCode(500, "Error de base de datos al guardar la categoría.");
+                return StatusCode(500, $"Error al guardar la categoría: {dbEx.InnerException.Message}");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Ocurrió un error inesperado en el servidor.");
+                return StatusCode(500, $"Ocurrió un error inesperado: {ex.Message}");
             }
         }
 
@@ -200,12 +229,21 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var categoria = await _context.Categorias.FindAsync(id);
-                if (categoria == null)
+                if (categoria == null || categoria.isDeleted)
                 {
-                    return NotFound();
+                    return NotFound($"No se encontró la categoría con ID = {id}");
                 }
 
-                _context.Categorias.Remove(categoria);
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                categoria.ModificadoPor = userID.Value;
+                categoria.FechaModificado = DateTime.UtcNow;
+                categoria.isDeleted = true;
+                _context.Entry(categoria).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return NoContent();
@@ -223,7 +261,7 @@ namespace finaz_app.Server.Controllers
         /// <returns>True si la categoría existe, de lo contrario false.</returns>
         private bool CategoriaExists(int id)
         {
-            return _context.Categorias.Any(e => e.CategoriaId == id);
+            return _context.Categorias.Any(e => e.CategoriaId == id && !e.isDeleted);
         }
     }
 }

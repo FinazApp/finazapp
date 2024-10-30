@@ -7,8 +7,14 @@
     {
         public int UsuarioId { get; set; }
 
-        public string? Nombre { get; set; }
+        public required string Nombre { get; set; }
 
-        public string? Correo { get; set; }
+        public required string CorreoElectronico { get; set; }
+
+        public required string PasswordHash { get; set; }
+
+        public required string Rol { get; set; }
+        
+        public bool isDeleted { get; set; } = false;
     }
 }

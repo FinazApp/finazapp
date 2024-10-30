@@ -1,16 +1,24 @@
-﻿namespace finaz_app.Server.Models.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace finaz_app.Server.Models.DTOs
 {
     /// <summary>
     /// Representa un objeto de transferencia de datos (DTO) para un gasto.
     /// </summary>
     public class GastosDTO
     {
-        public int GastosId { get; set; }
+        public int GastoId { get; set; }
 
-        public string? Nombre { get; set; }
+        public int? CategoriaId { get; set; }
 
-        public decimal? Monto { get; set; }
+        public required string Nombre { get; set; }
 
-        public virtual CategoriasDTO? Categoria { get; set; }
+        public decimal Monto { get; set; }
+
+        public bool isDeleted { get; set; } = false;
+
+        public int CreadoPor { get; set; }
+
+        public int? ModificadoPor { get; set; }
     }
 }

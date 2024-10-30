@@ -1,4 +1,5 @@
 ﻿using finaz_app.Server.Models;
+using finaz_app.Server.Models.DTOs;
 using finaz_app.Server.Security.JWT;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,6 @@ namespace finaz_app.Server.Controllers
     /// <summary>
     /// Controlador para gestionar el registro de nuevos usuarios en el sistema.
     /// </summary>
-    /// <remarks>
-    /// Este controlador permite registrar nuevos usuarios verificando que no existan ya en la base de datos, asegurando
-    /// que las credenciales sean válidas y creando un nuevo registro en la base de datos.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class RegisterController : ControllerBase
@@ -23,11 +20,6 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _appContext;
         private readonly JwtServices _jwtServices;
 
-        /// <summary>
-        /// Constructor para el controlador de registro.
-        /// </summary>
-        /// <param name="appContext">El contexto de la base de datos para FinanzApp.</param>
-        /// <param name="jwtServices">Servicio utilizado para gestionar tokens JWT, aunque no se usa en este controlador.</param>
         public RegisterController(FinanzAppContext appContext, JwtServices jwtServices)
         {
             _appContext = appContext;
@@ -37,18 +29,14 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Maneja el registro de un nuevo usuario.
         /// </summary>
-        /// <param name="request">Objeto de tipo Usuario que contiene la información del nuevo usuario.</param>
+        /// <param name="request">Objeto de tipo UsuariosDTO que contiene la información del nuevo usuario.</param>
         /// <returns>Devuelve un mensaje de éxito si el registro fue exitoso o un código de error en caso de conflicto o fallo.</returns>
-        /// <response code="200">Registro exitoso, se agrega el usuario a la base de datos.</response>
-        /// <response code="400">Los campos de entrada son inválidos, por ejemplo, el rol o el formato del correo no son válidos.</response>
-        /// <response code="409">Conflicto, el nombre de usuario o correo electrónico ya está en uso.</response>
-        /// <response code="500">Error interno del servidor, relacionado con la base de datos o el proceso de registro.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Usuario>> Register([FromBody] Usuario request)
+        public async Task<ActionResult> Register([FromBody] UsuariosDTO request)
         {
             // Validar el rol
             request.Rol = request.Rol?.ToLower();
@@ -58,13 +46,15 @@ namespace finaz_app.Server.Controllers
             }
 
             // Validar que los campos requeridos no estén vacíos
-            if (string.IsNullOrWhiteSpace(request.Nombre) || string.IsNullOrWhiteSpace(request.Correo) || string.IsNullOrWhiteSpace(request.PasswordHash))
+            if (string.IsNullOrWhiteSpace(request.Nombre) || 
+                string.IsNullOrWhiteSpace(request.CorreoElectronico) || 
+                string.IsNullOrWhiteSpace(request.PasswordHash))
             {
                 return BadRequest("Todos los campos son requeridos.");
             }
 
             // Validar el formato del correo electrónico
-            if (!new EmailAddressAttribute().IsValid(request.Correo))
+            if (!new EmailAddressAttribute().IsValid(request.CorreoElectronico))
             {
                 return BadRequest("El correo electrónico no es válido.");
             }
@@ -72,10 +62,11 @@ namespace finaz_app.Server.Controllers
             try
             {
                 // Verificar si el usuario ya existe
-                var existingUser = await _appContext.Usuarios.FirstOrDefaultAsync(u => u.Nombre == request.Nombre);
+                var existingUser = await _appContext.Usuarios
+                    .FirstOrDefaultAsync(u => u.CorreoElectronico == request.CorreoElectronico);
                 if (existingUser != null)
                 {
-                    return Conflict("El nombre de usuario ya está en uso.");
+                    return Conflict("El correo electrónico ya está en uso.");
                 }
 
                 // Hashear la contraseña
@@ -85,10 +76,10 @@ namespace finaz_app.Server.Controllers
                 var user = new Usuario
                 {
                     Nombre = request.Nombre,
-                    Correo = request.Correo,
+                    CorreoElectronico = request.CorreoElectronico,
                     PasswordHash = passwordHash,
-                    Estado = request.Estado,
-                    Rol = request.Rol
+                    Rol = request.Rol,
+                    isDeleted = false
                 };
 
                 // Agregar el nuevo usuario a la base de datos
@@ -99,7 +90,7 @@ namespace finaz_app.Server.Controllers
             }
             catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
             {
-                if (sqlEx.Number == 2627) // 2627 es el código de error para Unique Constraint Violation
+                if (sqlEx.Number == 2627)
                 {
                     return Conflict($"El correo electrónico ya está en uso.");
                 }

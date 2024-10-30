@@ -4,7 +4,6 @@ using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Azure.Core;
 using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,10 +12,6 @@ namespace finaz_app.Server.Controllers
     /// <summary>
     /// Controlador para gestionar las operaciones CRUD de los usuarios en el sistema.
     /// </summary>
-    /// <remarks>
-    /// Este controlador permite realizar operaciones como obtener, crear, modificar y eliminar usuarios.
-    /// Algunas rutas están protegidas para que solo usuarios con el rol de "admin" puedan acceder.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
@@ -24,11 +19,6 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Constructor del controlador de usuarios.
-        /// </summary>
-        /// <param name="context">El contexto de la base de datos para FinanzApp.</param>
-        /// <param name="mapper">Instancia de IMapper para mapear entidades a DTOs.</param>
         public UsuariosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
@@ -39,8 +29,6 @@ namespace finaz_app.Server.Controllers
         /// Obtiene todos los usuarios.
         /// </summary>
         /// <returns>Devuelve una lista de usuarios en formato DTO.</returns>
-        /// <response code="200">Operación exitosa, devuelve la lista de usuarios.</response>
-        /// <response code="500">Error interno del servidor al obtener los usuarios.</response>
         [HttpGet]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UsuariosDTO>), StatusCodes.Status200OK)]
@@ -49,7 +37,7 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var usuarios = await _context.Usuarios.ToListAsync();
+                var usuarios = await _context.Usuarios.Where(u => !u.isDeleted).ToListAsync();
                 var usuariosDto = _mapper.Map<IEnumerable<UsuariosDTO>>(usuarios);
 
                 return Ok(usuariosDto);
@@ -65,9 +53,6 @@ namespace finaz_app.Server.Controllers
         /// </summary>
         /// <param name="id">El ID del usuario a obtener.</param>
         /// <returns>Devuelve el usuario en formato DTO.</returns>
-        /// <response code="200">Operación exitosa, devuelve el usuario.</response>
-        /// <response code="404">Usuario no encontrado.</response>
-        /// <response code="500">Error interno del servidor al obtener el usuario.</response>
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status200OK)]
@@ -78,7 +63,7 @@ namespace finaz_app.Server.Controllers
             {
                 var usuario = await _context.Usuarios.FindAsync(id);
 
-                if (usuario == null)
+                if (usuario == null || usuario.isDeleted)
                 {
                     return NotFound();
                 }
@@ -95,48 +80,32 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Actualiza un usuario existente.
         /// </summary>
-        /// <param name="id">El ID del usuario a actualizar.</param>
-        /// <param name="usuario">Objeto de usuario con los datos actualizados.</param>
-        /// <returns>Devuelve un código de éxito o error.</returns>
-        /// <response code="204">El usuario se actualizó exitosamente.</response>
-        /// <response code="400">El ID del usuario no coincide con el parámetro proporcionado.</response>
-        /// <response code="404">Usuario no encontrado.</response>
-        /// <response code="500">Error interno del servidor al actualizar el usuario.</response>
         [HttpPatch("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> PutUsuario(int id, Usuario request)
+        public async Task<IActionResult> PutUsuario(int id, UsuariosDTO request)
         {
+            if (id != request.UsuarioId)
+                return BadRequest("El ID del usuario no coincide con el parámetro proporcionado.");
+
             var existingUser = await _context.Usuarios.FindAsync(id);
-            if (existingUser == null)
+            if (existingUser == null || existingUser.isDeleted)
                 return NotFound("Usuario no encontrado.");
 
             var nombreExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Nombre == request.Nombre && u.UsuarioId != id);
             if (nombreExistente != null)
                 return Conflict("El nombre ya está en uso.");
 
-            if (!string.IsNullOrWhiteSpace(request.Nombre))
-                existingUser.Nombre = request.Nombre;
-
-            if (!string.IsNullOrWhiteSpace(request.Correo))
-            {
-                if (!new EmailAddressAttribute().IsValid(request.Correo))
-                    return BadRequest("El correo electrónico no es válido.");
-                existingUser.Correo = request.Correo;
-            }
+            existingUser.Nombre = request.Nombre;
+            existingUser.CorreoElectronico = request.CorreoElectronico;
 
             if (!string.IsNullOrWhiteSpace(request.PasswordHash))
                 existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
 
-            if (!string.IsNullOrWhiteSpace(request.Rol))
-                existingUser.Rol = request.Rol;
-
-            if ((request.Estado) != null)
-                existingUser.Estado = request.Estado;
+            existingUser.Rol = request.Rol;
 
             _context.Entry(existingUser).State = EntityState.Modified;
 
@@ -154,15 +123,14 @@ namespace finaz_app.Server.Controllers
             {
                 return sqlEx.Number switch
                 {
-                    2627 => Conflict("El correo electrónico ya está en uso."), 
-                    547 => BadRequest("Violación de integridad referencial."), 
+                    2627 => Conflict("El correo electrónico ya está en uso."),
+                    547 => BadRequest("Violación de integridad referencial."),
                     _ => StatusCode(StatusCodes.Status500InternalServerError, $"Error en la base de datos: {sqlEx.Message}")
                 };
             }
             catch (Exception ex)
             {
-                var detalle = ex.InnerException?.Message ?? "Sin detalles adicionales.";
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el usuario: {ex.Message}. Detalle: {detalle}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el usuario: {ex.Message}");
             }
 
             return NoContent();
@@ -171,39 +139,29 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Crea un nuevo usuario.
         /// </summary>
-        /// <param name="usuario">El objeto de usuario a crear.</param>
-        /// <returns>Devuelve el usuario creado y su ID.</returns>
-        /// <response code="201">El usuario se creó exitosamente.</response>
-        /// <response code="400">Datos de entrada inválidos.</response>
-        /// <response code="500">Error interno del servidor al crear el usuario.</response>
-        /**
         [HttpPost]
-        [ProducesResponseType(typeof(Usuario), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<ActionResult<UsuariosDTO>> PostUsuario(UsuariosDTO usuarioDto)
         {
             try
             {
+                var usuario = _mapper.Map<Usuario>(usuarioDto);
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetUsuario), new { id = usuario.UsuarioId }, usuario);
+                var createdUsuarioDto = _mapper.Map<UsuariosDTO>(usuario);
+                return CreatedAtAction(nameof(GetUsuario), new { id = createdUsuarioDto.UsuarioId }, createdUsuarioDto);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el usuario: {ex.Message}");
             }
         }
-        */
 
         /// <summary>
         /// Elimina un usuario existente.
         /// </summary>
-        /// <param name="id">El ID del usuario a eliminar.</param>
-        /// <returns>Devuelve un código de éxito o error.</returns>
-        /// <response code="204">El usuario se eliminó exitosamente.</response>
-        /// <response code="404">Usuario no encontrado.</response>
-        /// <response code="500">Error interno del servidor al eliminar el usuario.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -212,12 +170,13 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var usuario = await _context.Usuarios.FindAsync(id);
-                if (usuario == null)
+                if (usuario == null || usuario.isDeleted)
                 {
                     return NotFound();
                 }
 
-                _context.Usuarios.Remove(usuario);
+                usuario.isDeleted = true;
+                _context.Entry(usuario).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return NoContent();
@@ -236,16 +195,11 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Verifica si un usuario existe en la base de datos.
-        /// </summary>
-        /// <param name="id">El ID del usuario a verificar.</param>
-        /// <returns>True si el usuario existe, false en caso contrario.</returns>
         private bool UsuarioExists(int id)
         {
             try
             {
-                return _context.Usuarios.Any(e => e.UsuarioId == id);
+                return _context.Usuarios.Any(e => e.UsuarioId == id && !e.isDeleted);
             }
             catch (Exception)
             {
@@ -253,5 +207,4 @@ namespace finaz_app.Server.Controllers
             }
         }
     }
-
 }

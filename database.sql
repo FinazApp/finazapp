@@ -1,48 +1,54 @@
 CREATE TABLE Usuarios (
-    UsuarioId INT PRIMARY KEY,
-    Nombre NVARCHAR(255) NOT NULL,
+    UsuarioId INT PRIMARY KEY IDENTITY(1,1),
+    Nombre NVARCHAR(100) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
-    CorreoElectronico NVARCHAR(255) NOT NULL,
-    isDeleted BIT NOT NULL
+    CorreoElectronico NVARCHAR(100) NOT NULL UNIQUE,
+    isDeleted BIT NOT NULL DEFAULT 0,
+    Rol NVARCHAR(10) NOT NULL
 );
 
 CREATE TABLE Categorias (
-    CategoriaId INT PRIMARY KEY,
-    Nombre NVARCHAR(255) NOT NULL,
+    CategoriaId INT PRIMARY KEY IDENTITY(1,1),
+    Nombre NVARCHAR(100) NOT NULL,
     Descripcion NVARCHAR(255),
-    isDeleted BIT NOT NULL,
+    isDeleted BIT NOT NULL DEFAULT 0,
     isSystem BIT NOT NULL,
-    UsuarioId INT,
-    CreadoPor NVARCHAR(255) NOT NULL,
-    FechaCreacion DATETIME NOT NULL,
-    ModificadoPor NVARCHAR(255),
-    FechaModificado DATETIME,
-    FOREIGN KEY (UsuarioId) REFERENCES Usuarios(UsuarioId)
+    CreadoPor INT NULL,
+    FechaCreacion DATETIME2 NOT NULL,
+    ModificadoPor INT NULL,
+    FechaModificado DATETIME2,
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
 );
-ALTER TABLE Categorias ADD CONSTRAINT UQ_Nombre_UsuarioId UNIQUE (Nombre, UsuarioId)
+
+ALTER TABLE Categorias ADD CONSTRAINT UQ_Nombre_CreadoPor UNIQUE (Nombre, CreadoPor);
 
 CREATE TABLE Gastos (
-    GastoId INT PRIMARY KEY,
+    GastoId INT PRIMARY KEY IDENTITY(1,1),
     CategoriaId INT,
-    Nombre NVARCHAR(255) NOT NULL,
-    Monto DECIMAL(18, 2) NOT NULL,
-    isDeleted BIT NOT NULL,
-    CreadoPor NVARCHAR(255) NOT NULL,
-    FechaCreacion DATETIME NOT NULL,
-    ModificadoPor NVARCHAR(255),
-    FechaModificado DATETIME,
-    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId)
+    Nombre NVARCHAR(100) NOT NULL,
+    Monto DECIMAL(18, 2) NOT NULL CHECK (Monto >= 0),
+    isDeleted BIT NOT NULL DEFAULT 0,
+    CreadoPor INT NOT NULL,
+    FechaCreacion DATETIME2 NOT NULL,
+    ModificadoPor INT NULL,
+    FechaModificado DATETIME2,
+    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId) ON DELETE NO ACTION,
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
 );
 
 CREATE TABLE Ingresos (
-    IngresoId INT PRIMARY KEY,
+    IngresoId INT PRIMARY KEY IDENTITY(1,1),
     CategoriaId INT,
-    Nombre NVARCHAR(255) NOT NULL,
-    Monto DECIMAL(18, 2) NOT NULL,
-    isDeleted BIT NOT NULL,
-    CreadoPor NVARCHAR(255) NOT NULL,
-    FechaCreacion DATETIME NOT NULL,
-    ModificadoPor NVARCHAR(255),
-    FechaModificado DATETIME,
-    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId)
+    Nombre NVARCHAR(100) NOT NULL,
+    Monto DECIMAL(18, 2) NOT NULL CHECK (Monto >= 0),
+    isDeleted BIT NOT NULL DEFAULT 0,
+    CreadoPor INT NOT NULL,
+    FechaCreacion DATETIME2 NOT NULL,
+    ModificadoPor INT NULL,
+    FechaModificado DATETIME2,
+    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId) ON DELETE NO ACTION,
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
 );

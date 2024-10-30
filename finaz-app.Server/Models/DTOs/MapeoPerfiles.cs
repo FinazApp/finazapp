@@ -15,8 +15,8 @@ namespace finaz_app.Server.Models.DTOs
             // Mapeo entre las entidades y sus respectivos DTOs
             CreateMap<Usuario, UsuariosDTO>();
             CreateMap<Gasto, GastosDTO>();
-            CreateMap<Ingreso, IngresosDTO>();
-            CreateMap<Categoria, CategoriasDTO>();
+            CreateMap<Ingreso, IngresosDTO>().ReverseMap();
+            CreateMap<Categoria, CategoriasDTO>().ReverseMap();
         }
     }
 }

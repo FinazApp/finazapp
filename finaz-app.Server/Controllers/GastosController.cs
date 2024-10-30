@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using finaz_app.Server.Models;
 using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using finaz_app.Server.Security.JWT;
 
 namespace finaz_app.Server.Controllers
@@ -15,10 +15,6 @@ namespace finaz_app.Server.Controllers
     /// <summary>
     /// Controlador API para la gestión de gastos en FinanzApp.
     /// </summary>
-    /// <remarks>
-    /// Este controlador maneja las operaciones CRUD para los gastos, como listar, obtener, 
-    /// crear, actualizar y eliminar gastos.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "usuario, admin")]
@@ -27,11 +23,6 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Constructor del controlador GastosController.
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos de FinanzApp.</param>
-        /// <param name="mapper">Instancia de AutoMapper para mapear entidades a DTOs.</param>
         public GastosController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
@@ -41,14 +32,11 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Obtiene todos los gastos.
         /// </summary>
-        /// <returns>Una lista de objetos GastosDTO.</returns>
-        /// <response code="200">Devuelve la lista de gastos.</response>
-        /// <response code="401">No autorizado.</response>
-        /// <response code="403">Prohibido.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GastosDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<GastosDTO>>> GetGastos()
         {
             try
@@ -62,7 +50,7 @@ namespace finaz_app.Server.Controllers
 
                 var gastos = await _context.Gastos
                     .Include(g => g.Categoria)
-                    .Where(g => g.CreadoPor == userIDT || g.CreadoPor == null) 
+                    .Where(g => g.CreadoPor == userIDT && !g.isDeleted)
                     .ToListAsync();
 
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
@@ -75,32 +63,27 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al obtener datos del gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
         }
-
 
         /// <summary>
         /// Obtiene un gasto específico por su ID.
         /// </summary>
-        /// <param name="id">ID del gasto a obtener.</param>
-        /// <returns>El objeto GastosDTO correspondiente al ID proporcionado.</returns>
-        /// <response code="200">Devuelve el gasto solicitado.</response>
-        /// <response code="404">No se encontró el gasto.</response>
-        /// <response code="401">No autorizado.</response>
-        /// <response code="403">Prohibido.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GastosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<GastosDTO>> GetGasto(int id)
         {
             try
             {
                 var gasto = await _context.Gastos
                     .Include(g => g.Categoria)
-                    .SingleOrDefaultAsync(a => a.GastosId == id);
+                    .SingleOrDefaultAsync(a => a.GastoId == id && !a.isDeleted);
 
                 if (gasto == null)
                 {
@@ -112,30 +95,35 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al obtener el gasto: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al obtener el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
         }
 
         /// <summary>
         /// Actualiza un gasto existente.
         /// </summary>
-        /// <param name="id">ID del gasto a actualizar.</param>
-        /// <param name="gasto">Objeto Gasto con los datos actualizados.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Gasto actualizado correctamente.</response>
-        /// <response code="400">El ID proporcionado no coincide con el ID del gasto.</response>
-        /// <response code="404">No se encontró el gasto.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutGasto(int id, Gasto gasto)
         {
-            if (id != gasto.GastosId)
+            if (id != gasto.GastoId)
             {
                 return BadRequest("El ID del gasto no coincide.");
             }
 
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+
+            gasto.FechaModificado = DateTime.UtcNow;
+            gasto.ModificadoPor = userID.Value;
+            gasto.CreadoPor = userID.Value;
             _context.Entry(gasto).State = EntityState.Modified;
 
             try
@@ -155,7 +143,8 @@ namespace finaz_app.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el gasto: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al actualizar el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
 
             return NoContent();
@@ -164,38 +153,51 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Crea un nuevo gasto.
         /// </summary>
-        /// <param name="gasto">Objeto Gasto a crear.</param>
-        /// <returns>El objeto Gasto creado.</returns>
-        /// <response code="201">Gasto creado correctamente.</response>
-        /// <response code="400">Solicitud incorrecta.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Gasto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Gasto>> PostGasto(Gasto gasto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                gasto.CreadoPor = userID.Value;
+                gasto.ModificadoPor = userID.Value;
+                gasto.FechaCreacion = DateTime.UtcNow;
+                gasto.FechaModificado = DateTime.UtcNow;
                 _context.Gastos.Add(gasto);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetGasto), new { id = gasto.GastosId }, gasto);
+                return CreatedAtAction(nameof(GetGasto), new { id = gasto.GastoId }, gasto);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el gasto: {dbEx.Message} - Detalles: {dbEx.InnerException?.Message}");
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el gasto: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el gasto: {ex.Message} - Detalles: {ex.InnerException?.Message}");
             }
         }
 
         /// <summary>
         /// Elimina un gasto existente por su ID.
         /// </summary>
-        /// <param name="id">ID del gasto a eliminar.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Gasto eliminado correctamente.</response>
-        /// <response code="404">No se encontró el gasto.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteGasto(int id)
         {
             try
@@ -206,27 +208,35 @@ namespace finaz_app.Server.Controllers
                     return NotFound();
                 }
 
-                _context.Gastos.Remove(gasto);
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                gasto.ModificadoPor = userID.Value;
+                gasto.FechaModificado = DateTime.UtcNow;
+                gasto.isDeleted = true;
+                _context.Entry(gasto).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el gasto: {ex.Message}");
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
         }
 
         /// <summary>
         /// Verifica si un gasto existe en la base de datos.
         /// </summary>
-        /// <param name="id">ID del gasto a verificar.</param>
-        /// <returns>True si el gasto existe, de lo contrario false.</returns>
         private bool GastoExists(int id)
         {
             try
             {
-                return _context.Gastos.Any(e => e.GastosId == id);
+                return _context.Gastos.Any(e => e.GastoId == id && !e.isDeleted);
             }
             catch (Exception)
             {

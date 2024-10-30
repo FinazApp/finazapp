@@ -7,9 +7,16 @@
     {
         public int CategoriaId { get; set; }
 
-        public string Nombre { get; set; } = null!;
+        public required string Nombre { get; set; }
 
         public string? Descripcion { get; set; }
 
+        public bool isDeleted { get; set; } = false;
+
+        public bool isSystem { get; set; } = false;
+
+        public int CreadoPor { get; set; }
+
+        public int? ModificadoPor { get; set; }
     }
 }
