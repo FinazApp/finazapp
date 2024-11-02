@@ -82,7 +82,7 @@ namespace finaz_app.Server.Controllers
                     UsuarioId = user.UsuarioId,
                     Nombre = user.Nombre,
                     CorreoElectronico = user.CorreoElectronico,
-                    PasswordHash = "",
+                    PasswordHash = user.PasswordHash,
                     Rol = user.Rol,
                     isDeleted = user.isDeleted
                 };

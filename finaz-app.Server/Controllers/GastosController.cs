@@ -115,19 +115,34 @@ namespace finaz_app.Server.Controllers
                 return BadRequest("El ID del gasto no coincide.");
             }
 
-            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
-            if (userID == null)
-            {
-                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
-            }
-
-            gasto.FechaModificado = DateTime.UtcNow;
-            gasto.ModificadoPor = userID.Value;
-            gasto.CreadoPor = userID.Value;
-            _context.Entry(gasto).State = EntityState.Modified;
-
             try
             {
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                var userExists = await _context.Usuarios.AnyAsync(u => u.UsuarioId == userID.Value);
+                if (!userExists)
+                {
+                    return Unauthorized("El usuario no existe en el sistema.");
+                }
+
+                var existingGasto = await _context.Gastos.FindAsync(id);
+                if (existingGasto == null || existingGasto.isDeleted)
+                {
+                    return NotFound();
+                }
+
+                gasto.CreadoPor = existingGasto.CreadoPor;
+                gasto.FechaCreacion = existingGasto.FechaCreacion;
+
+                gasto.ModificadoPor = userID.Value;
+                gasto.FechaModificado = DateTime.UtcNow;
+
+                _context.Entry(existingGasto).CurrentValues.SetValues(gasto);
+
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

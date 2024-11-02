@@ -1,9 +1,8 @@
 ﻿using finaz_app.Server.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Text;
-
-/*
 
 namespace finaz_app.Server.Controllers
 {
@@ -12,7 +11,7 @@ namespace finaz_app.Server.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly FinanzAppContext _context;
-        private readonly IWebHostEnvironment _environment; // Inyección del entorno para obtener el directorio web
+        private readonly IWebHostEnvironment _environment;
 
         public ReportsController(FinanzAppContext context, IWebHostEnvironment environment)
         {
@@ -28,9 +27,10 @@ namespace finaz_app.Server.Controllers
                 return BadRequest("Por favor, proporciona una fecha de inicio y una fecha de fin válidas.");
             }
 
-            // Obtener ingresos y gastos en el rango de fechas
             var ingresos = _context.Ingresos
-                .Where(i => i.FechaCreacion >= fechaInicio && i.FechaCreacion <= fechaFin && i.Estado != 0)
+                .Where(i => i.FechaCreacion >= fechaInicio.ToDateTime(TimeOnly.MinValue) && 
+                            i.FechaCreacion <= fechaFin.ToDateTime(TimeOnly.MaxValue) && 
+                            !i.isDeleted)
                 .Select(i => new {
                     Tipo = "Ingreso",
                     Transaccion = i.Nombre,
@@ -40,7 +40,9 @@ namespace finaz_app.Server.Controllers
                 }).ToList();
 
             var gastos = _context.Gastos
-                .Where(g => g.FechaCreacion >= fechaInicio && g.FechaCreacion <= fechaFin && g.Estado != 0)
+                .Where(g => g.FechaCreacion >= fechaInicio.ToDateTime(TimeOnly.MinValue) && 
+                            g.FechaCreacion <= fechaFin.ToDateTime(TimeOnly.MaxValue) && 
+                            !g.isDeleted)
                 .Select(g => new {
                     Tipo = "Gasto",
                     Transaccion = g.Nombre,
@@ -59,17 +61,13 @@ namespace finaz_app.Server.Controllers
                 csv.AppendLine($"{item.Tipo},{item.Transaccion},{item.Monto},{item.Categoria},{item.Fecha:yyyy-MM-dd}");
             }
 
-            // Crear el archivo temporal y guardar el CSV
             var fileName = $"reporte_{DateTime.Now:yyyyMMddHHmmss}.csv";
             var filePath = Path.Combine(_environment.WebRootPath, "reportes", fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Asegura que el directorio exista
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             System.IO.File.WriteAllText(filePath, csv.ToString(), Encoding.UTF8);
 
-            // Retorna la URL del archivo
             var fileUrl = $"{Request.Scheme}://{Request.Host}/reportes/{fileName}";
             return Ok(new { url = fileUrl });
         }
     }
 }
-
-*/

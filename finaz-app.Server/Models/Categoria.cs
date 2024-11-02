@@ -15,17 +15,23 @@ namespace finaz_app.Server.Models
 
         public string? Descripcion { get; set; }
 
+        [JsonIgnore]
         public bool isDeleted { get; set; } = false;
 
+        [JsonIgnore]
         public bool isSystem { get; set; } = false;
 
+        [JsonIgnore]
         public int CreadoPor { get; set; }
 
+        [JsonIgnore]
         [BindNever]
         public DateTime FechaCreacion { get; set; }
 
+        [JsonIgnore]
         public int? ModificadoPor { get; set; }
 
+        [JsonIgnore]
         [BindNever]
         public DateTime? FechaModificado { get; set; }
 

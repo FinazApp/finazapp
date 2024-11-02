@@ -50,7 +50,7 @@ namespace finaz_app.Server.Controllers
 
                 var ingresos = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .Where(i => i.CreadoPor == userID || i.CreadoPor == null)
+                    .Where(i => (i.CreadoPor == userID || i.CreadoPor == null) && !i.isDeleted)
                     .ToListAsync();
 
                 var ingresosDTO = _mapper.Map<IEnumerable<IngresosDTO>>(ingresos);
@@ -77,7 +77,7 @@ namespace finaz_app.Server.Controllers
             {
                 var ingreso = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .SingleOrDefaultAsync(i => i.IngresoId == id);
+                    .SingleOrDefaultAsync(i => i.IngresoId == id && !i.isDeleted);
 
                 if (ingreso == null)
                 {
@@ -116,11 +116,25 @@ namespace finaz_app.Server.Controllers
                     return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
                 }
 
+                var existingIngreso = await _context.Ingresos.FindAsync(id);
+                if (existingIngreso == null)
+                {
+                    return NotFound();
+                }
+
+                ingreso.CreadoPor = existingIngreso.CreadoPor;
+                ingreso.FechaCreacion = existingIngreso.FechaCreacion;
+
+                var userExists = await _context.Usuarios.AnyAsync(u => u.UsuarioId == userID.Value);
+                if (!userExists)
+                {
+                    return Unauthorized("El usuario no existe en el sistema.");
+                }
+
                 ingreso.ModificadoPor = userID.Value;
                 ingreso.FechaModificado = DateTime.UtcNow;
-                ingreso.CreadoPor = userID.Value;
 
-                _context.Entry(ingreso).State = EntityState.Modified;
+                _context.Entry(existingIngreso).CurrentValues.SetValues(ingreso);
 
                 await _context.SaveChangesAsync();
             }
@@ -220,7 +234,7 @@ namespace finaz_app.Server.Controllers
             catch (Exception ex)
             {
                 var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el ingreso: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
         }
 

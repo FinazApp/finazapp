@@ -17,7 +17,8 @@ namespace finaz_app.Server.Models
         public required string PasswordHash { get; set; }
 
         public required string Rol { get; set; }
-
+        
+        [JsonIgnore]
         public bool isDeleted { get; set; } = false;
 
         [JsonIgnore]

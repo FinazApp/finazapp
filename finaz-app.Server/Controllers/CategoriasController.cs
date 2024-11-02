@@ -5,16 +5,15 @@ using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using finaz_app.Server.Security.JWT;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace finaz_app.Server.Controllers
 {
     /// <summary>
     /// Controlador API para la gestión de categorías en FinanzApp.
     /// </summary>
-    /// <remarks>
-    /// Este controlador maneja las operaciones CRUD para las categorías, como listar, obtener, 
-    /// crear, actualizar y eliminar categorías.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "usuario, admin")]
@@ -23,24 +22,12 @@ namespace finaz_app.Server.Controllers
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Constructor de CategoriasController.
-        /// </summary>
-        /// <param name="context">Contexto de la base de datos de FinanzApp.</param>
-        /// <param name="mapper">Interfaz de AutoMapper para mapear entidades a DTOs.</param>
         public CategoriasController(FinanzAppContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Obtiene todas las categorías.
-        /// </summary>
-        /// <returns>Una lista de CategoriasDTO.</returns>
-        /// <response code="200">Devuelve la lista de categorías.</response>
-        /// <response code="401">No autorizado.</response>
-        /// <response code="403">Prohibido para el rol actual.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CategoriasDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -50,7 +37,6 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
-
                 if (userID == null)
                 {
                     return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
@@ -70,13 +56,6 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Obtiene una categoría específica por ID.
-        /// </summary>
-        /// <param name="id">ID de la categoría.</param>
-        /// <returns>Una categoría específica.</returns>
-        /// <response code="200">Devuelve la categoría solicitada.</response>
-        /// <response code="404">Categoría no encontrada.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(CategoriasDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -101,22 +80,13 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Actualiza una categoría existente.
-        /// </summary>
-        /// <param name="id">ID de la categoría a actualizar.</param>
-        /// <param name="categoria">Datos de la categoría actualizados.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Categoría actualizada correctamente.</response>
-        /// <response code="400">El ID proporcionado no coincide.</response>
-        /// <response code="404">Categoría no encontrada.</response>
         [HttpPatch("{id}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutCategoria(int id, Categoria categoria)
+        public async Task<IActionResult> PutCategoria(int id, [FromBody] Categoria categoria)
         {
             if (id != categoria.CategoriaId)
             {
@@ -137,10 +107,8 @@ namespace finaz_app.Server.Controllers
 
             existingCategoria.Nombre = categoria.Nombre;
             existingCategoria.Descripcion = categoria.Descripcion;
-            existingCategoria.isSystem = categoria.isSystem;
             existingCategoria.ModificadoPor = userID.Value;
             existingCategoria.FechaModificado = DateTime.UtcNow;
-            existingCategoria.CreadoPor = userID.Value;
 
             _context.Entry(existingCategoria).State = EntityState.Modified;
 
@@ -167,13 +135,6 @@ namespace finaz_app.Server.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Crea una nueva categoría.
-        /// </summary>
-        /// <param name="categoria">Los datos de la nueva categoría.</param>
-        /// <returns>La categoría creada.</returns>
-        /// <response code="201">Categoría creada correctamente.</response>
-        /// <response code="400">Solicitud incorrecta.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -193,10 +154,11 @@ namespace finaz_app.Server.Controllers
                     return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
                 }
 
+                categoria.isSystem = User.IsInRole("admin");
+
                 categoria.ModificadoPor = userID.Value;
                 categoria.CreadoPor = userID.Value;
                 categoria.FechaCreacion = DateTime.UtcNow;
-                categoria.isDeleted = false;
 
                 _context.Categorias.Add(categoria);
                 await _context.SaveChangesAsync();
@@ -213,13 +175,6 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Elimina una categoría por ID.
-        /// </summary>
-        /// <param name="id">ID de la categoría a eliminar.</param>
-        /// <returns>Resultado de la operación.</returns>
-        /// <response code="204">Categoría eliminada correctamente.</response>
-        /// <response code="404">Categoría no encontrada.</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -254,11 +209,6 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Verifica si una categoría existe.
-        /// </summary>
-        /// <param name="id">ID de la categoría a verificar.</param>
-        /// <returns>True si la categoría existe, de lo contrario false.</returns>
         private bool CategoriaExists(int id)
         {
             return _context.Categorias.Any(e => e.CategoriaId == id && !e.isDeleted);
