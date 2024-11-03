@@ -78,8 +78,7 @@ namespace finaz_app.Server.Controllers
                     Nombre = request.Nombre,
                     CorreoElectronico = request.CorreoElectronico,
                     PasswordHash = passwordHash,
-                    Rol = request.Rol,
-                    isDeleted = false
+                    Rol = request.Rol
                 };
 
                 // Agregar el nuevo usuario a la base de datos

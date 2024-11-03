@@ -3,7 +3,6 @@ CREATE TABLE Usuarios (
     Nombre NVARCHAR(100) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     CorreoElectronico NVARCHAR(100) NOT NULL UNIQUE,
-    isDeleted BIT NOT NULL DEFAULT 0,
     Rol NVARCHAR(10) NOT NULL
 );
 
@@ -17,8 +16,8 @@ CREATE TABLE Categorias (
     FechaCreacion DATETIME2 NOT NULL,
     ModificadoPor INT NULL,
     FechaModificado DATETIME2,
-    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
-    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId),
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId)
 );
 
 ALTER TABLE Categorias ADD CONSTRAINT UQ_Nombre_CreadoPor UNIQUE (Nombre, CreadoPor);
@@ -33,9 +32,9 @@ CREATE TABLE Gastos (
     FechaCreacion DATETIME2 NOT NULL,
     ModificadoPor INT NULL,
     FechaModificado DATETIME2,
-    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId) ON DELETE NO ACTION,
-    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
-    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
+    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId),
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId),
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId)
 );
 
 CREATE TABLE Ingresos (
@@ -48,7 +47,7 @@ CREATE TABLE Ingresos (
     FechaCreacion DATETIME2 NOT NULL,
     ModificadoPor INT NULL,
     FechaModificado DATETIME2,
-    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId) ON DELETE NO ACTION,
-    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION,
-    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId) ON DELETE NO ACTION
+    FOREIGN KEY (CategoriaId) REFERENCES Categorias(CategoriaId),
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId),
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId)
 );

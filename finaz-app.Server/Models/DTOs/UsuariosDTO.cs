@@ -14,7 +14,5 @@
         public required string PasswordHash { get; set; }
 
         public required string Rol { get; set; }
-        
-        public bool isDeleted { get; set; } = false;
     }
 }

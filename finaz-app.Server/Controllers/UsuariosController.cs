@@ -37,7 +37,7 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var usuarios = await _context.Usuarios.Where(u => !u.isDeleted).ToListAsync();
+                var usuarios = await _context.Usuarios.ToListAsync();
                 var usuariosDto = _mapper.Map<IEnumerable<UsuariosDTO>>(usuarios);
 
                 return Ok(usuariosDto);
@@ -63,7 +63,7 @@ namespace finaz_app.Server.Controllers
             {
                 var usuario = await _context.Usuarios.FindAsync(id);
 
-                if (usuario == null || usuario.isDeleted)
+                if (usuario == null)
                 {
                     return NotFound();
                 }
@@ -92,7 +92,7 @@ namespace finaz_app.Server.Controllers
                 return BadRequest("El ID del usuario no coincide con el parámetro proporcionado.");
 
             var existingUser = await _context.Usuarios.FindAsync(id);
-            if (existingUser == null || existingUser.isDeleted)
+            if (existingUser == null)
                 return NotFound("Usuario no encontrado.");
 
             var nombreExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Nombre == request.Nombre && u.UsuarioId != id);
@@ -160,7 +160,7 @@ namespace finaz_app.Server.Controllers
         }
 
         /// <summary>
-        /// Elimina un usuario existente.
+        /// Elimina un usuario existente de manera definitiva.
         /// </summary>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -169,15 +169,8 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                var usuario = await _context.Usuarios.FindAsync(id);
-                if (usuario == null || usuario.isDeleted)
-                {
-                    return NotFound();
-                }
-
-                usuario.isDeleted = true;
-                _context.Entry(usuario).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
+                var paramUsuarioId = new SqlParameter("@UsuarioId", id);
+                await _context.Database.ExecuteSqlRawAsync("EXEC EliminarUsuario @UsuarioId", paramUsuarioId);
 
                 return NoContent();
             }
@@ -199,7 +192,7 @@ namespace finaz_app.Server.Controllers
         {
             try
             {
-                return _context.Usuarios.Any(e => e.UsuarioId == id && !e.isDeleted);
+                return _context.Usuarios.Any(e => e.UsuarioId == id);
             }
             catch (Exception)
             {

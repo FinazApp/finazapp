@@ -159,6 +159,7 @@ namespace finaz_app.Server.Controllers
                 categoria.ModificadoPor = userID.Value;
                 categoria.CreadoPor = userID.Value;
                 categoria.FechaCreacion = DateTime.UtcNow;
+                categoria.FechaModificado = DateTime.UtcNow;
 
                 _context.Categorias.Add(categoria);
                 await _context.SaveChangesAsync();

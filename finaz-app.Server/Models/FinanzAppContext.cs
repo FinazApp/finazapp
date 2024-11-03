@@ -115,7 +115,6 @@ namespace finaz_app.Server.Models
                 entity.Property(e => e.Rol)
                     .HasMaxLength(10)
                     .HasDefaultValue("usuario");
-                entity.Property(e => e.isDeleted).IsRequired().HasDefaultValue(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

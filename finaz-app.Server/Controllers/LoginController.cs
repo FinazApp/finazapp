@@ -48,7 +48,7 @@ namespace finaz_app.Server.Controllers
             {
                 // Buscando al usuario
                 var user = await _context.Usuarios
-                    .Where(u => u.CorreoElectronico == request.CorreoElectronico && !u.isDeleted)
+                    .Where(u => u.CorreoElectronico == request.CorreoElectronico)
                     .SingleOrDefaultAsync();
 
                 // Verifica si el usuario existe
@@ -83,8 +83,7 @@ namespace finaz_app.Server.Controllers
                     Nombre = user.Nombre,
                     CorreoElectronico = user.CorreoElectronico,
                     PasswordHash = user.PasswordHash,
-                    Rol = user.Rol,
-                    isDeleted = user.isDeleted
+                    Rol = user.Rol
                 };
 
                 return Ok(new { message = "Inicio de sesión exitoso", user = userDto });
