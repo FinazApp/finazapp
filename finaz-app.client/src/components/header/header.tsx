@@ -1,36 +1,47 @@
-import React from "react";
-import { Box, Flex } from "styled-system/jsx";
+import * as React from 'react';
+import GlobalStyles from '@mui/joy/GlobalStyles';
+import Sheet from '@mui/joy/Sheet';
+import IconButton from '@mui/joy/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import { SidebarUtils } from '@utils';
 
-import { Heading, Text } from "../park-ui";
-
-export interface IHeaderProps {
-  title: string;
-  subtitle: string;
-  rightContent?: React.ReactNode;
-}
-
-const Header = ({ subtitle, title, rightContent }: IHeaderProps) => {
+export default function Header() {
   return (
-    <Box bg="Background" borderRadius="lg" boxShadow="lg">
-      <Flex
-        p={4}
-        flexWrap="wrap"
-        gap={4}
-        justifyContent="space-between"
-        alignItems="center"
+    <Sheet
+      sx={{
+        display: { xs: 'flex', md: 'none' },
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        top: 0,
+        width: '100vw',
+        height: 'var(--Header-height)',
+        zIndex: 9995,
+        p: 2,
+        gap: 1,
+        borderBottom: '1px solid',
+        borderColor: 'background.level1',
+        boxShadow: 'sm',
+      }}
+    >
+      <GlobalStyles
+        styles={(theme) => ({
+          ':root': {
+            '--Header-height': '52px',
+            [theme.breakpoints.up('md')]: {
+              '--Header-height': '0px',
+            },
+          },
+        })}
+      />
+      <IconButton
+        onClick={() => SidebarUtils.toggleSidebar()}
+        variant="outlined"
+        color="neutral"
+        size="sm"
       >
-        <Box>
-          <Text as="span" fontWeight="medium" color="neutral.11" size="md">
-            {subtitle}
-          </Text>
-          <Heading as="h1" size={["2xl", "3xl"]}>
-            {title}
-          </Heading>
-        </Box>
-        <Flex gap="5">{rightContent}</Flex>
-      </Flex>
-    </Box>
+        <MenuIcon />
+      </IconButton>
+    </Sheet>
   );
-};
-
-export default Header;
+}

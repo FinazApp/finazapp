@@ -7,7 +7,6 @@ import {
   isRouteErrorResponse,
 } from "react-router-dom";
 
-import { Button, Heading, Text } from "../park-ui";
 
 const ErrorBoundary = () => {
   const error = useRouteError();
@@ -35,7 +34,7 @@ const ErrorBoundary = () => {
       flexDirection="column"
       justifyContent="center"
     >
-      <Heading
+      {/* <Heading
         as="h1"
         color="red.10"
         textAlign="center"
@@ -59,7 +58,7 @@ const ErrorBoundary = () => {
           Ir a la pagina principal
           <IconHome name="home" />
         </Button>
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 };

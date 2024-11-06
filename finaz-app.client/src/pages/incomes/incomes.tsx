@@ -1,13 +1,13 @@
 import React from "react";
 import { IIncomes } from "@interfaces";
 import { Box } from "styled-system/jsx";
-import { FormatNumber } from "@ark-ui/react";
+// import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { useDeleteIncomes, useFetchIncomes } from "@hooks";
-import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
+// import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
 import toast from "react-hot-toast";
 
 const columnHelper = createColumnHelper<IIncomes>();
@@ -22,17 +22,17 @@ const columns = [
     id: "category",
     header: "Categoría",
   }),
-  columnHelper.accessor("monto", {
-    id: "amount",
-    header: "Monto",
-    cell: (info) => (
-      <FormatNumber
-        style="currency"
-        currency="USD"
-        value={info.getValue() ?? 0}
-      />
-    ),
-  }),
+  // columnHelper.accessor("monto", {
+  //   id: "amount",
+  //   header: "Monto",
+  //   cell: (info) => (
+  //     <FormatNumber
+  //       style="currency"
+  //       currency="USD"
+  //       value={info.getValue() ?? 0}
+  //     />
+  //   ),
+  // }),
 ];
 
 const IncomesPage = () => {
@@ -46,7 +46,7 @@ const IncomesPage = () => {
 
   return (
     <>
-      <Header
+      {/* <Header
         title="Ingresos"
         subtitle="{{breadcrumb}}"
         rightContent={
@@ -90,7 +90,7 @@ const IncomesPage = () => {
         id={state.id}
         open={state.open}
         onOpenChange={() => dispatch({ type: "CLOSE_DRAWER" })}
-      />
+      /> */}
     </>
   );
 };

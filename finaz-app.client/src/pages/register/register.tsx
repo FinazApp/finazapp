@@ -5,7 +5,7 @@ import { Box, Flex } from "styled-system/jsx";
 
 import { useRegister } from "@hooks";
 import { IRegisterUser } from "@interfaces";
-import { Button, Heading, Link, Text, TextField } from "@components";
+// import { Button, Heading, Link, Text, TextField } from "@components";
 
 const validationSchema = Yup.object({
   nombre: Yup.string().required("El nombre es obligatorio"),
@@ -31,12 +31,12 @@ const RegisterPage = () => {
     >
       <Box px="10" py="8" boxShadow="lg" bg="Background" borderRadius="lg">
         <Box mb="5">
-          <Heading as="h1" textAlign="center" fontSize="3xl">
+          {/* <Heading as="h1" textAlign="center" fontSize="3xl">
             Crear nueva cuenta
           </Heading>
           <Text color="neutral.11" textAlign="center">
             Rellena para crear una nueva cuenta
-          </Text>
+          </Text> */}
         </Box>
         <Formik<IRegisterUser>
           initialValues={{
@@ -57,7 +57,7 @@ const RegisterPage = () => {
           {(formik) => (
             <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
               <Flex gap={5} flexDir="column">
-                <TextField
+                {/* <TextField
                   name="nombre"
                   label="Nombre completo"
                   placeholder="Ej. Jesimiel Martes"
@@ -76,17 +76,17 @@ const RegisterPage = () => {
                 />
                 <Button type="submit" variant="solid" loading={isPending}>
                   Registrarte
-                </Button>
+                </Button> */}
               </Flex>
             </Form>
           )}
         </Formik>
-        <Text as="p" textAlign="center" fontSize="sm" color="neutral.11" mt={4}>
+        {/* <Text as="p" textAlign="center" fontSize="sm" color="neutral.11" mt={4}>
           ¿Ya tienes cuenta?
           <Link href="/login" fontSize="sm" ml={1}>
             Inicia sesión
           </Link>
-        </Text>
+        </Text> */}
       </Box>
     </Box>
   );

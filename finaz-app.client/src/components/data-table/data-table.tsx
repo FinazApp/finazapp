@@ -13,13 +13,13 @@ import {
   AccessorKeyColumnDef,
 } from "@tanstack/react-table";
 
-import {
-  Text,
-  Table,
-  IconButton,
-  Pagination,
-  IconButtonProps,
-} from "@components";
+// import {
+//   Text,
+//   Table,
+//   IconButton,
+//   Pagination,
+//   IconButtonProps,
+// } from "@components";
 
 export type Action = {
   icon: Icon;
@@ -66,103 +66,104 @@ const DataTable = <T extends object>({
   );
 
   return (
-    <Table.Root variant="outline" size="sm">
-      <Table.Head>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <Table.Row key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <Table.Header key={header.id}>
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-              </Table.Header>
-            ))}
-            {!!actions({} as never)?.length && (
-              <Table.Header>
-                <Center>
-                  <IconClick size="22" style={{ height: 22, width: 22 }} />
-                </Center>
-              </Table.Header>
-            )}
-          </Table.Row>
-        ))}
-      </Table.Head>
-      <Table.Body>
-        {table.getRowModel().rows.map((row) => (
-          <Table.Row key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <Table.Cell key={cell.id}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Table.Cell>
-            ))}
-            {!!actions(row.original)?.length && (
-              <Table.Cell width="1" whiteSpace="nowrap">
-                {actions(row.original)?.map(
-                  ({ icon: ActionIcon, colorPalette, onClick, title }) => (
-                    <IconButton
-                      size="xs"
-                      key={title}
-                      title={title}
-                      variant="ghost"
-                      onClick={onClick}
-                      colorPalette={colorPalette || "accent"}
-                    >
-                      <ActionIcon size="20" style={{ height: 20, width: 20 }} />
-                    </IconButton>
-                  )
-                )}
-              </Table.Cell>
-            )}
-          </Table.Row>
-        ))}
-      </Table.Body>
-      {/* <Table.Foot>
-            {table.getFooterGroups().map((footerGroup) => (
-              <Table.Row key={footerGroup.id}>
-                {footerGroup.headers.map((header) => (
-                  <Table.Cell key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.footer,
-                          header.getContext()
-                        )}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Foot> */}
-      <Table.Caption pb="2">
-        <Flex flex={1} alignItems="center" justifyContent="center" mb={1}>
-          <Pagination
-            siblingCount={2}
-            count={table.getRowCount()}
-            page={table.getState().pagination.pageIndex + 1}
-            pageSize={table.getState().pagination.pageSize}
-            onPageChange={(details) => table.setPageIndex(details.page - 1)}
-          />
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
-            }}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </select>
-        </Flex>
-        <Text>
-          Mostrando {table.getRowModel().rows.length.toLocaleString()} de{" "}
-          {table.getRowCount().toLocaleString()}
-        </Text>
-      </Table.Caption>
-    </Table.Root>
+    <></>
+    // <Table.Root variant="outline" size="sm">
+    //   <Table.Head>
+    //     {table.getHeaderGroups().map((headerGroup) => (
+    //       <Table.Row key={headerGroup.id}>
+    //         {headerGroup.headers.map((header) => (
+    //           <Table.Header key={header.id}>
+    //             {header.isPlaceholder
+    //               ? null
+    //               : flexRender(
+    //                   header.column.columnDef.header,
+    //                   header.getContext()
+    //                 )}
+    //           </Table.Header>
+    //         ))}
+    //         {!!actions({} as never)?.length && (
+    //           <Table.Header>
+    //             <Center>
+    //               <IconClick size="22" style={{ height: 22, width: 22 }} />
+    //             </Center>
+    //           </Table.Header>
+    //         )}
+    //       </Table.Row>
+    //     ))}
+    //   </Table.Head>
+    //   <Table.Body>
+    //     {table.getRowModel().rows.map((row) => (
+    //       <Table.Row key={row.id}>
+    //         {row.getVisibleCells().map((cell) => (
+    //           <Table.Cell key={cell.id}>
+    //             {flexRender(cell.column.columnDef.cell, cell.getContext())}
+    //           </Table.Cell>
+    //         ))}
+    //         {!!actions(row.original)?.length && (
+    //           <Table.Cell width="1" whiteSpace="nowrap">
+    //             {actions(row.original)?.map(
+    //               ({ icon: ActionIcon, colorPalette, onClick, title }) => (
+    //                 <IconButton
+    //                   size="xs"
+    //                   key={title}
+    //                   title={title}
+    //                   variant="ghost"
+    //                   onClick={onClick}
+    //                   colorPalette={colorPalette || "accent"}
+    //                 >
+    //                   <ActionIcon size="20" style={{ height: 20, width: 20 }} />
+    //                 </IconButton>
+    //               )
+    //             )}
+    //           </Table.Cell>
+    //         )}
+    //       </Table.Row>
+    //     ))}
+    //   </Table.Body>
+    //   {/* <Table.Foot>
+    //         {table.getFooterGroups().map((footerGroup) => (
+    //           <Table.Row key={footerGroup.id}>
+    //             {footerGroup.headers.map((header) => (
+    //               <Table.Cell key={header.id}>
+    //                 {header.isPlaceholder
+    //                   ? null
+    //                   : flexRender(
+    //                       header.column.columnDef.footer,
+    //                       header.getContext()
+    //                     )}
+    //               </Table.Cell>
+    //             ))}
+    //           </Table.Row>
+    //         ))}
+    //       </Table.Foot> */}
+    //   <Table.Caption pb="2">
+    //     <Flex flex={1} alignItems="center" justifyContent="center" mb={1}>
+    //       <Pagination
+    //         siblingCount={2}
+    //         count={table.getRowCount()}
+    //         page={table.getState().pagination.pageIndex + 1}
+    //         pageSize={table.getState().pagination.pageSize}
+    //         onPageChange={(details) => table.setPageIndex(details.page - 1)}
+    //       />
+    //       <select
+    //         value={table.getState().pagination.pageSize}
+    //         onChange={(e) => {
+    //           table.setPageSize(Number(e.target.value));
+    //         }}
+    //       >
+    //         {[10, 20, 30, 40, 50].map((pageSize) => (
+    //           <option key={pageSize} value={pageSize}>
+    //             Mostrar {pageSize}
+    //           </option>
+    //         ))}
+    //       </select>
+    //     </Flex>
+    //     <Text>
+    //       Mostrando {table.getRowModel().rows.length.toLocaleString()} de{" "}
+    //       {table.getRowCount().toLocaleString()}
+    //     </Text>
+    //   </Table.Caption>
+    // </Table.Root>
   );
 };
 

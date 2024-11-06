@@ -1,15 +1,11 @@
 import React from "react";
-import { Grid } from "styled-system/jsx";
-
-import {
-  RadioButtonGroup,
-  IKPICardProps,
-  KPICard,
-  Header,
-  Card,
-  Button,
-} from "@components";
-import { IconFileExport } from "@tabler/icons-react";
+import Button from "@mui/joy/Button";
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
+import Box from "@mui/joy/Box";
+import { IKPICardProps } from "@components";
+import Typography from "@mui/joy/Typography";
+import ToggleButtonGroup from '@mui/joy/ToggleButtonGroup';
+import OrderTable from "src/components/order-table";
 
 const DashboardPage = () => {
   const [filter, setFilter] = React.useState("1");
@@ -49,7 +45,50 @@ const DashboardPage = () => {
 
   return (
     <>
-      <Header
+      <Box
+        sx={{
+          display: "flex",
+          mb: 1,
+          gap: 1,
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "start", sm: "center" },
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography level="h2" component="h1">
+          Inicio
+        </Typography>
+        <Box         sx={{
+          display: "flex",
+          gap: 1,
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "start", sm: "center" },
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        }}>
+          <ToggleButtonGroup
+            value={filter}
+            size="md"
+            onChange={(_, newValue) => {
+              setFilter(newValue ?? "");
+            }}
+          >
+            {options.map((option) => (
+              <Button key={option.label} value={option.value}>{option.label}</Button>
+            ))}
+          </ToggleButtonGroup>
+          <Button
+            color="primary"
+            startDecorator={<DownloadRoundedIcon />}
+            size="sm"
+          >
+            Download PDF
+          </Button>
+        </Box>
+      </Box>
+      <OrderTable />
+      {/* <Header
         title="Johan Sierra Linares"
         subtitle="Bienvenido de nuevo,"
         rightContent={
@@ -68,26 +107,25 @@ const DashboardPage = () => {
                 </RadioButtonGroup.Item>
               ))}
             </RadioButtonGroup.Root>
-            <Button colorPalette="neutral" variant="subtle">
+            {/* <Button colorPalette="neutral" variant="subtle">
               Exportar
               <IconFileExport size="20" style={{ height: 20, width: 20 }} />
-            </Button>
-          </>
-        }
-      />
-      <Grid columns={{ sm: 1, md: 2, lg: 3 }} columnGap={5} rowGap={5}>
-        {stats.map((stat) => (
-          <KPICard {...stat} />
-        ))}
-      </Grid>
-      <Grid columns={3} columnGap={5} rowGap={5}>
-        <Card.Root h="full" p="2">
-          {`{{charts}}`}
-        </Card.Root>
-        <Card.Root h="full" p="2">
-          {`{{table}}`}
-        </Card.Root>
-      </Grid>
+            </Button> */}
+      {/* // }
+      // />
+      // <Grid columns={{ sm: 1, md: 2, lg: 3 }} columnGap={5} rowGap={5}>
+      //   {stats.map((stat) => (
+      //     <KPICard {...stat} />
+      //   ))}
+      // </Grid>
+      // <Grid columns={3} columnGap={5} rowGap={5}>
+      //   <Card.Root h="full" p="2">
+      //     {`{{charts}}`}
+      //   </Card.Root>
+      //   <Card.Root h="full" p="2">
+      //     {`{{table}}`}
+      //   </Card.Root>
+      // </Grid> */}
     </>
   );
 };

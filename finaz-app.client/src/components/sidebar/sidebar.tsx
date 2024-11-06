@@ -1,88 +1,171 @@
-import React from "react";
-import { Box, Flex } from "styled-system/jsx";
-import {
-  IconX,
-  IconHome2,
-  IconPigMoney,
-  IconCurrencyDollar,
-} from "@tabler/icons-react";
+import * as React from "react";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import Avatar from "@mui/joy/Avatar";
+import Box from "@mui/joy/Box";
+import Divider from "@mui/joy/Divider";
+import IconButton from "@mui/joy/IconButton";
+import Input from "@mui/joy/Input";
+import List from "@mui/joy/List";
+import  { listItemButtonClasses } from "@mui/joy/ListItemButton";
+import Typography from "@mui/joy/Typography";
+import Sheet from "@mui/joy/Sheet";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
+import { SidebarUtils } from "@utils";
+import { IconCurrencyDollar, IconHome2, IconPigMoney } from "@tabler/icons-react";
 
 import { NavLink } from "../navlink";
-import { Drawer } from "../park-ui/drawer";
-import { Avatar, Heading, IconButton, Text } from "../park-ui";
+import { ColorSchemeToggle } from "../color-scheme-toggle";
 
-type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
-
-export interface SidebarProps {
-  (): React.JSX.Element;
-  Drawer: React.FC<DrawerRootProps>;
-}
-
-const SidebarContent = () => {
+const Sidebar = () => {
   return (
-    <>
-      <Flex id="Navbar" flexDir="column" flex={1} gap="2" px="4">
-        <NavLink to="/" title="Inicio" icon={IconHome2} />
-        <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
-        <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
-      </Flex>
-      <Flex px="4" py="2" _hover={{ bg: "Silver" }} gap="2">
-        <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
-        <Box>
-          <Text size="sm" fontWeight="semibold">
-            Johan Sierra Linares
-          </Text>
-          <Text size="xs" color="neutral.10">
-            johan@finazapp.com
-          </Text>
-        </Box>
-      </Flex>
-    </>
-  );
-};
-
-const Sidebar: SidebarProps = () => {
-  return (
-    <Flex
-      w="64"
-      h="full"
-      bg="Background"
-      boxShadow="lg"
-      flexDirection="column"
-      justifyContent="space-between"
-      display={{ lgDown: "none", lg: "flex" }}
+    <Sheet
+      className="Sidebar"
+      sx={{
+        position: { xs: "fixed", md: "sticky" },
+        transform: {
+          xs: "translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1)))",
+          md: "none",
+        },
+        transition: "transform 0.4s, width 0.4s",
+        zIndex: 10000,
+        height: "100dvh",
+        width: "var(--Sidebar-width)",
+        top: 0,
+        p: 2,
+        flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        borderRight: "1px solid",
+        borderColor: "divider",
+      }}
     >
-      <Box p="4">
-        <Heading as="h2" size="2xl">
-          FinazApp
-        </Heading>
+      <GlobalStyles
+        styles={(theme) => ({
+          ":root": {
+            "--Sidebar-width": "220px",
+            [theme.breakpoints.up("lg")]: {
+              "--Sidebar-width": "240px",
+            },
+          },
+        })}
+      />
+      <Box
+        className="Sidebar-overlay"
+        sx={{
+          position: "fixed",
+          zIndex: 9998,
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          opacity: "var(--SideNavigation-slideIn)",
+          backgroundColor: "var(--joy-palette-background-backdrop)",
+          transition: "opacity 0.4s",
+          transform: {
+            xs: "translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1) + var(--SideNavigation-slideIn, 0) * var(--Sidebar-width, 0px)))",
+            lg: "translateX(-100%)",
+          },
+        }}
+        onClick={() => SidebarUtils.closeSidebar()}
+      />
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <IconButton variant="soft" color="primary" size="sm">
+          <BrightnessAutoRoundedIcon />
+        </IconButton>
+        <Typography level="title-lg">FinazApp</Typography>
+        <ColorSchemeToggle sx={{ ml: "auto" }} />
       </Box>
-      <SidebarContent />
-    </Flex>
+      <Input
+        size="sm"
+        startDecorator={<SearchRoundedIcon />}
+        placeholder="Busqueda..."
+      />
+      <Box
+        sx={{
+          minHeight: 0,
+          overflow: "hidden auto",
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          [`& .${listItemButtonClasses.root}`]: {
+            gap: 1.5,
+          },
+        }}
+      >
+        <List
+          size="sm"
+          sx={{
+            gap: 1,
+            "--List-nestedInsetStart": "30px",
+            "--ListItem-radius": (theme) => theme.vars.radius.sm,
+          }}
+        >
+          <NavLink to="/" title="Inicio" icon={IconHome2} />
+          <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
+          <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
+          {/* <ListItem nested>
+            <Toggler
+              renderToggle={({ open, setOpen }) => (
+                <ListItemButton onClick={() => setOpen(!open)}>
+                  <GroupRoundedIcon />
+                  <ListItemContent>
+                    <Typography level="title-sm">Users</Typography>
+                  </ListItemContent>
+                  <KeyboardArrowDownIcon
+                    sx={[
+                      open
+                        ? {
+                            transform: "rotate(180deg)",
+                          }
+                        : {
+                            transform: "none",
+                          },
+                    ]}
+                  />
+                </ListItemButton>
+              )}
+            >
+              <List sx={{ gap: 0.5 }}>
+                <ListItem sx={{ mt: 0.5 }}>
+                  <ListItemButton
+                    role="menuitem"
+                    component="a"
+                    href="/joy-ui/getting-started/templates/profile-dashboard/"
+                  >
+                    My profile
+                  </ListItemButton>
+                </ListItem>
+                <ListItem>
+                  <ListItemButton>Create a new user</ListItemButton>
+                </ListItem>
+                <ListItem>
+                  <ListItemButton>Roles & permission</ListItemButton>
+                </ListItem>
+              </List>
+            </Toggler>
+          </ListItem> */}
+        </List>
+      </Box>
+      <Divider />
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Avatar
+          variant="outlined"
+          size="sm"
+          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography level="title-sm">Emelyn Jose de Egipto</Typography>
+          <Typography level="body-xs">siriwatk@test.com</Typography>
+        </Box>
+        <IconButton size="sm" variant="plain" color="neutral">
+          <LogoutRoundedIcon />
+        </IconButton>
+      </Box>
+    </Sheet>
   );
-};
-
-Sidebar.Drawer = ({ children, ...props }) => {
-  return (
-    <Drawer.Root variant="left" {...props}>
-      <Drawer.Backdrop />
-      <Drawer.Positioner>
-        <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title>FinazApp</Drawer.Title>
-            <Drawer.CloseTrigger asChild position="absolute" top="3" right="4">
-              <IconButton variant="ghost">
-                <IconX />
-              </IconButton>
-            </Drawer.CloseTrigger>
-          </Drawer.Header>
-          <Drawer.Body className="p-0 m-0">
-            <SidebarContent />
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Positioner>
-    </Drawer.Root>
-  );
-};
+}
 
 export default Sidebar;

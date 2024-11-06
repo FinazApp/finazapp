@@ -1,13 +1,12 @@
 import React from "react";
-import { Box } from "styled-system/jsx";
-import { FormatNumber } from "@ark-ui/react";
+// import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { IBills } from "@interfaces";
 import { useDeleteBills, useFetchBills } from "@hooks";
-import { Button, DataTable, Header, BillFormDrawer } from "@components";
+// import { Button, DataTable, Header, BillFormDrawer } from "@components";
 import toast from "react-hot-toast";
 
 const columnHelper = createColumnHelper<IBills>();
@@ -22,17 +21,17 @@ const columns = [
     id: "category",
     header: "Categoría",
   }),
-  columnHelper.accessor("monto", {
-    id: "amount",
-    header: "Monto",
-    cell: (info) => (
-      <FormatNumber
-        style="currency"
-        currency="USD"
-        value={info.getValue() ?? 0}
-      />
-    ),
-  }),
+  // columnHelper.accessor("monto", {
+  //   id: "amount",
+  //   header: "Monto",
+  //   cell: (info) => (
+  //     <FormatNumber
+  //       style="currency"
+  //       currency="USD"
+  //       value={info.getValue() ?? 0}
+  //     />
+  //   ),
+  // }),
 ];
 
 const BillsPage = () => {
@@ -46,7 +45,7 @@ const BillsPage = () => {
 
   return (
     <>
-      <Header
+      {/* <Header
         title="Gastos"
         subtitle="{{breadcrumb}}"
         rightContent={
@@ -90,7 +89,7 @@ const BillsPage = () => {
         id={state.id}
         open={state.open}
         onOpenChange={() => dispatch({ type: "CLOSE_DRAWER" })}
-      />
+      /> */}
     </>
   );
 };
