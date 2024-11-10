@@ -16,6 +16,7 @@ namespace finaz_app.Server.Models
 
         public required string PasswordHash { get; set; }
 
+        [JsonIgnore]
         public required string Rol { get; set; }
 
         [JsonIgnore]

@@ -81,7 +81,6 @@ namespace finaz_app.Server.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -104,6 +103,8 @@ namespace finaz_app.Server.Controllers
             {
                 return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
             }
+
+            existingCategoria.isSystem = User.IsInRole("admin");
 
             existingCategoria.Nombre = categoria.Nombre;
             existingCategoria.Descripcion = categoria.Descripcion;
@@ -177,7 +178,6 @@ namespace finaz_app.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteCategoria(int id)

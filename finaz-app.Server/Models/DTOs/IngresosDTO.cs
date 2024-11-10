@@ -15,11 +15,5 @@ namespace finaz_app.Server.Models.DTOs
 
         [Range(0, double.MaxValue)]
         public decimal Monto { get; set; }
-
-        public bool isDeleted { get; set; } = false;
-
-        public int CreadoPor { get; set; }
-
-        public int? ModificadoPor { get; set; }
     }
 }

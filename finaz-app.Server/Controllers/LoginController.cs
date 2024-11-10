@@ -82,8 +82,7 @@ namespace finaz_app.Server.Controllers
                     UsuarioId = user.UsuarioId,
                     Nombre = user.Nombre,
                     CorreoElectronico = user.CorreoElectronico,
-                    PasswordHash = user.PasswordHash,
-                    Rol = user.Rol
+                    PasswordHash = user.PasswordHash
                 };
 
                 return Ok(new { message = "Inicio de sesión exitoso", user = userDto });

@@ -11,7 +11,7 @@ CREATE TABLE Categorias (
     Nombre NVARCHAR(100) NOT NULL,
     Descripcion NVARCHAR(255),
     isDeleted BIT NOT NULL DEFAULT 0,
-    isSystem BIT NOT NULL,
+    isSystem BIT NOT NULL DEFAULT 0,
     CreadoPor INT NULL,
     FechaCreacion DATETIME2 NOT NULL,
     ModificadoPor INT NULL,

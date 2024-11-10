@@ -12,7 +12,5 @@
         public required string CorreoElectronico { get; set; }
 
         public required string PasswordHash { get; set; }
-
-        public required string Rol { get; set; }
     }
 }
