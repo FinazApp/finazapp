@@ -3,7 +3,6 @@ using finaz_app.Server.Models.DTOs;
 using finaz_app.Server.Security.JWT;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -38,13 +37,6 @@ namespace finaz_app.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Register([FromBody] UsuariosDTO request)
         {
-            // Validar el rol
-            request.Rol = request.Rol?.ToLower();
-            if (!new[] { "usuario", "admin" }.Contains(request.Rol))
-            {
-                return BadRequest("Rol no identificado");
-            }
-
             // Validar que los campos requeridos no estén vacíos
             if (string.IsNullOrWhiteSpace(request.Nombre) || 
                 string.IsNullOrWhiteSpace(request.CorreoElectronico) || 
@@ -72,16 +64,14 @@ namespace finaz_app.Server.Controllers
                 // Hashear la contraseña
                 string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
 
-                // Crear un nuevo usuario
                 var user = new Usuario
                 {
                     Nombre = request.Nombre,
                     CorreoElectronico = request.CorreoElectronico,
                     PasswordHash = passwordHash,
-                    Rol = request.Rol
+                    Rol = "usuario"
                 };
 
-                // Agregar el nuevo usuario a la base de datos
                 _appContext.Usuarios.Add(user);
                 await _appContext.SaveChangesAsync();
 

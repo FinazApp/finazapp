@@ -105,8 +105,6 @@ namespace finaz_app.Server.Controllers
             if (!string.IsNullOrWhiteSpace(request.PasswordHash))
                 existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
 
-            existingUser.Rol = request.Rol;
-
             _context.Entry(existingUser).State = EntityState.Modified;
 
             try
