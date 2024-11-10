@@ -4,21 +4,28 @@ import { Chip } from "@mui/joy";
 import Input from "@mui/joy/Input";
 import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
-import Select from "@mui/joy/Select";
-import Option from "@mui/joy/Option";
-import FormLabel from "@mui/joy/FormLabel";
 import Typography from "@mui/joy/Typography";
-import FormControl from "@mui/joy/FormControl";
-import SearchIcon from "@mui/icons-material/Search";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconPencil, IconTrash, IconPlug, IconPlus } from "@tabler/icons-react";
+import FormControl from "@mui/joy/FormControl";
+import FormLabel from "@mui/joy/FormLabel";
+import {
+  IconPlug,
+  IconTrash,
+  IconPencil,
+  IconCategoryPlus,
+} from "@tabler/icons-react";
+import SearchIcon from "@mui/icons-material/Search";
 
 import { Reducers } from "@core";
-import { IBill } from "@interfaces";
-import { DataTable, BillFormModal, ModalConfirm } from "@components";
-import { useDeleteBill, useFetchBills, useFetchCategories, useRestoreBill } from "@hooks";
+import { ICategory } from "@interfaces";
+import {
+  useDeleteCategory,
+  useFetchCategories,
+  useRestoreCategory,
+} from "@hooks";
+import { CategoryFormModal, DataTable, ModalConfirm } from "@components";
 
-const columnHelper = createColumnHelper<IBill>();
+const columnHelper = createColumnHelper<ICategory>();
 
 const columns = [
   columnHelper.accessor("nombre", {
@@ -26,9 +33,9 @@ const columns = [
     header: "Nombre",
     cell: (info) => <b>{info.getValue()}</b>,
   }),
-  columnHelper.accessor("monto", {
-    id: "monto",
-    header: "Monto",
+  columnHelper.accessor("descripcion", {
+    id: "descripcion",
+    header: "Descripción",
   }),
   columnHelper.accessor("isDeleted", {
     id: "isDeleted",
@@ -45,90 +52,68 @@ const columns = [
   }),
 ];
 
-const BillsPage = () => {
-  const bills = useFetchBills();
-  const deleteBill = useDeleteBill();
-  const restoreBill = useRestoreBill();
+const CategoriesPage = () => {
   const categories = useFetchCategories();
+  const deleteCategory = useDeleteCategory();
+  const restoreCategory = useRestoreCategory();
 
-  const [categoryId, setCategoryId] = React.useState(0);
   const [searchText, setSearchText] = React.useState("");
   const [type, setType] = React.useState<"restore" | "delete">("delete");
-  const [bill, setBill] = React.useState<IBill | null>(null);
+  const [category, setCategory] = React.useState<ICategory | null>(null);
   const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
     id: 0,
     open: false,
   });
 
-  const handleDelete = React.useCallback(() => {
+  const handleDeleteCategory = React.useCallback(() => {
     return toast.promise(
-      deleteBill.mutateAsync(bill?.gastoId ?? 0, {
-        onSuccess: () => setBill(null),
-      }),
+      deleteCategory.mutateAsync(category?.categoriaId ?? 0),
       {
         error: (e) => e,
-        loading: `Eliminando gasto ${bill?.nombre}...`,
-        success: `Gasto ${bill?.nombre} eliminado correctamente.`,
+        loading: `Eliminando categoría ${category?.nombre}...`,
+        success: `Categoría ${category?.nombre} eliminada correctamente.`,
       }
     );
-  }, [bill?.gastoId, bill?.nombre, deleteBill]);
+  }, [category?.categoriaId, category?.nombre, deleteCategory]);
 
-  const handleRestore = React.useCallback(() => {
+  const handleRestoreCategory = React.useCallback(() => {
     return toast.promise(
-      restoreBill.mutateAsync(bill?.gastoId ?? 0, {
-        onSuccess: () => setBill(null),
-      }),
+      restoreCategory.mutateAsync(category?.categoriaId ?? 0),
       {
         error: (e) => e,
-        loading: `Restaurando gasto ${bill?.nombre}...`,
-        success: `Gasto ${bill?.nombre} restaurado correctamente.`,
+        loading: `Restaurando categoría ${category?.nombre}...`,
+        success: `Categoría ${category?.nombre} restaurada correctamente.`,
       }
     );
-  }, [bill?.gastoId, bill?.nombre, restoreBill]);
+  }, [category?.categoriaId, category?.nombre, restoreCategory]);
 
-  const categoriesOptions = React.useMemo(() => {
-    if (!categories.data?.length) return [];
-    return categories.data.map((category) => ({
-      label: category.nombre,
-      value: category.categoriaId,
-      disabled: category.isDeleted,
-    }));
-  }, [categories.data]);
-
-  const renderFilters = () => (
-    <React.Fragment>
-      <FormControl size="sm">
-        <FormLabel>Categoría</FormLabel>
-        <Select<number>
-          size="sm"
-          value={categoryId}
-          placeholder="Filtrar por categoría"
-          onChange={(_, value) => setCategoryId(value ?? 0)}
-          slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-        >
-          {categoriesOptions.map((item) => (
-            <Option
-              key={item.label}
-              value={item.value}
-              disabled={item.disabled}
-            >
-              {item.label}
-            </Option>
-          ))}
-        </Select>
-      </FormControl>
-    </React.Fragment>
-  );
+  // const renderFilters = () => (
+  //   <React.Fragment>
+  //     <FormControl size="sm">
+  //       <FormLabel>Estado</FormLabel>
+  //       <Select<string>
+  //         size="sm"
+  //         value={status}
+  //         placeholder="Filtrar por estado"
+  //         onChange={(_, value) => setStatus(`${value}`)}
+  //         slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
+  //       >
+  //         <Option value="active">Activo</Option>
+  //         <Option value="deleted">Eliminado</Option>
+  //       </Select>
+  //     </FormControl>
+  //   </React.Fragment>
+  // );
 
   const data = React.useMemo(() => {
-    if (!bills.data?.length) return [];
-    return bills.data.filter((bill) => {
+    if (!categories.data?.length) return [];
+    return categories.data.filter((category) => {
       return (
-        bill.monto?.toString().includes(searchText) ||
-        bill.nombre?.toLowerCase().includes(searchText?.toLowerCase())
+        category.descripcion?.toString().includes(searchText) ||
+        category.nombre?.toLowerCase().includes(searchText?.toLowerCase())
       );
     });
-  }, [bills.data, searchText]);
+  }, [categories.data, searchText]);
 
   return (
     <>
@@ -144,7 +129,7 @@ const BillsPage = () => {
         }}
       >
         <Typography level="h2" component="h1">
-          Gastos
+          Categorías
         </Typography>
         <Box
           sx={{
@@ -158,10 +143,12 @@ const BillsPage = () => {
         >
           <Button
             color="primary"
-            startDecorator={<IconPlus style={{ width: 22, height: 22 }} />}
+            startDecorator={
+              <IconCategoryPlus style={{ width: 22, height: 22 }} />
+            }
             onClick={() => dispatch({ type: "OPEN_DRAWER", payload: 0 })}
           >
-            Agregar nuevo gasto
+            Crear nueva categoría
           </Button>
         </Box>
       </Box>
@@ -180,14 +167,14 @@ const BillsPage = () => {
           <FormLabel>Búsqueda</FormLabel>
           <Input
             size="sm"
+            onChange={(e) => setSearchText(e.target.value)}
             placeholder="Búsqueda..."
             startDecorator={<SearchIcon />}
-            onChange={(e) => setSearchText(e.target.value)}
           />
         </FormControl>
-        {renderFilters()}
+        {/* {renderFilters()} */}
       </Box>
-      <DataTable<IBill>
+      <DataTable<ICategory>
         data={data ?? []}
         columns={columns}
         tableActions={(data) => [
@@ -195,7 +182,7 @@ const BillsPage = () => {
             title: "Editar",
             icon: IconPencil,
             onClick: () =>
-              dispatch({ type: "OPEN_DRAWER", payload: data.gastoId }),
+              dispatch({ type: "OPEN_DRAWER", payload: data.categoriaId }),
           },
           {
             color: "danger",
@@ -204,7 +191,7 @@ const BillsPage = () => {
             disabled: data.isDeleted,
             onClick: () => {
               setType("delete");
-              setBill(data);
+              setCategory(data);
             },
           },
           {
@@ -214,30 +201,32 @@ const BillsPage = () => {
             disabled: !data.isDeleted,
             onClick: () => {
               setType("restore");
-              setBill(data);
+              setCategory(data);
             },
           },
         ]}
       />
-      <BillFormModal
+      <CategoryFormModal
         id={state.id}
         open={state.open}
         onClose={() => dispatch({ type: "CLOSE_DRAWER" })}
       />
       <ModalConfirm
         type={type}
-        open={!!bill}
-        onConfirm={type === "delete" ? handleDelete : handleRestore}
-        onClose={() => setBill(null)}
+        open={!!category}
+        onConfirm={
+          type === "delete" ? handleDeleteCategory : handleRestoreCategory
+        }
+        onClose={() => setCategory(null)}
         description={`"¿Deseas ${
           type === "delete" ? "eliminar" : "restaurar"
-        } este gasto?"`}
-        title={`${type === "delete" ? "Eliminando" : "Restaurando"} gasto '${
-          bill?.nombre ?? ""
-        }'`}
+        } esta categoría?"`}
+        title={`${
+          type === "delete" ? "Eliminando" : "Restaurando"
+        } categoría '${category?.nombre ?? ""}'`}
       />
     </>
   );
 };
 
-export default BillsPage;
+export default CategoriesPage;

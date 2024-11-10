@@ -6,7 +6,14 @@ import {
 } from "react-router-dom";
 
 import { ErrorBoundary, MainLayout } from "@components";
-import { DashboardPage, IncomesPage, BillsPage, RegisterPage, LoginPage } from "@pages";
+import {
+  DashboardPage,
+  IncomesPage,
+  BillsPage,
+  RegisterPage,
+  LoginPage,
+  CategoriesPage,
+} from "@pages";
 
 function App() {
   const routes: RouteObject[] = [
@@ -25,6 +32,11 @@ function App() {
           path: "incomes",
           id: "incomes-page",
           element: <IncomesPage />,
+        },
+        {
+          path: "categories",
+          id: "categories-page",
+          element: <CategoriesPage />,
         },
         {
           path: "bills",

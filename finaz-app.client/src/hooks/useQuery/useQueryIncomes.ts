@@ -9,7 +9,7 @@ export const useFetchIncomes = () => {
   });
 };
 
-export const useFetchOneIncomes = (id: number) => {
+export const useFetchOneIncome = (id: number) => {
   return useQuery({
     enabled: !!id,
     queryKey: [Tags.INCOMES, id],

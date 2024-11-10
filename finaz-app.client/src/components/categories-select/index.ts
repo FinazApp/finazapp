@@ -1,0 +1,1 @@
+export { default as CategoriesSelect } from "./categories-select";

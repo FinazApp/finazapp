@@ -9,3 +9,11 @@ export const useFetchCategories = () => {
     queryKey: [Tags.CATEGORIES],
   });
 };
+
+export const useFetchOneCategory = (id: number) => {
+  return useQuery({
+    queryKey: [Tags.CATEGORIES, id],
+    queryFn: () => CategoriesApi.getById(id),
+    enabled: !!id,
+  });
+};

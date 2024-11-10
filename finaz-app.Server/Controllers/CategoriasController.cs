@@ -5,9 +5,6 @@ using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using finaz_app.Server.Security.JWT;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace finaz_app.Server.Controllers
 {
@@ -44,7 +41,6 @@ namespace finaz_app.Server.Controllers
 
                 var categorias = await _context.Categorias
                     .Where(c => c.CreadoPor == userID || c.CreadoPor == null)
-                    .Where(c => !c.isDeleted)
                     .ToListAsync();
 
                 var categoriasDTO = _mapper.Map<IEnumerable<CategoriasDTO>>(categorias);
@@ -64,7 +60,7 @@ namespace finaz_app.Server.Controllers
             try
             {
                 var categoria = await _context.Categorias
-                    .SingleOrDefaultAsync(a => a.CategoriaId == id && !a.isDeleted);
+                    .SingleOrDefaultAsync(a => a.CategoriaId == id);
 
                 if (categoria == null)
                 {

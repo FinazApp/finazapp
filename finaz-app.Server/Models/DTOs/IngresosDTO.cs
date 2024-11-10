@@ -13,6 +13,8 @@ namespace finaz_app.Server.Models.DTOs
 
         public required string Nombre { get; set; }
 
+        public bool isDeleted { get; set; } = false;
+
         [Range(0, double.MaxValue)]
         public decimal Monto { get; set; }
     }

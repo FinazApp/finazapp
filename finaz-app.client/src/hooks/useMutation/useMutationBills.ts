@@ -2,7 +2,7 @@ import { Tags } from "@core";
 import { BillsApi } from "@api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useCreateBills = () => {
+export const useCreateBill = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: BillsApi.create,
@@ -13,7 +13,7 @@ export const useCreateBills = () => {
   });
 };
 
-export const useUpdateBills = () => {
+export const useUpdateBill = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: BillsApi.update,
@@ -24,11 +24,22 @@ export const useUpdateBills = () => {
   });
 };
 
-export const useDeleteBills = () => {
+export const useDeleteBill = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: BillsApi.delete,
     mutationKey: [Tags.BILLS, Tags.MUTATION_DELETE],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [Tags.BILLS] })
+    }
+  });
+};
+
+export const useRestoreBill = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: BillsApi.restore,
+    mutationKey: [Tags.BILLS, Tags.MUTATION_RESTORE],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [Tags.BILLS] })
     }

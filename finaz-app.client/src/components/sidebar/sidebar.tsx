@@ -13,7 +13,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
 import { SidebarUtils } from "@utils";
-import { IconCurrencyDollar, IconHome2, IconPigMoney } from "@tabler/icons-react";
+import { IconCategory, IconCurrencyDollar, IconHome2, IconPigMoney } from "@tabler/icons-react";
 
 import { NavLink } from "../navlink";
 import { ColorSchemeToggle } from "../color-scheme-toggle";
@@ -29,7 +29,7 @@ const Sidebar = () => {
           md: "none",
         },
         transition: "transform 0.4s, width 0.4s",
-        zIndex: 10000,
+        zIndex: 1200,
         height: "100dvh",
         width: "var(--Sidebar-width)",
         top: 0,
@@ -104,6 +104,7 @@ const Sidebar = () => {
           }}
         >
           <NavLink to="/" title="Inicio" icon={IconHome2} />
+          <NavLink to="/categories" title="Categorías" icon={IconCategory} />
           <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
           <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
           {/* <ListItem nested>

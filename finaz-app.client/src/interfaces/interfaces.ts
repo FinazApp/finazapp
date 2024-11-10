@@ -1,12 +1,13 @@
 export interface IRegisterUser {
+    rol: "usuario";
     nombre: string;
-    correo: string;
     passwordHash: string;
+    correoElectronico: string;
 }
 
 export interface ILoginUser {
-    email: string;
-    hashContraseña: string;
+    correoElectronico: string;
+    passwordHash: string;
 }
 
 export interface IUser {
@@ -18,52 +19,59 @@ export interface IUser {
 export interface ICategory {
     nombre: string;
     usuario: IUser;
+    isSystem: boolean;
+    isDeleted: boolean;
     descripcion: string;
     categoriaId: number;
 }
 
-export interface IIncomes {
+export type ICategoryCreate = {
+    nombre: string;
+    categoriaId?: number;
+    descripcion: string;
+}
+
+export interface IIncome {
     monto: number;
     usuario: IUser;
     nombre: string;
-    ingresosId: number;
-    categoria: ICategory;
+    isDeleted: boolean;
+    ingresoId: number;
+    categoriaId: number;
 }
 
 export interface IIncomesUpdate {
     monto: number;
     nombre: string;
-    usuarioId: number;
-    ingresosId: number;
+    ingresoId: number;
     categoriaId: number;
 }
 
 export interface IIncomesCreate {
     monto: number;
     nombre: string;
-    usuarioId: number;
+    ingresoId: number;
     categoriaId: number;
 }
 
-export interface IBills {
-    monto: number;
-    usuario: IUser;
-    nombre: string;
-    gastosId: number;
-    categoria: ICategory;
-}
-
-export interface IBillsUpdate {
+export interface IBill {
     monto: number;
     nombre: string;
-    gastosId: number;
-    usuarioId: number;
+    gastoId: number;
+    isDeleted: boolean;
     categoriaId: number;
 }
 
-export interface IBillsCreate {
+export interface IBillUpdate {
     monto: number;
     nombre: string;
-    usuarioId: number;
+    gastoId: number;
+    categoriaId: number;
+}
+
+export interface IBillCreate {
+    monto: number;
+    nombre: string;
+    gastoId: number;
     categoriaId: number;
 }

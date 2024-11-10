@@ -1,40 +1,28 @@
 import React from "react";
 import * as Yup from "yup";
-import Box from '@mui/joy/Box';
-import Button from '@mui/joy/Button';
-import Checkbox from '@mui/joy/Checkbox';
-import Divider from '@mui/joy/Divider';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import IconButton, { IconButtonProps } from '@mui/joy/IconButton';
-import Link from '@mui/joy/Link';
-import Input from '@mui/joy/Input';
-import Typography from '@mui/joy/Typography';
-import Stack from '@mui/joy/Stack';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
+import Box from "@mui/joy/Box";
+import Link from "@mui/joy/Link";
 import { useLogin } from "@hooks";
-import { ColorSchemeToggle } from "@components";
+import Stack from "@mui/joy/Stack";
+import toast from "react-hot-toast";
+import Button from "@mui/joy/Button";
+import { Form, Formik } from "formik";
+import { ILoginUser } from "@interfaces";
+import Typography from "@mui/joy/Typography";
+import IconButton from "@mui/joy/IconButton";
+import { ColorSchemeToggle, InputField } from "@components";
+import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
+import { useNavigate } from "react-router";
 
 const validationSchema = Yup.object({
-  email: Yup.string()
+  correoElectronico: Yup.string()
     .email("Correo inválido")
     .required("El correo es obligatorio"),
-  hashContraseña: Yup.string().required("La contraseña es obligatoria"),
+  passwordHash: Yup.string().required("La contraseña es obligatoria"),
 });
 
-interface FormElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
-  password: HTMLInputElement;
-  persistent: HTMLInputElement;
-}
-
-interface SignInFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
-
 const LoginPage = () => {
+  const navigate = useNavigate();
   const { mutateAsync, isPending } = useLogin();
 
   return (
@@ -72,7 +60,7 @@ const LoginPage = () => {
               <IconButton variant="soft" color="primary" size="sm">
                 <BadgeRoundedIcon />
               </IconButton>
-              <Typography level="title-lg">Company logo</Typography>
+              <Typography level="title-lg">FinazApp</Typography>
             </Box>
             <ColorSchemeToggle />
           </Box>
@@ -102,75 +90,89 @@ const LoginPage = () => {
             <Stack sx={{ gap: 4, mb: 2 }}>
               <Stack sx={{ gap: 1 }}>
                 <Typography component="h1" level="h3">
-                  Sign in
+                  Iniciar Sesión
                 </Typography>
                 <Typography level="body-sm">
-                  New to company?{" "}
-                  <Link href="#replace-with-a-link" level="title-sm">
-                    Sign up!
+                  ¿Eres nuevo?{" "}
+                  <Link href="/register" level="title-sm">
+                    Regístrate!
                   </Link>
                 </Typography>
               </Stack>
             </Stack>
-            <Divider
-              sx={(theme) => ({
-                [theme.getColorSchemeSelector("light")]: {
-                  color: { xs: "#FFF", md: "text.tertiary" },
-                },
-              })}
-            >
-              or
-            </Divider>
             <Stack sx={{ gap: 4, mt: 2 }}>
-              <form
-                onSubmit={(event: React.FormEvent<SignInFormElement>) => {
-                  event.preventDefault();
-                  const formElements = event.currentTarget.elements;
-                  const data = {
-                    email: formElements.email.value,
-                    password: formElements.password.value,
-                    persistent: formElements.persistent.checked,
-                  };
-                  alert(JSON.stringify(data, null, 2));
+              <Formik<ILoginUser>
+                initialValues={{ correoElectronico: "", passwordHash: "" }}
+                onSubmit={async (values) => {
+                  console.log(values);
+                  toast.promise(
+                    mutateAsync(values, {
+                      onSuccess: () => {
+                        navigate("/");
+                      },
+                    }),
+                    {
+                      error: (result) => `${result}`,
+                      loading: "Iniciando sesión...",
+                      success: (result) => `${result.message ?? ""}`,
+                    }
+                  );
                 }}
+                validationSchema={validationSchema}
               >
-                <FormControl required>
-                  <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" />
-                </FormControl>
-                <FormControl required>
-                  <FormLabel>Password</FormLabel>
-                  <Input type="password" name="password" />
-                </FormControl>
-                <Stack sx={{ gap: 4, mt: 2 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
+                {(formik) => (
+                  <Form
+                    onSubmit={formik.handleSubmit}
+                    onReset={formik.handleReset}
                   >
-                    <Checkbox size="sm" label="Remember me" name="persistent" />
-                    <Link level="title-sm" href="#replace-with-a-link">
-                      Forgot your password?
-                    </Link>
-                  </Box>
-                  <Button type="submit" fullWidth>
-                    Sign in
-                  </Button>
-                </Stack>
-              </form>
+                    <InputField
+                      type="email"
+                      name="correoElectronico"
+                      label="Correo electrónico"
+                      placeholder="jesimiel@finazapp.com"
+                    />
+                    <InputField
+                      type="password"
+                      name="passwordHash"
+                      label="Contraseña"
+                      placeholder="**************"
+                    />
+                    <Stack sx={{ mt: 2 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* <Checkbox
+                          size="sm"
+                          label="Remember me"
+                          name="persistent"
+                        />
+                        <Link level="title-sm" href="#replace-with-a-link">
+                          Forgot your password?
+                        </Link> */}
+                      </Box>
+                      <Button type="submit" loading={isPending} fullWidth>
+                        Ingresar
+                      </Button>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
             </Stack>
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" sx={{ textAlign: "center" }}>
-              © Your company {new Date().getFullYear()}
+              © FinazApp {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>
       </Box>
       <Box
-        sx={(theme) => ({
+        sx={() => ({
+          display: ["none", "none", "block"],
           height: "100%",
           position: "fixed",
           right: 0,
@@ -184,12 +186,7 @@ const LoginPage = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)",
-          [theme.getColorSchemeSelector("dark")]: {
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1572072393749-3ca9c8ea0831?auto=format&w=1000&dpr=2)",
-          },
+          backgroundImage: "url(/bg-login.jpeg)",
         })}
       />
     </>

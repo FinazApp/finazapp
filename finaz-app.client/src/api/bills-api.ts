@@ -1,10 +1,10 @@
 import { Endpoints } from "@core";
-import { IBills, IBillsCreate, IBillsUpdate } from "@interfaces";
+import { IBill, IBillCreate, IBillUpdate } from "@interfaces";
 
 import API from "./api";
 
 const BillsApi = {
-    create: async (data: IBillsCreate) => {
+    create: async (data: IBillCreate) => {
         const result = await API().post(Endpoints.BILLS, data);
         return result.data;
     },
@@ -12,16 +12,20 @@ const BillsApi = {
         const result = await API().delete(`${Endpoints.BILLS}/${id}`);
         return result.data;
     },
-    update: async (data: Partial<IBillsUpdate>) => {
-        const result = await API().patch(`${Endpoints.BILLS}/${data.gastosId}`, data);
+    restore: async (id: number) => {
+        const result = await API().patch(`${Endpoints.BILLS}/${id}`, { isDeleted: false });
+        return result.data;
+    },
+    update: async (data: Partial<IBillUpdate>) => {
+        const result = await API().patch(`${Endpoints.BILLS}/${data.gastoId}`, data);
         return result.data;
     },
     getAll: async () => {
-        const result = await API().get<IBills[]>(Endpoints.BILLS);
+        const result = await API().get<IBill[]>(Endpoints.BILLS);
         return result.data;
-    }, 
+    },
     getById: async (id: number) => {
-        const result = await API().get<IBills>(`${Endpoints.BILLS}/${id}`);
+        const result = await API().get<IBill>(`${Endpoints.BILLS}/${id}`);
         return result.data;
     },
 }

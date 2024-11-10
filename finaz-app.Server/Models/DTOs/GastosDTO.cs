@@ -14,5 +14,7 @@ namespace finaz_app.Server.Models.DTOs
         public required string Nombre { get; set; }
 
         public decimal Monto { get; set; }
+        
+        public bool isDeleted { get; set; } = false;
     }
 }

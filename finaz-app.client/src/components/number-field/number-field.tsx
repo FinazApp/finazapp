@@ -1,36 +1,51 @@
 import React from "react";
-import { omit } from "radash";
-import { useField } from "formik";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
 
-// import { Field, NumberInputProps, NumberInput } from "../park-ui";
+import { InputField, IInputFieldProps } from "../input-field";
 
-export interface INumberFieldProps extends NumberInputProps {
+export interface INumberFieldProps extends IInputFieldProps {
   name: string;
   label: string;
   helperText?: string;
 }
 
-const NumberField = ({ name, label, helperText, ...props }: INumberFieldProps) => {
-  const [field, { touched, error }, { setValue }] = useField({ name });
+interface CustomProps {
+  onChange: (event: { target: { name: string; value: string } }) => void;
+  name: string;
+}
 
+const NumericFormatAdapter = React.forwardRef<NumericFormatProps, CustomProps>(
+  function NumericFormatAdapter(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+      <NumericFormat
+        {...other}
+        getInputRef={ref}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        valueIsNumericString
+        prefix="$"
+      />
+    );
+  }
+);
+
+const NumberField = (props: INumberFieldProps) => {
   return (
-    <></>
-    // <Field.Root invalid={touched && !!error}>
-    //   <Field.Label>{label}</Field.Label>
-    //   <Field.Input asChild>
-    //     <NumberInput
-    //       {...props}
-    //       {...omit(field, ["onChange", "value"])}
-    //       p="0"
-    //       value={isNaN(field.value) ? "" : field.value}
-    //       onValueChange={(details) => setValue(details.valueAsNumber)}
-    //     />
-    //   </Field.Input>
-    //   {error && <Field.ErrorText>{error}</Field.ErrorText>}
-    //   {helperText && !error && (
-    //     <Field.HelperText>{helperText}</Field.HelperText>
-    //   )}
-    // </Field.Root>
+    <InputField
+      {...props}
+      slots={{
+        input: NumericFormatAdapter,
+      }}
+    />
   );
 };
 

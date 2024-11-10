@@ -4,7 +4,7 @@ import Link from "@mui/joy/Link";
 import { Outlet, useMatches } from "react-router";
 import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import { IconHomeFilled } from "@tabler/icons-react";
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 import { Sidebar } from "../sidebar";
 import { Header } from "../header";
@@ -59,17 +59,15 @@ const MainLayout = ({
             </Link>
             {matches.slice(1).map((match) => (
               <Link
-              underline="hover"
-              color="neutral"
-              href={match.pathname}
-              sx={{ fontSize: 12, fontWeight: 500 }}
-            >
-              Inicio
-            </Link>
+                key={match.id}
+                underline="hover"
+                color="neutral"
+                href={match.pathname}
+                sx={{ fontSize: 12, fontWeight: 500 }}
+              >
+                Inicio
+              </Link>
             ))}
-            {/* <Typography color="primary" sx={{ fontWeight: 500, fontSize: 12 }}>
-              Orders
-            </Typography> */}
           </Breadcrumbs>
         </Box>
         {withOutlet ? <Outlet /> : children}
