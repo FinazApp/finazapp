@@ -8,8 +8,7 @@ public async Task<bool> DeleteUserAccountAsync(string userId)
 {
     try
     {
-        // Buscar el usuario por su ID
-        var user = await _dbContext.Users
+        var user = await _dbContext.Usuarios // Cambiado a 'Usuarios' para coincidir con el DbSet
             .Include(u => u.CategoriaCreadoPorNavigations)
             .Include(u => u.CategoriaModificadoPorNavigations)
             .Include(u => u.GastoCreadoPorNavigations)
@@ -18,7 +17,7 @@ public async Task<bool> DeleteUserAccountAsync(string userId)
 
         if (user == null)
         {
-            return false;
+            return false; // Si el usuario no existe, retornar false
         }
 
         // Eliminar todas las relaciones del usuario
@@ -28,10 +27,10 @@ public async Task<bool> DeleteUserAccountAsync(string userId)
         _dbContext.Ingresos.RemoveRange(user.IngresoCreadoPorNavigations);
 
         // Eliminar el usuario
-        _dbContext.Users.Remove(user);
+        _dbContext.Usuarios.Remove(user); // Asegúrate de usar 'Usuarios' aquí también
 
-        // Guardar los cambios en la base de datos
         await _dbContext.SaveChangesAsync();
+
         return true;
     }
     catch (Exception)
