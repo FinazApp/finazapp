@@ -1,7 +1,7 @@
 import React from "react";
 import { isFunction } from "radash";
 import { Center, Flex } from "styled-system/jsx";
-import { Icon, IconClick} from "@tabler/icons-react";
+import { Icon, IconClick } from "@tabler/icons-react";
 import {
   flexRender,
   useReactTable,
@@ -13,20 +13,26 @@ import {
   AccessorKeyColumnDef,
 } from "@tanstack/react-table";
 
-import { IconButton, IconButtonProps, Pagination, Table, Text } from "@components";
+import {
+  Text,
+  Table,
+  IconButton,
+  Pagination,
+  IconButtonProps,
+} from "@components";
 
 export type Action = {
   icon: Icon;
   title: string;
   onClick?: () => void;
-  colorPalette?: IconButtonProps["colorPalette"]
+  colorPalette?: IconButtonProps["colorPalette"];
 };
 
 export interface IDataTableProps<T extends object> {
   data: T[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: AccessorKeyColumnDef<T, any>[];
-  tableActions?: (() => Action[]) | Action[];
+  tableActions?: ((data: T) => Action[]) | Action[];
 }
 
 const DataTable = <T extends object>({
@@ -54,8 +60,8 @@ const DataTable = <T extends object>({
     // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
   });
 
-  const actions = React.useMemo(
-    () => (isFunction(tableActions) ? tableActions() : tableActions),
+  const actions = React.useCallback(
+    (data: T) => (isFunction(tableActions) ? tableActions(data) : tableActions),
     [tableActions]
   );
 
@@ -74,7 +80,7 @@ const DataTable = <T extends object>({
                     )}
               </Table.Header>
             ))}
-            {!!actions?.length && (
+            {!!actions({} as never)?.length && (
               <Table.Header>
                 <Center>
                   <IconClick size="22" style={{ height: 22, width: 22 }} />
@@ -92,21 +98,22 @@ const DataTable = <T extends object>({
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </Table.Cell>
             ))}
-            {!!actions?.length && (
+            {!!actions(row.original)?.length && (
               <Table.Cell width="1" whiteSpace="nowrap">
-                {actions?.map(({ icon: ActionIcon, colorPalette, onClick, title }) => {
-                  return (
+                {actions(row.original)?.map(
+                  ({ icon: ActionIcon, colorPalette, onClick, title }) => (
                     <IconButton
                       size="xs"
+                      key={title}
                       title={title}
                       variant="ghost"
                       onClick={onClick}
-                      colorPalette={colorPalette ?? "accent"}
+                      colorPalette={colorPalette || "accent"}
                     >
                       <ActionIcon size="20" style={{ height: 20, width: 20 }} />
                     </IconButton>
-                  );
-                })}
+                  )
+                )}
               </Table.Cell>
             )}
           </Table.Row>
@@ -145,7 +152,7 @@ const DataTable = <T extends object>({
           >
             {[10, 20, 30, 40, 50].map((pageSize) => (
               <option key={pageSize} value={pageSize}>
-                Show {pageSize}
+                Mostrar {pageSize}
               </option>
             ))}
           </select>

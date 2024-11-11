@@ -1,32 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace finaz_app.Server.Models;
-
-/// <summary>
-/// Representa una categoría de gastos o ingresos en la aplicación.
-/// </summary>
-public partial class Categoria
+namespace finaz_app.Server.Models
 {
-    [BindNever]
-    public int CategoriaId { get; set; }
+    public partial class Categoria
+    {
+        [BindNever]
+        public int CategoriaId { get; set; }
 
-    public string Nombre { get; set; } = null!;
+        public required string Nombre { get; set; }
 
-    public string? Descripcion { get; set; }
+        public string? Descripcion { get; set; }
 
-    public int? Estado { get; set; }
+        [JsonIgnore]
+        public bool isDeleted { get; set; } = false;
 
-    public int? UsuarioId { get; set; }
+        [JsonIgnore]
+        public bool isSystem { get; set; } = false;
 
-    [JsonIgnore]
-    public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
+        [JsonIgnore]
+        public int CreadoPor { get; set; }
 
-    [JsonIgnore]
-    public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+        [JsonIgnore]
+        [BindNever]
+        public DateTime FechaCreacion { get; set; }
 
-    [JsonIgnore]
-    public virtual Usuario? Usuario { get; set; }
+        [JsonIgnore]
+        public int? ModificadoPor { get; set; }
+
+        [JsonIgnore]
+        [BindNever]
+        public DateTime? FechaModificado { get; set; }
+
+        [JsonIgnore]
+        public virtual Usuario? CreadoPorNavigation { get; set; }
+
+        [JsonIgnore]
+        public virtual Usuario? ModificadoPorNavigation { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
+
+        [JsonIgnore]
+        public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+    }
 }

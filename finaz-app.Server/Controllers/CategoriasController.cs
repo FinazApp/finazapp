@@ -90,7 +90,6 @@ namespace finaz_app.Server.Controllers
             if (id != categoria.CategoriaId)
             {
                 return BadRequest("El ID de la categoría no coincide.");
-
             }
 
             var existingCategoria = await _context.Categorias.FindAsync(id);
