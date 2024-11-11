@@ -7,25 +7,32 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace finaz_app.Server.Controllers
 {
-    public class DeleteUserAccountController : ControllerBase // La clase debe ser pública
+    public class DeleteUserAccountController : ControllerBase
     {
         private readonly FinanzAppContext _dbContext;
 
-        public DeleteUserAccountController(FinanzAppContext dbContext) // Constructor público
+        public DeleteUserAccountController(FinanzAppContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<bool> DeleteUserAccountAsync(string userId) // Método público
+        public async Task<bool> DeleteUserAccountAsync(string userId)
         {
             try
             {
-                var user = await _dbContext.Usuarios // Cambiado a 'Usuarios' para coincidir con el DbSet
+                // Convertir userId de string a int
+                if (!int.TryParse(userId, out int parsedUserId))
+                {
+                    // Si userId no se puede convertir a int, retorna false
+                    return false;
+                }
+
+                var user = await _dbContext.Usuarios
                     .Include(u => u.CategoriaCreadoPorNavigations)
                     .Include(u => u.CategoriaModificadoPorNavigations)
                     .Include(u => u.GastoCreadoPorNavigations)
                     .Include(u => u.IngresoCreadoPorNavigations)
-                    .FirstOrDefaultAsync(u => u.UsuarioId == userId);
+                    .FirstOrDefaultAsync(u => u.UsuarioId == parsedUserId);
 
                 if (user == null)
                 {
@@ -39,7 +46,7 @@ namespace finaz_app.Server.Controllers
                 _dbContext.Ingresos.RemoveRange(user.IngresoCreadoPorNavigations);
 
                 // Eliminar el usuario
-                _dbContext.Usuarios.Remove(user); // Asegúrate de usar 'Usuarios' aquí también
+                _dbContext.Usuarios.Remove(user);
 
                 await _dbContext.SaveChangesAsync();
 
