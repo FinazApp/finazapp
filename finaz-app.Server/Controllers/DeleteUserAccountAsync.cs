@@ -2,40 +2,46 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using finaz_app.Server.Models; 
+using finaz_app.Server.Models;
 
-public async Task<bool> DeleteUserAccountAsync(string userId)
+namespace finaz_app.Server.Controllers
 {
-    try
+    public class DeleteUserAccountController : ControllerBase // La clase debe ser pública
     {
-        // Buscar el usuario por su ID
-        var user = await _dbContext.Users
-            .Include(u => u.CategoriaCreadoPorNavigations)
-            .Include(u => u.CategoriaModificadoPorNavigations)
-            .Include(u => u.GastoCreadoPorNavigations)
-            .Include(u => u.IngresoCreadoPorNavigations)
-            .FirstOrDefaultAsync(u => u.UsuarioId == userId);
+        private readonly FinanzAppContext _dbContext;
 
-        if (user == null)
+        public DeleteUserAccountController(FinanzAppContext dbContext) // Constructor público
         {
-            return false;
+            _dbContext = dbContext;
         }
 
-        // Eliminar todas las relaciones del usuario
-        _dbContext.Categorias.RemoveRange(user.CategoriaCreadoPorNavigations);
-        _dbContext.Categorias.RemoveRange(user.CategoriaModificadoPorNavigations);
-        _dbContext.Gastos.RemoveRange(user.GastoCreadoPorNavigations);
-        _dbContext.Ingresos.RemoveRange(user.IngresoCreadoPorNavigations);
+        public async Task<bool> DeleteUserAccountAsync(string userId) // Método público
+        {
+            try
+            {
+                var user = await _dbContext.Users
+                    .Include(u => u.CategoriaCreadoPorNavigations)
+                    .Include(u => u.CategoriaModificadoPorNavigations)
+                    .Include(u => u.GastoCreadoPorNavigations)
+                    .Include(u => u.IngresoCreadoPorNavigations)
+                    .FirstOrDefaultAsync(u => u.UsuarioId == userId);
 
-        // Eliminar el usuario
-        _dbContext.Users.Remove(user);
+                if (user == null) return false;
 
-        // Guardar los cambios en la base de datos
-        await _dbContext.SaveChangesAsync();
-        return true;
-    }
-    catch (Exception)
-    {
-        return false;
+                _dbContext.Categorias.RemoveRange(user.CategoriaCreadoPorNavigations);
+                _dbContext.Categorias.RemoveRange(user.CategoriaModificadoPorNavigations);
+                _dbContext.Gastos.RemoveRange(user.GastoCreadoPorNavigations);
+                _dbContext.Ingresos.RemoveRange(user.IngresoCreadoPorNavigations);
+
+                _dbContext.Users.Remove(user);
+
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
