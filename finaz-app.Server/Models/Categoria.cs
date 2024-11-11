@@ -1,42 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace finaz_app.Server.Models;
-
-/// <summary>
-/// Representa una categoría de gastos o ingresos en la aplicación.
-/// </summary>
-public partial class Categoria
+namespace finaz_app.Server.Models
 {
-    [BindNever]
-    public int CategoriaId { get; set; }
+    public partial class Categoria
+    {
+        [BindNever]
+        public int CategoriaId { get; set; }
 
-    public string Nombre { get; set; } = null!;
+        public required string Nombre { get; set; }
 
-    public string? Descripcion { get; set; }
+        public string? Descripcion { get; set; }
 
-    public bool isDeleted { get; set; }  // Nuevo campo para indicar si la categoría está eliminada
+        [JsonIgnore]
+        public bool isDeleted { get; set; } = false;
 
-    public bool isSystem { get; set; }  // Nuevo campo para identificar si es una categoría del sistema
+        [JsonIgnore]
+        public bool isSystem { get; set; } = false;
 
-    public int? UsuarioId { get; set; }
+        [JsonIgnore]
+        public int CreadoPor { get; set; }
 
-    public string CreadoPor { get; set; } = null!;  // Nuevo campo para el usuario que creó la categoría
+        [JsonIgnore]
+        [BindNever]
+        public DateTime FechaCreacion { get; set; }
 
-    public DateTime FechaCreacion { get; set; }  // Nuevo campo para la fecha de creación
+        [JsonIgnore]
+        public int? ModificadoPor { get; set; }
 
-    public string? ModificadoPor { get; set; }  // Nuevo campo para el usuario que modificó la categoría
+        [JsonIgnore]
+        [BindNever]
+        public DateTime? FechaModificado { get; set; }
 
-    public DateTime? FechaModificado { get; set; }  // Nuevo campo para la fecha de modificación
+        [JsonIgnore]
+        public virtual Usuario? CreadoPorNavigation { get; set; }
 
-    [JsonIgnore]
-    public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
+        [JsonIgnore]
+        public virtual Usuario? ModificadoPorNavigation { get; set; }
 
-    [JsonIgnore]
-    public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+        [JsonIgnore]
+        public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
 
-    [JsonIgnore]
-    public virtual Usuario? Usuario { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+    }
 }

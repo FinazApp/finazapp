@@ -11,6 +11,8 @@ export interface IDrawerProps extends DrawerRootProps {
   subtitle: string;
   submitText: string;
   cancelText?: string;
+  cancelLoading?: boolean;
+  submitLoading?: boolean;
 }
 
 const Drawer = ({
@@ -18,6 +20,8 @@ const Drawer = ({
   subtitle,
   children,
   submitText,
+  submitLoading,
+  cancelLoading,
   cancelText = "Cancelar",
   ...props
 }: React.PropsWithChildren<IDrawerProps>) => {
@@ -43,11 +47,13 @@ const Drawer = ({
           <ParkDrawer.Body>{children}</ParkDrawer.Body>
           <ParkDrawer.Footer gap="3">
             <ParkDrawer.CloseTrigger asChild>
-              <Button type="reset" variant="outline">
+              <Button type="reset" loading={cancelLoading} variant="outline">
                 {cancelText}
               </Button>
             </ParkDrawer.CloseTrigger>
-            <Button type="submit">{submitText}</Button>
+            <Button type="submit" loading={submitLoading}>
+              {submitText}
+            </Button>
           </ParkDrawer.Footer>
         </ParkDrawer.Content>
       </ParkDrawer.Positioner>

@@ -1,41 +1,46 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace finaz_app.Server.Models;
-
-/// <summary>
-/// Representa un ingreso en la aplicación.
-/// </summary>
-public partial class Ingreso
+namespace finaz_app.Server.Models
 {
-    [BindNever]
-    public int IngresosId { get; set; }
+    public partial class Ingreso
+    {
+        [BindNever]
+        public int IngresoId { get; set; }
 
-    public int? UsuarioId { get; set; }
+        public int? CategoriaId { get; set; }
 
-    public int? CategoriaId { get; set; }
+        public required string Nombre { get; set; }
 
-    public string? Nombre { get; set; }
+        public required decimal Monto { get; set; }
 
-    public decimal? Monto { get; set; }
+        [JsonIgnore]
+        public bool isDeleted { get; set; } = false;
 
-    public bool isDeleted { get; set; }  // Campo para indicar si el ingreso está eliminado
+        [JsonIgnore]
+        public int CreadoPor { get; set; }
 
-    public int? Estado { get; set; }  // Campo para indicar el estado del ingreso
+        [JsonIgnore]
+        [BindNever]
+        public DateTime FechaCreacion { get; set; }
 
-    public string CreadoPor { get; set; } = null!;  // Campo para el usuario que creó el ingreso
+        [JsonIgnore]
+        public int? ModificadoPor { get; set; }
 
-    public DateTime FechaCreacion { get; set; }  // Campo para la fecha de creación
+        [JsonIgnore]
+        [BindNever]
+        public DateTime? FechaModificado { get; set; }
 
-    public string? ModificadoPor { get; set; }  // Campo para el usuario que modificó el ingreso
+        [JsonIgnore]
+        public virtual Categoria? Categoria { get; set; }
 
-    public DateTime? FechaModificado { get; set; }  // Campo para la fecha de modificación
+        [JsonIgnore]
+        public virtual Usuario? CreadoPorNavigation { get; set; }
 
-    [JsonIgnore]
-    public virtual Categoria? Categoria { get; set; }
-
-    [JsonIgnore]
-    public virtual Usuario? Usuario { get; set; }
+        [JsonIgnore]
+        public virtual Usuario? ModificadoPorNavigation { get; set; }
+    }
 }

@@ -1,0 +1,1 @@
+"AppConnection": "Data Source=localhost;Initial Catalog=FinazApp;User Id=sa; Password=P@ncakes01!;MultipleActiveResultSets=True;TrustServerCertificate=true; Connection Timeout=5000;"

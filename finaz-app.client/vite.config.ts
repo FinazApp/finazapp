@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { env } from 'process';
-import { defineConfig } from 'vite';
 import child_process from 'child_process';
 import plugin from '@vitejs/plugin-react';
+import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -17,7 +17,7 @@ const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
 const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
 if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (0 !== child_process.spawnSync('dotnet', [
+    const result = child_process.spawnSync('dotnet', [
         'dev-certs',
         'https',
         '--export-path',
@@ -25,33 +25,53 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
         '--format',
         'Pem',
         '--no-password',
-    ], { stdio: 'inherit', }).status) {
+    ], { stdio: 'inherit' });
+
+    if (result.status !== 0) {
+        console.error("Error creating certificate:", result.stderr.toString());
         throw new Error("Could not create certificate.");
     }
 }
 
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7111';
+const target = env.ASPNETCORE_HTTPS_PORT
+    ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}`
+    : env.ASPNETCORE_URLS
+        ? env.ASPNETCORE_URLS.split(';')[0]
+        : 'https://localhost:7111';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [plugin(), tsconfigPaths({ root: './' })],
-    resolve: {
-        alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
-        }
-    },
-    server: {
-        proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), "");
+
+    return {
+        define: {
+            "process.env.SERVER_URL": JSON.stringify(
+                env.SERVER_URL,
+            ),
+        },
+        plugins: [plugin(), tsconfigPaths({ root: './' })],
+        resolve: {
+            alias: {
+                '@': fileURLToPath(new URL('./src', import.meta.url))
             }
         },
-        port: 5173,
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
+        server: {
+            proxy: {
+                '^/swagger': {
+                    target,
+                    secure: false
+                },
+                '^/api': {
+                    target,
+                    secure: false,
+                    changeOrigin: true,
+                }
+            },
+            port: 5173,
+            https: {
+                key: fs.readFileSync(keyFilePath),
+                cert: fs.readFileSync(certFilePath),
+            }
         }
     }
-})
+});

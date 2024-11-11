@@ -19,9 +19,10 @@ const NumberField = ({ name, label, helperText, ...props }: INumberFieldProps) =
       <Field.Input asChild>
         <NumberInput
           {...props}
-          {...omit(field, ["onChange"])}
+          {...omit(field, ["onChange", "value"])}
           p="0"
-          onValueChange={(details) => setValue(details.valueAsNumber, true)}
+          value={isNaN(field.value) ? "" : field.value}
+          onValueChange={(details) => setValue(details.valueAsNumber)}
         />
       </Field.Input>
       {error && <Field.ErrorText>{error}</Field.ErrorText>}

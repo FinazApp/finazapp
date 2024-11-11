@@ -1,4 +1,5 @@
 ﻿using finaz_app.Server.Models;
+using finaz_app.Server.Models.DTOs;
 using finaz_app.Server.Security.JWT;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,6 @@ namespace finaz_app.Server.Controllers
     /// <summary>
     /// Controlador para manejar la autenticación de usuarios mediante inicio de sesión.
     /// </summary>
-    /// <remarks>
-    /// Este controlador permite que los usuarios se autentiquen en el sistema, verificando sus credenciales
-    /// y generando un token JWT para las sesiones autenticadas.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
@@ -23,8 +20,6 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Constructor del LoginController.
         /// </summary>
-        /// <param name="context">El contexto de la base de datos de FinanzApp.</param>
-        /// <param name="jwtServices">Servicio para generar y gestionar tokens JWT.</param>
         public LoginController(FinanzAppContext context, JwtServices jwtServices)
         {
             _context = context;
@@ -36,11 +31,7 @@ namespace finaz_app.Server.Controllers
         /// </summary>
         /// <param name="request">Objeto Login que contiene las credenciales del usuario.</param>
         /// <returns>Devuelve un mensaje de éxito si el inicio de sesión es correcto o un código de error en caso contrario.</returns>
-        /// <response code="200">Inicio de sesión exitoso, se genera y almacena un JWT en las cookies.</response>
-        /// <response code="400">Datos de inicio de sesión inválidos o vacíos.</response>
-        /// <response code="401">Credenciales incorrectas.</response>
-        /// <response code="500">Error interno del servidor durante el proceso de autenticación.</response>
-        [HttpPost("Login")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -48,7 +39,7 @@ namespace finaz_app.Server.Controllers
         public async Task<ActionResult<string>> Login([FromBody] Login request)
         {
             // Validación de entrada
-            if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.HashContraseña))
+            if (request == null || string.IsNullOrWhiteSpace(request.CorreoElectronico) || string.IsNullOrWhiteSpace(request.PasswordHash))
             {
                 return BadRequest("Los datos de inicio de sesión no pueden estar vacíos.");
             }
@@ -56,7 +47,9 @@ namespace finaz_app.Server.Controllers
             try
             {
                 // Buscando al usuario
-                var user = await _context.Usuarios.SingleOrDefaultAsync(u => u.Correo == request.Email);
+                var user = await _context.Usuarios
+                    .Where(u => u.CorreoElectronico == request.CorreoElectronico)
+                    .SingleOrDefaultAsync();
 
                 // Verifica si el usuario existe
                 if (user == null)
@@ -65,7 +58,7 @@ namespace finaz_app.Server.Controllers
                 }
 
                 // Verifica la contraseña
-                if (!BCrypt.Net.BCrypt.Verify(request.HashContraseña, user.PasswordHash))
+                if (!BCrypt.Net.BCrypt.Verify(request.PasswordHash, user.PasswordHash))
                 {
                     return Unauthorized("Usuario o contraseña incorrecta/o.");
                 }
@@ -83,7 +76,16 @@ namespace finaz_app.Server.Controllers
                     IsEssential = true
                 });
 
-                return Ok(new { message = "Inicio de sesión exitoso" });
+                // Retornar el DTO del usuario autenticado
+                var userDto = new UsuariosDTO
+                {
+                    UsuarioId = user.UsuarioId,
+                    Nombre = user.Nombre,
+                    CorreoElectronico = user.CorreoElectronico,
+                    PasswordHash = user.PasswordHash
+                };
+
+                return Ok(new { message = "Inicio de sesión exitoso", user = userDto });
             }
             catch (DbUpdateException dbEx)
             {

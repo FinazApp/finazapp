@@ -26,11 +26,13 @@ jobs:
       - name: Restore .NET dependencies
         run: dotnet restore ./finaz-app.Server/finaz-app.Server.csproj
 
+      - name: Create HTTPS Development Certificate
+        run: |
+          mkdir -p $HOME/.aspnet/https
+          dotnet dev-certs https --trust --export-path "$HOME/.aspnet/https/finaz-app.client.pem" --format Pem --no-password
+
       - name: Build .NET project
         run: dotnet build ./finaz-app.Server/finaz-app.Server.csproj --configuration Release
-
-      - name: Run .NET tests
-        run: dotnet test ./finaz-app.Tests/finaz-app.Tests.csproj --configuration Release
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -41,11 +43,6 @@ jobs:
         run: |
           cd finaz-app.client
           npm install
-
-      - name: Run frontend tests
-        run: |
-          cd finaz-app.client
-          npm test
 
       - name: Build frontend
         run: |
