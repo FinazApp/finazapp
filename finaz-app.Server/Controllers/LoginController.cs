@@ -76,16 +76,7 @@ namespace finaz_app.Server.Controllers
                     IsEssential = true
                 });
 
-                // Retornar el DTO del usuario autenticado
-                var userDto = new UsuariosDTO
-                {
-                    UsuarioId = user.UsuarioId,
-                    Nombre = user.Nombre,
-                    CorreoElectronico = user.CorreoElectronico,
-                    PasswordHash = user.PasswordHash
-                };
-
-                return Ok(new { message = "Inicio de sesión exitoso", user = userDto });
+                return Ok(new { message = "Inicio de sesión exitoso" });
             }
             catch (DbUpdateException dbEx)
             {

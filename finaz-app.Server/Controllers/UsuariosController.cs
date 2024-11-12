@@ -135,29 +135,6 @@ namespace finaz_app.Server.Controllers
         }
 
         /// <summary>
-        /// Crea un nuevo usuario.
-        /// </summary>
-        [HttpPost]
-        [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<UsuariosDTO>> PostUsuario(UsuariosDTO usuarioDto)
-        {
-            try
-            {
-                var usuario = _mapper.Map<Usuario>(usuarioDto);
-                _context.Usuarios.Add(usuario);
-                await _context.SaveChangesAsync();
-
-                var createdUsuarioDto = _mapper.Map<UsuariosDTO>(usuario);
-                return CreatedAtAction(nameof(GetUsuario), new { id = createdUsuarioDto.UsuarioId }, createdUsuarioDto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al crear el usuario: {ex.Message}");
-            }
-        }
-
-        /// <summary>
         /// Elimina un usuario existente de manera definitiva.
         /// </summary>
         [HttpDelete("{id}")]
