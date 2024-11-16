@@ -36,7 +36,7 @@ namespace finaz_app.Server.Controllers
         public async Task<ActionResult> AsignarRol(int userId, string rol)
         {
             rol = rol?.ToLower();
-            if (!new[] { "usuario", "admin" }.Contains(rol))
+            if (!new[] { "User", "admin" }.Contains(rol))
             {
                 return BadRequest("Rol no identificado. Los roles válidos son 'usuario' o 'admin'.");
             }
