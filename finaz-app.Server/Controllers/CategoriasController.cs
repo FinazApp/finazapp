@@ -214,73 +214,104 @@ namespace finaz_app.Server.Controllers
         {
             return _context.Categorias.Any(e => e.CategoriaId == id && !e.isDeleted);
         }
-
-        [HttpPost("restore")]
+        [HttpPost("categoria/restore/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> RestoreUserCategories()
+        public async Task<IActionResult> RestoreCategoryById(int id)
         {
             var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
             if (userID == null)
             {
                 return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
             }
-
+        
             try
             {
-                // Restaurar categorías, gastos e ingresos del usuario que estén marcados como eliminados
-                var categorias = await _context.Categorias
-                    .Where(c => c.CreadoPor == userID && c.isDeleted)
-                    .ToListAsync();
-                var gastos = await _context.Gastos
-                    .Where(g => g.CreadoPor == userID && g.isDeleted)
-                    .ToListAsync();
-                var ingresos = await _context.Ingresos
-                    .Where(i => i.CreadoPor == userID && i.isDeleted)
-                    .ToListAsync();
-
-                // Cambiar el estado de 'isDeleted' a falso
-                categorias.ForEach(c => c.isDeleted = false);
-                gastos.ForEach(g => g.isDeleted = false);
-                ingresos.ForEach(i => i.isDeleted = false);
-
+                var categoria = await _context.Categorias
+                    .FirstOrDefaultAsync(c => c.CategoriaId == id && c.CreadoPor == userID && c.isDeleted);
+        
+                if (categoria == null)
+                {
+                    return NotFound("No se encontró la categoría eliminada para el usuario.");
+                }
+        
+                categoria.isDeleted = false;
                 await _context.SaveChangesAsync();
-                return Ok("Categorías, ingresos y gastos restaurados correctamente.");
+        
+                return Ok("Categoría restaurada correctamente.");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error en la API: {ex.Message}");
             }
         }
-
-        [HttpGet("user/me")]
+        [HttpPost("gasto/restore/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAuthenticatedUser()
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RestoreGastoById(int id)
         {
             var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
             if (userID == null)
             {
                 return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
             }
-
-            var user = await _context.Usuarios
-                .AsNoTracking() // Para optimizar si no se va a modificar el objeto
-                .FirstOrDefaultAsync(u => u.UsuarioId == userID);
-
-            if (user == null)
+        
+            try
             {
-                return NotFound("Usuario no encontrado.");
+                var gasto = await _context.Gastos
+                    .FirstOrDefaultAsync(g => g.GastoId == id && g.CreadoPor == userID && g.isDeleted);
+        
+                if (gasto == null)
+                {
+                    return NotFound("No se encontró el gasto eliminado para el usuario.");
+                }
+        
+                gasto.isDeleted = false;
+                await _context.SaveChangesAsync();
+        
+                return Ok("Gasto restaurado correctamente.");
             }
-
-            return Ok(new {
-                user.UsuarioId,
-                user.Nombre,
-                user.CorreoElectronico,
-                user.Rol
-            });
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error en la API: {ex.Message}");
+            }
+        }
+        [HttpPost("ingreso/restore/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RestoreIngresoById(int id)
+        {
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+        
+            try
+            {
+                var ingreso = await _context.Ingresos
+                    .FirstOrDefaultAsync(i => i.IngresoId == id && i.CreadoPor == userID && i.isDeleted);
+        
+                if (ingreso == null)
+                {
+                    return NotFound("No se encontró el ingreso eliminado para el usuario.");
+                }
+        
+                ingreso.isDeleted = false;
+                await _context.SaveChangesAsync();
+        
+                return Ok("Ingreso restaurado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error en la API: {ex.Message}");
+            }
         }
     }
 }
