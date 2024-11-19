@@ -17,7 +17,7 @@ namespace finaz_app.Server.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "usuario, admin")]
+    [Authorize]
     public class IngresosController : ControllerBase
     {
         private readonly FinanzAppContext _context;
