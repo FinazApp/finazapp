@@ -1,9 +1,11 @@
 import React from "react";
 import { useField } from "formik";
-import FormControl from "@mui/joy/FormControl";
+import Stack from "@mui/joy/Stack";
+import Skeleton from "@mui/joy/Skeleton";
 import FormLabel from "@mui/joy/FormLabel";
-import FormHelperText from "@mui/joy/FormHelperText";
+import FormControl from "@mui/joy/FormControl";
 import Input, { InputProps } from "@mui/joy/Input";
+import FormHelperText from "@mui/joy/FormHelperText";
 
 export interface IInputFieldProps extends InputProps {
   name: string;
@@ -44,20 +46,15 @@ const InputField = ({
           </FormHelperText>
         ))}
     </FormControl>
-    // <Field.Root invalid={invalid}>
-    //   <Field.Label>{label}</Field.Label>
-    //   <Field.Input
-    //     {...field}
-    //     {...props}
-    //     name={name}
-    //     id={name}
-    //     placeholder={placeholder}
-    //   />
-    //   {error && <Field.ErrorText>{error}</Field.ErrorText>}
-    //   {helperText && !error && (
-    //     <Field.HelperText>{helperText}</Field.HelperText>
-    //   )}
-    // </Field.Root>
+  );
+};
+
+InputField.Skeleton = function InputFieldSkeleton() {
+  return (
+    <Stack direction="column" spacing={1}>
+      <Skeleton variant="rectangular" height={10} />
+      <Skeleton variant="rectangular" height={40} />
+    </Stack>
   );
 };
 

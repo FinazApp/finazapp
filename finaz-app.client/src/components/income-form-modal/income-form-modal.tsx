@@ -14,6 +14,8 @@ import { IIncome, IIncomesCreate } from "@interfaces";
 import { CategoriesSelect, InputField } from "@components";
 import { useCreateIncome, useFetchOneIncome, useUpdateIncome } from "@hooks";
 
+import { SelectField } from "../select-field";
+
 export interface IIncomeFormModalProps {
   id: number;
   open: boolean;
@@ -120,23 +122,33 @@ const IncomeFormModal = ({ id, open, onClose }: IIncomeFormModalProps) => {
         >
           {(formik) => (
             <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-              <InputField
-                type="text"
-                name="nombre"
-                label="Nombre del ingreso"
-                placeholder="Ej: Tienda"
-              />
-              <Stack sx={{ mt: 2, mb: 2 }}>
-                <InputField
-                  type="number"
-                  name="monto"
-                  label="Monto"
-                  placeholder="Ingresa el monto"
-                />
-              </Stack>
-              <Stack sx={{ mt: 2, mb: 2 }}>
-                <CategoriesSelect name="categoriaId" />
-              </Stack>
+              {income.isPending && id ? (
+                <>
+                  <InputField.Skeleton />
+                  <InputField.Skeleton />
+                  <SelectField.Skeleton />
+                </>
+              ) : (
+                <>
+                  <InputField
+                    type="text"
+                    name="nombre"
+                    label="Nombre del ingreso"
+                    placeholder="Ej: Tienda"
+                  />
+                  <Stack sx={{ mt: 2, mb: 2 }}>
+                    <InputField
+                      type="number"
+                      name="monto"
+                      label="Monto"
+                      placeholder="Ingresa el monto"
+                    />
+                  </Stack>
+                  <Stack sx={{ mt: 2, mb: 2 }}>
+                    <CategoriesSelect name="categoriaId" />
+                  </Stack>
+                </>
+              )}
               <Button type="submit" loading={isPending} fullWidth>
                 {id ? "Guardar cambios" : "Agregar ingreso"}
               </Button>

@@ -1,7 +1,9 @@
 import React from "react";
 import { useField } from "formik";
+import Stack from "@mui/joy/Stack";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
+import Skeleton from "@mui/joy/Skeleton";
 import FormLabel from "@mui/joy/FormLabel";
 import FormControl from "@mui/joy/FormControl";
 import FormHelperText from "@mui/joy/FormHelperText";
@@ -56,6 +58,15 @@ const SelectField = ({
           </FormHelperText>
         ))}
     </FormControl>
+  );
+};
+
+SelectField.Skeleton = function SelectFieldSkeleton() {
+  return (
+    <Stack direction="column" spacing={1}>
+      <Skeleton variant="rectangular" height={10} />
+      <Skeleton variant="rectangular" height={40} />
+    </Stack>
   );
 };
 

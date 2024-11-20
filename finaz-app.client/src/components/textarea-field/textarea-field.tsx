@@ -1,7 +1,9 @@
 import React from "react";
 import { useField } from "formik";
-import FormControl from "@mui/joy/FormControl";
+import Stack from "@mui/joy/Stack";
+import Skeleton from "@mui/joy/Skeleton";
 import FormLabel from "@mui/joy/FormLabel";
+import FormControl from "@mui/joy/FormControl";
 import FormHelperText from "@mui/joy/FormHelperText";
 import Textarea, { TextareaProps } from "@mui/joy/Textarea";
 
@@ -38,6 +40,15 @@ const TextareaField = ({
           </FormHelperText>
         ))}
     </FormControl>
+  );
+};
+
+TextareaField.Skeleton = function TextareaFieldSkeleton() {
+  return (
+    <Stack direction="column" spacing={1}>
+      <Skeleton variant="rectangular" height={10} />
+      <Skeleton variant="rectangular" height={70} />
+    </Stack>
   );
 };
 

@@ -1,43 +1,34 @@
 import React from "react";
-import Card from "@mui/joy/Card";
-import CardContent from "@mui/joy/CardContent";
-import CircularProgress from "@mui/joy/CircularProgress";
-import Typography from "@mui/joy/Typography";
+import millify from "millify";
 import SvgIcon from "@mui/joy/SvgIcon";
+import Typography from "@mui/joy/Typography";
+import CardContent from "@mui/joy/CardContent";
+import Card, { CardProps } from "@mui/joy/Card";
+import CircularProgress from "@mui/joy/CircularProgress";
+import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 
 export interface IKPICardProps {
   title: string;
   value: number;
+  color: CardProps["color"];
   data: {
     percent: number;
     type: "down" | "up";
   };
 }
 
-const KPICard = ({ title, value }: IKPICardProps) => {
+const KPICard = ({ title, value, data, color = "primary" }: IKPICardProps) => {
   return (
-    <Card variant="solid" color="primary" invertedColors>
+    <Card variant="soft" color={color} sx={{ width: "100%" }} invertedColors>
       <CardContent orientation="horizontal">
-        <CircularProgress size="lg" determinate value={20}>
+        <CircularProgress size="lg" determinate value={data.percent}>
           <SvgIcon>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
-              />
-            </svg>
+            {data.type === "down" ? <IconTrendingDown /> : <IconTrendingUp />}
           </SvgIcon>
         </CircularProgress>
         <CardContent>
           <Typography level="body-md">{title}</Typography>
-          <Typography level="h2">{value}</Typography>
+          <Typography level="h2">{millify(value, { precision: 2 })}</Typography>
         </CardContent>
       </CardContent>
     </Card>

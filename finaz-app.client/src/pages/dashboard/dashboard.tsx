@@ -1,11 +1,37 @@
 import React from "react";
 import Box from "@mui/joy/Box";
+import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
+import Grid from "@mui/material/Grid2";
+import { PieChart } from "@mui/x-charts";
 import Typography from "@mui/joy/Typography";
+import { createColumnHelper } from "@tanstack/react-table";
 import ToggleButtonGroup from "@mui/joy/ToggleButtonGroup";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
-import { IKPICardProps, KPICard } from "@components";
+import { DataTable, IKPICardProps, KPICard } from "@components";
+
+const columnHelper = createColumnHelper<{
+  nombre: string;
+  tipo: string;
+  monto: number;
+}>();
+
+const columns = [
+  columnHelper.accessor("tipo", {
+    id: "categoriaId",
+    header: "Tipo",
+  }),
+  columnHelper.accessor("nombre", {
+    id: "nombre",
+    header: "Nombre",
+    cell: (info) => <b>{info.getValue()}</b>,
+  }),
+  columnHelper.accessor("monto", {
+    id: "monto",
+    header: "Monto",
+  }),
+];
 
 const DashboardPage = () => {
   const [filter, setFilter] = React.useState("1");
@@ -19,34 +45,29 @@ const DashboardPage = () => {
   const stats: IKPICardProps[] = [
     {
       title: "Balance",
-      value: 500000,
+      value: 5000,
+      color: "primary",
       data: {
         type: "down",
-        percent: 5,
+        percent: 43,
       },
     },
     {
       title: "Gastos",
       value: 500000,
+      color: "danger",
       data: {
         type: "up",
-        percent: 5,
+        percent: 53,
       },
     },
     {
       title: "Ingresos",
       value: 500000,
+      color: "success",
       data: {
         type: "down",
-        percent: 5,
-      },
-    },
-    {
-      title: "Ingresos",
-      value: 500000,
-      data: {
-        type: "down",
-        percent: 5,
+        percent: 23,
       },
     },
   ];
@@ -99,6 +120,7 @@ const DashboardPage = () => {
         sx={{
           py: 1,
           display: "flex",
+          gap: 2,
           justifyContent: "space-between",
           flexDirection: { xs: "column", lg: "row" },
         }}
@@ -107,6 +129,44 @@ const DashboardPage = () => {
           <KPICard {...stat} />
         ))}
       </Box>
+      <Grid container spacing={2} sx={{ flexGrow: 1 }}>
+        <Grid size={4}>
+          <Stack
+            direction="row"
+            paddingY="20px"
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <PieChart
+              series={[
+                {
+                  data: [
+                    { id: 0, value: 10, label: "series A" },
+                    { id: 1, value: 15, label: "series B" },
+                    { id: 2, value: 20, label: "series C" },
+                  ],
+                },
+              ]}
+              height={200}
+            />
+          </Stack>
+        </Grid>
+        <Grid size={8}>
+          <DataTable
+            data={[
+              {
+                monto: 100,
+                nombre: "Hello",
+                tipo: "Hello",
+              },
+            ]}
+            columns={columns}
+            tableActions={[]}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 };

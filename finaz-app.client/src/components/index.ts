@@ -3,7 +3,6 @@ export * from "./kpi-card";
 export * from "./data-table";
 export * from "./input-field";
 export * from "./main-layout";
-// export * from "./number-field";
 export * from "./modal-confirm";
 export * from "./error-boundary";
 export * from "./bill-form-modal";

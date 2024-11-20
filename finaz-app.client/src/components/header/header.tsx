@@ -1,9 +1,12 @@
 import * as React from 'react';
-import GlobalStyles from '@mui/joy/GlobalStyles';
 import Sheet from '@mui/joy/Sheet';
 import IconButton from '@mui/joy/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import GlobalStyles from '@mui/joy/GlobalStyles';
+
 import { SidebarUtils } from '@utils';
+
+import { ColorSchemeToggle } from '../color-scheme-toggle';
 
 export default function Header() {
   return (
@@ -42,6 +45,7 @@ export default function Header() {
       >
         <MenuIcon />
       </IconButton>
+      <ColorSchemeToggle sx={{ ml: "auto" }} />
     </Sheet>
   );
 }

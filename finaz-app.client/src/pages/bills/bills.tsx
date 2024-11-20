@@ -30,6 +30,10 @@ const columns = [
     id: "monto",
     header: "Monto",
   }),
+  columnHelper.accessor("categoriaId", {
+    id: "categoriaId",
+    header: "Categoría",
+  }),
   columnHelper.accessor("isDeleted", {
     id: "isDeleted",
     header: "Estado",

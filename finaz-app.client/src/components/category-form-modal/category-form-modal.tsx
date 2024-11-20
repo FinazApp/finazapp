@@ -116,20 +116,29 @@ const CategoryFormModal = ({ id, open, onClose }: ICategoryFormModalProps) => {
         >
           {(formik) => (
             <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-              <InputField
-                type="text"
-                name="nombre"
-                placeholder="Ej: Hogar"
-                label="Nombre de la categoría"
-              />
-              <Stack sx={{ mt: 2, mb: 2 }}>
-                <TextareaField
-                  minRows={3}
-                  name="descripcion"
-                  label="Descripción"
-                  placeholder="Escribe la descripcion"
-                />
-              </Stack>
+              {category.isPending && id ? (
+                <>
+                  <InputField.Skeleton />
+                  <TextareaField.Skeleton />
+                </>
+              ) : (
+                <>
+                  <InputField
+                    type="text"
+                    name="nombre"
+                    placeholder="Ej: Hogar"
+                    label="Nombre de la categoría"
+                  />
+                  <Stack sx={{ mt: 2, mb: 2 }}>
+                    <TextareaField
+                      minRows={3}
+                      name="descripcion"
+                      label="Descripción"
+                      placeholder="Escribe la descripcion"
+                    />
+                  </Stack>
+                </>
+              )}
               <Button type="submit" loading={isPending} fullWidth>
                 {id ? "Guardar cambios" : "Crear categoría"}
               </Button>
