@@ -47,6 +47,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // añadir autoMapper
 builder.Services.AddAutoMapper(typeof(MapeoPerfiles));
 
+// Registra Restores
+builder.Services.AddScoped<Restore>();
+
 builder.Services.AddControllers();
 
 // Configuración adicional de Swagger/OpenAPI
