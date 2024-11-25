@@ -16,16 +16,18 @@ namespace finaz_app.Server.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "usuario, admin")]
+    [Authorize]
     public class CategoriasController : ControllerBase
     {
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
+        private readonly Restore _restore;
 
-        public CategoriasController(FinanzAppContext context, IMapper mapper)
+        public CategoriasController(FinanzAppContext context, IMapper mapper, Restore restor)
         {
             _context = context;
             _mapper = mapper;
+            _restore = restor ?? throw new ArgumentNullException(nameof(restor));
         }
 
         [HttpGet]
@@ -209,6 +211,25 @@ namespace finaz_app.Server.Controllers
                 return StatusCode(500, $"Error en la API: {ex.Message}");
             }
         }
+
+        [HttpPost("categoria/restore/{id}")]
+        public async Task<IActionResult> RestoreCategoryById(int id)
+        {
+            var userId = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userId == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+
+            var (statusCode, message) = await _restore.RestoreEntity<Categoria>(
+                id,
+                userId.Value,
+                "Categorias",
+                "CategoriaId");
+
+            return StatusCode(statusCode, message);
+        }
+
 
         private bool CategoriaExists(int id)
         {

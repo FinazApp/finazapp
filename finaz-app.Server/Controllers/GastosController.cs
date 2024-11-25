@@ -9,6 +9,7 @@ using AutoMapper;
 using finaz_app.Server.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using finaz_app.Server.Security.JWT;
+using System.Numerics;
 
 namespace finaz_app.Server.Controllers
 {
@@ -17,16 +18,19 @@ namespace finaz_app.Server.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "usuario, admin")]
+    [Authorize]
     public class GastosController : ControllerBase
     {
         private readonly FinanzAppContext _context;
         private readonly IMapper _mapper;
+        private readonly Restore _restore;
 
-        public GastosController(FinanzAppContext context, IMapper mapper)
+        public GastosController(FinanzAppContext context, IMapper mapper, Restore restor)
         {
             _context = context;
             _mapper = mapper;
+            _restore = restor ?? throw new ArgumentNullException(nameof(restor));
+
         }
 
         /// <summary>
@@ -242,6 +246,24 @@ namespace finaz_app.Server.Controllers
                 var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar el gasto: {ex.Message} - Detalles: {innerExceptionMessage}");
             }
+        }
+
+        [HttpPost("Restore/{id}")]
+        public async Task<IActionResult> RestoreCategoryById(int id)
+        {
+            var userId = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userId == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+
+            var (statusCode, message) = await _restore.RestoreEntity<Gasto>(
+                id,
+                userId.Value,
+                "Gastos",
+                "GastoId");
+
+            return StatusCode(statusCode, message);
         }
 
         /// <summary>
