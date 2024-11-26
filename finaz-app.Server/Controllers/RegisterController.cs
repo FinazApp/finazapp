@@ -35,7 +35,7 @@ namespace finaz_app.Server.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Register([FromBody] UsuariosDTO request)
+        public async Task<ActionResult> Register([FromBody] Usuario request)
         {
             // Validar que los campos requeridos no estén vacíos
             if (string.IsNullOrWhiteSpace(request.Nombre) || 
@@ -69,7 +69,7 @@ namespace finaz_app.Server.Controllers
                     Nombre = request.Nombre,
                     CorreoElectronico = request.CorreoElectronico,
                     PasswordHash = passwordHash,
-                    Rol = "usuario"
+                    Rol = "User"
                 };
 
                 _appContext.Usuarios.Add(user);

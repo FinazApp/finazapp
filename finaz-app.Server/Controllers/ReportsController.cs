@@ -1,4 +1,5 @@
 ﻿using finaz_app.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace finaz_app.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ReportsController : ControllerBase
     {
         private readonly FinanzAppContext _context;
