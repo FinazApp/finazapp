@@ -1,4 +1,5 @@
 export const BILLS = "BILLS";
+export const USER_ME = "USER_ME";
 export const INCOMES = "INCOMES";
 export const LOGIN_USER = "LOGIN_USER";
 export const CATEGORIES = "CATEGORIES";

@@ -13,12 +13,12 @@
     "cypress:run": "cypress run"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.6",
     "@mui/joy": "^5.0.0-beta.48",
-    "@mui/material": "^6.1.7",
-    "@mui/x-charts": "^7.22.2",
+    "@mui/material": "^6.1.8",
+    "@mui/x-charts": "^7.22.3",
     "@mui/x-data-grid": "^7.22.2",
     "@tabler/icons-react": "^3.17.0",
     "@tanstack/query-sync-storage-persister": "^5.56.2",

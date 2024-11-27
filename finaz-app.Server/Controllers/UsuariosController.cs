@@ -53,9 +53,8 @@ namespace finaz_app.Server.Controllers
         /// <summary>
         /// Obtiene un usuario específico por ID.
         /// </summary>
-        /// <param name="id">El ID del usuario a obtener.</param>
         /// <returns>Devuelve el usuario en formato DTO.</returns>
-        [HttpGet("id")]
+        [HttpGet("Me")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(UsuariosDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,7 +80,8 @@ namespace finaz_app.Server.Controllers
                 var usuariosDto = new UsuariosDTO
                 {
                     Nombre = usuario.Nombre,
-                    CorreoElectronico = usuario.CorreoElectronico
+                    UsuarioId = usuario.UsuarioId,
+                    CorreoElectronico = usuario.CorreoElectronico,
                 };
 
                 return Ok(usuariosDto);

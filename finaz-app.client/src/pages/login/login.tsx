@@ -13,6 +13,7 @@ import IconButton from "@mui/joy/IconButton";
 import { ColorSchemeToggle, InputField } from "@components";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import { useNavigate } from "react-router";
+import { useAuth } from "@contexts";
 
 const validationSchema = Yup.object({
   correoElectronico: Yup.string()
@@ -23,7 +24,20 @@ const validationSchema = Yup.object({
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { isLogged } = useAuth();
+
   const { mutateAsync, isPending } = useLogin();
+
+  React.useEffect(() => {
+    const fn = async () => {
+      if (isLogged) {
+        navigate("/");
+        return;
+      }
+    };
+
+    fn();
+  }, [isLogged, navigate]);
 
   return (
     <>

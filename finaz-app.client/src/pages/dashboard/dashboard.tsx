@@ -3,7 +3,6 @@ import Box from "@mui/joy/Box";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
 import Grid from "@mui/material/Grid2";
-import { PieChart } from "@mui/x-charts";
 import Typography from "@mui/joy/Typography";
 import { createColumnHelper } from "@tanstack/react-table";
 import ToggleButtonGroup from "@mui/joy/ToggleButtonGroup";
@@ -112,7 +111,7 @@ const DashboardPage = () => {
             ))}
           </ToggleButtonGroup>
           <Button color="primary" startDecorator={<DownloadRoundedIcon />}>
-            Download PDF
+            Descargar reporte
           </Button>
         </Box>
       </Box>
@@ -129,6 +128,7 @@ const DashboardPage = () => {
           <KPICard {...stat} />
         ))}
       </Box>
+
       <Grid container spacing={2} sx={{ flexGrow: 1 }}>
         <Grid size={4}>
           <Stack
@@ -139,18 +139,7 @@ const DashboardPage = () => {
               alignItems: "center",
             }}
           >
-            <PieChart
-              series={[
-                {
-                  data: [
-                    { id: 0, value: 10, label: "series A" },
-                    { id: 1, value: 15, label: "series B" },
-                    { id: 2, value: 20, label: "series C" },
-                  ],
-                },
-              ]}
-              height={200}
-            />
+            Grafico aqui
           </Stack>
         </Grid>
         <Grid size={8}>

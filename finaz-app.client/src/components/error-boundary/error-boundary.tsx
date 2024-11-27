@@ -24,7 +24,8 @@ const ErrorBoundary = () => {
 
   return (
     <Sheet>
-      {(isRouteErrorResponse(error) && error?.status) || 400}
+      {JSON.stringify(error)}
+      {(isRouteErrorResponse(error) && error?.status)}
       {subtitle}
     </Sheet>
     // <Flex

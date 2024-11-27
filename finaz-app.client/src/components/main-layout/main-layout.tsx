@@ -1,13 +1,14 @@
 import React from "react";
 import Box from "@mui/joy/Box";
 import Link from "@mui/joy/Link";
-import { Outlet, useMatches } from "react-router";
 import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import { IconHomeFilled } from "@tabler/icons-react";
+import { Outlet, useMatches, useNavigate } from "react-router";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 import { Sidebar } from "../sidebar";
 import { Header } from "../header";
+import { useAuth } from "@contexts";
 
 export interface IMainLayoutProps {
   withOutlet?: boolean;
@@ -18,6 +19,19 @@ const MainLayout = ({
   withOutlet,
 }: React.PropsWithChildren<IMainLayoutProps>) => {
   const matches = useMatches();
+  const navigate = useNavigate();
+  const { isLogged } = useAuth();
+
+  React.useEffect(() => {
+    const fn = async () => {
+      if (!isLogged) {
+        navigate("/login");
+        return;
+      }
+    };
+
+    fn();
+  }, [isLogged, navigate]);
 
   return (
     <Box sx={{ display: "flex", minHeight: "100dvh" }}>

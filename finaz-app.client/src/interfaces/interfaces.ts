@@ -12,8 +12,8 @@ export interface ILoginUser {
 
 export interface IUser {
     nombre: string;
-    correo: string;
     usuarioId: number;
+    correoElectronico: string;
 }
 
 export interface ICategory {

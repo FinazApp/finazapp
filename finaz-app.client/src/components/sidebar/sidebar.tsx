@@ -1,24 +1,37 @@
 import * as React from "react";
-import GlobalStyles from "@mui/joy/GlobalStyles";
-import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
-import Divider from "@mui/joy/Divider";
-import IconButton from "@mui/joy/IconButton";
-import Input from "@mui/joy/Input";
 import List from "@mui/joy/List";
-import  { listItemButtonClasses } from "@mui/joy/ListItemButton";
-import Typography from "@mui/joy/Typography";
+import Menu from "@mui/joy/Menu";
+import Input from "@mui/joy/Input";
 import Sheet from "@mui/joy/Sheet";
+import Avatar from "@mui/joy/Avatar";
+import Divider from "@mui/joy/Divider";
+import MenuItem from "@mui/joy/MenuItem";
+import Dropdown from "@mui/joy/Dropdown";
+import MenuButton from "@mui/joy/MenuButton";
+import Typography from "@mui/joy/Typography";
+import IconButton from "@mui/joy/IconButton";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
 import { SidebarUtils } from "@utils";
-import { IconCategory, IconCurrencyDollar, IconHome2, IconPigMoney } from "@tabler/icons-react";
+import {
+  IconCategory,
+  IconCurrencyDollar,
+  IconHome2,
+  IconDotsVertical,
+  IconPigMoney,
+} from "@tabler/icons-react";
+import { useAuth } from "@contexts";
 
 import { NavLink } from "../navlink";
 import { ColorSchemeToggle } from "../color-scheme-toggle";
 
 const Sidebar = () => {
+  const { user } = useAuth();
+  console.log("🚀 ~ Sidebar ~ user:", user);
+
   return (
     <Sheet
       className="Sidebar"
@@ -29,7 +42,7 @@ const Sidebar = () => {
           md: "none",
         },
         transition: "transform 0.4s, width 0.4s",
-        zIndex: 1200,
+        // zIndex: 1200,
         height: "100dvh",
         width: "var(--Sidebar-width)",
         top: 0,
@@ -158,15 +171,26 @@ const Sidebar = () => {
           src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
         />
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography level="title-sm">Emelyn Jose de Egipto</Typography>
-          <Typography level="body-xs">siriwatk@test.com</Typography>
+          <Typography level="title-sm">{user?.nombre ?? ""}</Typography>
+          <Typography level="body-xs">
+            {user?.correoElectronico ?? ""}
+          </Typography>
         </Box>
-        <IconButton size="sm" variant="plain" color="neutral">
-          <LogoutRoundedIcon />
-        </IconButton>
+        <Dropdown>
+          <MenuButton
+            slots={{ root: IconButton }}
+            slotProps={{ root: { variant: "outlined", color: "neutral" } }}
+          >
+            <IconDotsVertical style={{ width: 20, height: 20 }} />
+          </MenuButton>
+          <Menu>
+            <MenuItem>Perfil</MenuItem>
+            <MenuItem>Cerrar Sesión</MenuItem>
+          </Menu>
+        </Dropdown>
       </Box>
     </Sheet>
   );
-}
+};
 
 export default Sidebar;
