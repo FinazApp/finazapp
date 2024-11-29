@@ -4,6 +4,7 @@ export const INCOMES = "INCOMES";
 export const LOGIN_USER = "LOGIN_USER";
 export const CATEGORIES = "CATEGORIES";
 export const REGISTER_USER = "REGISTER_USER";
+export const PANEL_ADMIN_BALANCE = "PANEL_ADMIN_BALANCE";
 
 //--------------------------------------------------------------------------------------//
 //                                      Mutations                                       //

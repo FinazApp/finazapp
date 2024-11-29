@@ -26,6 +26,7 @@
     "@tanstack/react-query-persist-client": "^5.56.2",
     "@tanstack/react-table": "^8.20.5",
     "axios": "^1.7.7",
+    "dayjs": "^1.11.13",
     "finaz-app.client": "file:",
     "formik": "^2.4.6",
     "millify": "^6.1.0",

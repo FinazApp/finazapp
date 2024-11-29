@@ -13,7 +13,7 @@ const IncomesApi = {
         return result.data;
     },
     restore: async (id: number) => {
-        const result = await API().patch(`${Endpoints.INCOMES}/${id}`, { isDeleted: false });
+        const result = await API().post(`${Endpoints.INCOMES}/Restore/${id}`);
         return result.data;
     },
     update: async (data: Partial<IIncomesUpdate>) => {

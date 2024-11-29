@@ -5,25 +5,20 @@ import Input from "@mui/joy/Input";
 import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
 import Typography from "@mui/joy/Typography";
-import { createColumnHelper } from "@tanstack/react-table";
+import AddIcon from "@mui/icons-material/Add";
 import FormControl from "@mui/joy/FormControl";
-import FormLabel from "@mui/joy/FormLabel";
-import {
-  IconPlug,
-  IconTrash,
-  IconPencil,
-  IconCategoryPlus,
-} from "@tabler/icons-react";
 import SearchIcon from "@mui/icons-material/Search";
+import { createColumnHelper } from "@tanstack/react-table";
+import { IconPlug, IconTrash, IconPencil } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { ICategory } from "@interfaces";
+import { CategoryFormModal, DataTable, ModalConfirm } from "@components";
 import {
   useDeleteCategory,
   useFetchCategories,
   useRestoreCategory,
 } from "@hooks";
-import { CategoryFormModal, DataTable, ModalConfirm } from "@components";
 
 const columnHelper = createColumnHelper<ICategory>();
 
@@ -67,7 +62,11 @@ const CategoriesPage = () => {
 
   const handleDeleteCategory = React.useCallback(() => {
     return toast.promise(
-      deleteCategory.mutateAsync(category?.categoriaId ?? 0),
+      deleteCategory.mutateAsync(category?.categoriaId ?? 0, {
+        onSuccess: () => {
+          setCategory(null);
+        },
+      }),
       {
         error: (e) => e,
         loading: `Eliminando categoría ${category?.nombre}...`,
@@ -78,7 +77,11 @@ const CategoriesPage = () => {
 
   const handleRestoreCategory = React.useCallback(() => {
     return toast.promise(
-      restoreCategory.mutateAsync(category?.categoriaId ?? 0),
+      restoreCategory.mutateAsync(category?.categoriaId ?? 0, {
+        onSuccess: () => {
+          setCategory(null);
+        },
+      }),
       {
         error: (e) => e,
         loading: `Restaurando categoría ${category?.nombre}...`,
@@ -86,24 +89,6 @@ const CategoriesPage = () => {
       }
     );
   }, [category?.categoriaId, category?.nombre, restoreCategory]);
-
-  // const renderFilters = () => (
-  //   <React.Fragment>
-  //     <FormControl size="sm">
-  //       <FormLabel>Estado</FormLabel>
-  //       <Select<string>
-  //         size="sm"
-  //         value={status}
-  //         placeholder="Filtrar por estado"
-  //         onChange={(_, value) => setStatus(`${value}`)}
-  //         slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-  //       >
-  //         <Option value="active">Activo</Option>
-  //         <Option value="deleted">Eliminado</Option>
-  //       </Select>
-  //     </FormControl>
-  //   </React.Fragment>
-  // );
 
   const data = React.useMemo(() => {
     if (!categories.data?.length) return [];
@@ -143,9 +128,7 @@ const CategoriesPage = () => {
         >
           <Button
             color="primary"
-            startDecorator={
-              <IconCategoryPlus style={{ width: 22, height: 22 }} />
-            }
+            startDecorator={<AddIcon />}
             onClick={() => dispatch({ type: "OPEN_DRAWER", payload: 0 })}
           >
             Crear nueva categoría
@@ -164,7 +147,6 @@ const CategoriesPage = () => {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Búsqueda</FormLabel>
           <Input
             size="sm"
             onChange={(e) => setSearchText(e.target.value)}
@@ -172,7 +154,6 @@ const CategoriesPage = () => {
             startDecorator={<SearchIcon />}
           />
         </FormControl>
-        {/* {renderFilters()} */}
       </Box>
       <DataTable<ICategory>
         data={data ?? []}

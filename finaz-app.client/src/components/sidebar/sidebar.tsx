@@ -30,7 +30,6 @@ import { ColorSchemeToggle } from "../color-scheme-toggle";
 
 const Sidebar = () => {
   const { user } = useAuth();
-  console.log("🚀 ~ Sidebar ~ user:", user);
 
   return (
     <Sheet
@@ -42,7 +41,7 @@ const Sidebar = () => {
           md: "none",
         },
         transition: "transform 0.4s, width 0.4s",
-        // zIndex: 1200,
+        zIndex: 50,
         height: "100dvh",
         width: "var(--Sidebar-width)",
         top: 0,

@@ -208,7 +208,7 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        [HttpPost("categoria/restore/{id}")]
+        [HttpPost("Restore/{id}")]
         public async Task<IActionResult> RestoreCategoryById(int id)
         {
             var userId = JwtHelper.ObtenerIdDeJwt(HttpContext);

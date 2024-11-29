@@ -4,16 +4,17 @@ import Box from "@mui/joy/Box";
 import Link from "@mui/joy/Link";
 import { useLogin } from "@hooks";
 import Stack from "@mui/joy/Stack";
+import { useAuth } from "@contexts";
 import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
 import { Form, Formik } from "formik";
 import { ILoginUser } from "@interfaces";
+import { useNavigate } from "react-router";
 import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
 import { ColorSchemeToggle, InputField } from "@components";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
-import { useNavigate } from "react-router";
-import { useAuth } from "@contexts";
+
 
 const validationSchema = Yup.object({
   correoElectronico: Yup.string()
@@ -59,11 +60,11 @@ const LoginPage = () => {
       >
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "100dvh",
-            width: "100%",
             px: 2,
+            width: "100%",
+            display: "flex",
+            minHeight: "100dvh",
+            flexDirection: "column",
           }}
         >
           <Box
@@ -122,7 +123,7 @@ const LoginPage = () => {
                   toast.promise(
                     mutateAsync(values, {
                       onSuccess: () => {
-                        navigate("/");
+                        window.location.reload();
                       },
                     }),
                     {
@@ -152,22 +153,6 @@ const LoginPage = () => {
                       placeholder="**************"
                     />
                     <Stack sx={{ mt: 2 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        {/* <Checkbox
-                          size="sm"
-                          label="Remember me"
-                          name="persistent"
-                        />
-                        <Link level="title-sm" href="#replace-with-a-link">
-                          Forgot your password?
-                        </Link> */}
-                      </Box>
                       <Button type="submit" loading={isPending} fullWidth>
                         Ingresar
                       </Button>

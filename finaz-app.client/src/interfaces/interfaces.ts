@@ -35,9 +35,10 @@ export interface IIncome {
     monto: number;
     usuario: IUser;
     nombre: string;
-    isDeleted: boolean;
     ingresoId: number;
+    isDeleted: boolean;
     categoriaId: number;
+    categoria: ICategory;
 }
 
 export interface IIncomesUpdate {
@@ -60,6 +61,7 @@ export interface IBill {
     gastoId: number;
     isDeleted: boolean;
     categoriaId: number;
+    categoria: ICategory;
 }
 
 export interface IBillUpdate {
@@ -74,4 +76,16 @@ export interface IBillCreate {
     nombre: string;
     gastoId: number;
     categoriaId: number;
+}
+
+type Kpi = { value: number; percentage: number; }
+
+export interface IDashboardBalance {
+    kpi: Record<"balance" | "ingresos" | "gastos", Kpi>;
+    last: {
+        monto: number;
+        nombre: string;
+        fechaCreacion: string,
+        tipo: string
+    }[]
 }

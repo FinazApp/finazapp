@@ -57,6 +57,8 @@ namespace finaz_app.Server.Controllers
                     .Where(g => g.CreadoPor == userIDT)
                     .ToListAsync();
 
+                Console.WriteLine(gastos);
+
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
 
                 return Ok(gastosDTO);

@@ -21,7 +21,7 @@ const CategoriesApi = {
         return result.data;
     },
     restore: async (id: number) => {
-        const result = await API().patch(`${Endpoints.CATEGORIES}/${id}`, { isDeleted: false });
+        const result = await API().post(`${Endpoints.CATEGORIES}/Restore/${id}`);
         return result.data;
     },
     update: async (data: Partial<ICategory>) => {

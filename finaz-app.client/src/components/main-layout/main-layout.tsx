@@ -74,8 +74,8 @@ const MainLayout = ({
             {matches.slice(1).map((match) => (
               <Link
                 key={match.id}
-                underline="hover"
                 color="neutral"
+                underline="hover"
                 href={match.pathname}
                 sx={{ fontSize: 12, fontWeight: 500 }}
               >

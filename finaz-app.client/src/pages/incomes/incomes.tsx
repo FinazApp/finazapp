@@ -6,21 +6,21 @@ import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
-import FormLabel from "@mui/joy/FormLabel";
 import Typography from "@mui/joy/Typography";
+import AddIcon from "@mui/icons-material/Add";
 import FormControl from "@mui/joy/FormControl";
 import SearchIcon from "@mui/icons-material/Search";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconPencil, IconTrash, IconPlug, IconPlus } from "@tabler/icons-react";
+import { IconPencil, IconTrash, IconPlug } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { IIncome } from "@interfaces";
 import { DataTable, IncomeFormModal, ModalConfirm } from "@components";
 import {
   useDeleteIncome,
-  useFetchCategories,
   useFetchIncomes,
   useRestoreIncome,
+  useFetchCategories,
 } from "@hooks";
 
 const columnHelper = createColumnHelper<IIncome>();
@@ -34,8 +34,16 @@ const columns = [
   columnHelper.accessor("monto", {
     id: "monto",
     header: "Monto",
+    cell: (info) => (
+      <span>
+        {new Intl.NumberFormat("es-DO", {
+          style: "currency",
+          currency: "DOP",
+        }).format(info.getValue())}
+      </span>
+    ),
   }),
-  columnHelper.accessor("categoriaId", {
+  columnHelper.accessor("categoria.nombre", {
     id: "categoriaId",
     header: "Categoría",
   }),
@@ -107,7 +115,6 @@ const IncomesPage = () => {
   const renderFilters = () => (
     <React.Fragment>
       <FormControl size="sm">
-        <FormLabel>Categoría</FormLabel>
         <Select<number>
           size="sm"
           value={categoryId}
@@ -115,6 +122,7 @@ const IncomesPage = () => {
           onChange={(_, value) => setCategoryId(value ?? 0)}
           slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
         >
+          <Option value="">Filtrar por categoría</Option>
           {categoriesOptions.map((item) => (
             <Option
               key={item.label}
@@ -131,13 +139,15 @@ const IncomesPage = () => {
 
   const data = React.useMemo(() => {
     if (!incomes.data?.length) return [];
-    return incomes.data.filter((category) => {
-      return (
-        category.monto?.toString().includes(searchText) ||
-        category.nombre?.toLowerCase().includes(searchText?.toLowerCase())
-      );
-    });
-  }, [incomes.data, searchText]);
+    return incomes.data
+      .filter((category) => {
+        return (
+          category.monto?.toString().includes(searchText) ||
+          category.nombre?.toLowerCase().includes(searchText?.toLowerCase())
+        );
+      })
+      .filter((bill) => (categoryId ? bill.categoriaId === categoryId : true));
+  }, [categoryId, incomes.data, searchText]);
 
   return (
     <>
@@ -167,7 +177,7 @@ const IncomesPage = () => {
         >
           <Button
             color="primary"
-            startDecorator={<IconPlus style={{ width: 22, height: 22 }} />}
+            startDecorator={<AddIcon />}
             onClick={() => dispatch({ type: "OPEN_DRAWER", payload: 0 })}
           >
             Agregar nuevo ingreso
@@ -186,7 +196,6 @@ const IncomesPage = () => {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Búsqueda</FormLabel>
           <Input
             size="sm"
             placeholder="Búsqueda..."

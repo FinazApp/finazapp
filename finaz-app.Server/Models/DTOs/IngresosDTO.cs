@@ -11,6 +11,8 @@ namespace finaz_app.Server.Models.DTOs
 
         public int? CategoriaId { get; set; }
 
+        public virtual Categoria? Categoria { get; set; }
+
         public required string Nombre { get; set; }
 
         public bool isDeleted { get; set; } = false;

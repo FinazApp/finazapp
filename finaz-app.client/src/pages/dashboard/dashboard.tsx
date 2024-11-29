@@ -1,4 +1,5 @@
 import React from "react";
+import dayjs from "dayjs";
 import Box from "@mui/joy/Box";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
@@ -9,6 +10,8 @@ import ToggleButtonGroup from "@mui/joy/ToggleButtonGroup";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import { DataTable, IKPICardProps, KPICard } from "@components";
+import { useFetchDashboardBalance } from "@hooks";
+import { capitalize } from "radash";
 
 const columnHelper = createColumnHelper<{
   nombre: string;
@@ -17,10 +20,6 @@ const columnHelper = createColumnHelper<{
 }>();
 
 const columns = [
-  columnHelper.accessor("tipo", {
-    id: "categoriaId",
-    header: "Tipo",
-  }),
   columnHelper.accessor("nombre", {
     id: "nombre",
     header: "Nombre",
@@ -29,44 +28,87 @@ const columns = [
   columnHelper.accessor("monto", {
     id: "monto",
     header: "Monto",
+    cell: (info) => (
+      <span>
+        {new Intl.NumberFormat("es-DO", {
+          style: "currency",
+          currency: "DOP",
+        }).format(info.getValue())}
+      </span>
+    ),
+  }),
+  columnHelper.accessor("tipo", {
+    id: "tipo",
+    header: "Tipo",
+    cell: (info) => <span>{capitalize(info.getValue())}</span>,
   }),
 ];
 
 const DashboardPage = () => {
   const [filter, setFilter] = React.useState("1");
 
+  const [startDate, endDate] = React.useMemo(() => {
+    if (filter === "2") {
+      const lastMonth = dayjs().subtract(1, "month");
+      return [
+        lastMonth.startOf("month").format("DD/MM/YYYY"),
+        lastMonth.endOf("month").format("DD/MM/YYYY"),
+      ]
+    }
+    if (filter === "3") {
+      return [
+        dayjs().startOf("year").format("DD/MM/YYYY"),
+        dayjs().endOf("year").format("DD/MM/YYYY"),
+      ];
+    }
+    if (filter === "4") {
+      const lastYear = dayjs().subtract(1, "year");
+      return [
+        lastYear.startOf("year").format("DD/MM/YYYY"),
+        lastYear.endOf("year").format("DD/MM/YYYY"),
+      ];
+    }
+    return [
+      dayjs().startOf("month").format("DD/MM/YYYY"),
+      dayjs().endOf("month").format("DD/MM/YYYY"),
+    ];
+  }, [filter]);
+
+  const dashboard = useFetchDashboardBalance(startDate, endDate);
+
   const options = [
-    { label: "Este Mes", value: "1" },
-    { label: "Ultimo Mes", value: "2" },
-    { label: "Ultimo año", value: "3" },
+    { label: "Este mes", value: "1" },
+    { label: "Ultimo mes", value: "2" },
+    { label: "Este año", value: "3" },
+    { label: "Ultimo año", value: "4" },
   ];
 
   const stats: IKPICardProps[] = [
     {
       title: "Balance",
-      value: 5000,
+      value: dashboard.data?.kpi.balance.value ?? 0,
       color: "primary",
       data: {
         type: "down",
-        percent: 43,
+        percent: dashboard.data?.kpi.balance.percentage ?? 0,
       },
     },
     {
       title: "Gastos",
-      value: 500000,
+      value: dashboard.data?.kpi.gastos.value ?? 0,
       color: "danger",
       data: {
         type: "up",
-        percent: 53,
+        percent: dashboard.data?.kpi.gastos.percentage ?? 0,
       },
     },
     {
       title: "Ingresos",
-      value: 500000,
+      value: dashboard.data?.kpi.ingresos.value ?? 0,
       color: "success",
       data: {
         type: "down",
-        percent: 23,
+        percent: dashboard.data?.kpi.ingresos.percentage ?? 0,
       },
     },
   ];
@@ -144,15 +186,9 @@ const DashboardPage = () => {
         </Grid>
         <Grid size={8}>
           <DataTable
-            data={[
-              {
-                monto: 100,
-                nombre: "Hello",
-                tipo: "Hello",
-              },
-            ]}
             columns={columns}
             tableActions={[]}
+            data={dashboard.data?.last ?? []}
           />
         </Grid>
       </Grid>
