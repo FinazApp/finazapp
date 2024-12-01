@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using finaz_app.Server.Models;
 using finaz_app.Server.Security.JWT;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace finaz_app.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DashboardController : ControllerBase
     {
         private readonly FinanzAppContext _context;
