@@ -214,5 +214,46 @@ namespace finaz_app.Server.Controllers
                 return false;
             }
         }
+        
+        [HttpGet("dashboard/summary")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetDashboardSummary()
+        {
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+            }
+
+            try
+            {
+                // Sumar los ingresos del usuario
+                var totalIngresos = await _context.Ingresos
+                    .Where(i => i.CreadoPor == userID && !i.isDeleted)
+                    .SumAsync(i => i.Monto);
+
+                // Sumar los gastos del usuario
+                var totalGastos = await _context.Gastos
+                    .Where(g => g.CreadoPor == userID && !g.isDeleted)
+                    .SumAsync(g => g.Monto);
+
+                // Calcular el balance actual
+                var balanceActual = totalIngresos - totalGastos;
+
+                // Retornar los resultados en un objeto JSON
+                return Ok(new
+                {
+                    BalanceActual = balanceActual,
+                    TotalIngresos = totalIngresos,
+                    TotalGastos = totalGastos
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error en la API: {ex.Message}");
+            }
+        }
     }
 }
