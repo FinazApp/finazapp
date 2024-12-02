@@ -1,12 +1,19 @@
 import React from "react";
-import { Outlet } from "react-router";
-import { Box, Flex } from "styled-system/jsx";
-import {
-  IconLayoutSidebarLeftCollapse,
-  IconLayoutSidebarLeftExpand,
-} from "@tabler/icons-react";
+import Box from "@mui/joy/Box";
+import Link from "@mui/joy/Link";
+import Alert from "@mui/joy/Alert";
+import { useAuth } from "@contexts";
+import Button from "@mui/joy/Button";
+import IconButton from "@mui/joy/IconButton";
+import { useLocalStorage } from "usehooks-ts";
+import Breadcrumbs from "@mui/joy/Breadcrumbs";
+import OpenInNew from "@mui/icons-material/OpenInNew";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { Outlet, useMatches, useNavigate } from "react-router";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 import { Sidebar } from "../sidebar";
+import { Header } from "../header";
 
 export interface IMainLayoutProps {
   withOutlet?: boolean;
@@ -16,44 +23,113 @@ const MainLayout = ({
   children,
   withOutlet,
 }: React.PropsWithChildren<IMainLayoutProps>) => {
-  const [sidebarMobileCollapsed, setSidebarMobileCollapsed] =
-    React.useState(true);
+  const matches = useMatches();
+  const navigate = useNavigate();
+  const { isLogged } = useAuth();
+
+  const [value, setValue] = useLocalStorage("survey-off", false);
+
+  React.useEffect(() => {
+    const fn = async () => {
+      if (!isLogged) {
+        navigate("/login");
+        return;
+      }
+    };
+
+    fn();
+  }, [isLogged, navigate]);
 
   return (
-    <Flex h="screen" w="screen" bg="neutral.2">
+    <Box sx={{ display: "flex", minHeight: "100dvh" }}>
+      <Header />
       <Sidebar />
-      <Box display={{ mdDown: "block", lg: "none" }}>
-        <Sidebar.Drawer
-          open={!sidebarMobileCollapsed}
-          onOpenChange={(details) => setSidebarMobileCollapsed(!details.open)}
-        />
-      </Box>
-      <Flex p="4" gap="4" flex={1} overflow="auto" flexDir="column">
-        <Box
-          p={2}
-          boxShadow="lg"
-          bg="Background"
-          cursor="pointer"
-          borderRadius="sm"
-          width="fit-content"
-          display={{ mdDown: "flex", lg: "none" }}
-          onClick={() => setSidebarMobileCollapsed(false)}
-        >
-          {sidebarMobileCollapsed ? (
-            <IconLayoutSidebarLeftExpand
-              size="24"
-              style={{ width: 24, height: 24 }}
-            />
-          ) : (
-            <IconLayoutSidebarLeftCollapse
-              size="24"
-              style={{ width: 24, height: 24 }}
-            />
-          )}
+      <Box
+        component="main"
+        className="MainContent"
+        sx={{
+          px: { xs: 2, md: 6 },
+          pt: {
+            xs: "calc(12px + var(--Header-height))",
+            sm: "calc(12px + var(--Header-height))",
+            md: 3,
+          },
+          pb: { xs: 2, sm: 2, md: 3 },
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          height: "100dvh",
+          gap: 1,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Breadcrumbs
+            size="sm"
+            aria-label="breadcrumbs"
+            separator={<ChevronRightRoundedIcon fontSize="small" />}
+            sx={{ pl: 0 }}
+          >
+            <Link
+              underline="none"
+              color="neutral"
+              href={matches[0].pathname}
+              aria-label="Home"
+            >
+              <i
+                className="ti ti-home-filled"
+                style={{ width: 16, height: 16 }}
+              ></i>
+            </Link>
+            {matches.slice(1).map((match) => (
+              <Link
+                key={match.id}
+                color="neutral"
+                underline="hover"
+                href={match.pathname}
+                sx={{ fontSize: 12, fontWeight: 500 }}
+              >
+                Inicio
+              </Link>
+            ))}
+          </Breadcrumbs>
         </Box>
+        {!value && (
+          <Alert
+            variant="soft"
+            color="primary"
+            startDecorator={<i className="ti ti-checkbox"></i>}
+            endDecorator={
+              <Box>
+                <Button
+                  size="sm"
+                  component="a"
+                  variant="solid"
+                  color="primary"
+                  startDecorator={<OpenInNew />}
+                  target="_blank"
+                  href="https://es.surveymonkey.com/r/ZGMHFD5"
+                >
+                  Ir a la encuesta
+                </Button>
+                <IconButton
+                  size="sm"
+                  variant="plain"
+                  color="neutral"
+                  onClick={() => setValue(true)}
+                >
+                  <CloseRoundedIcon />
+                </IconButton>
+              </Box>
+            }
+          >
+            ¿Te gusta la aplicación? Haz esta encuesta de satisfacción para
+            mejorar la aplicación.
+          </Alert>
+        )}
         {withOutlet ? <Outlet /> : children}
-      </Flex>
-    </Flex>
+      </Box>
+    </Box>
   );
 };
 

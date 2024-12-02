@@ -1,87 +1,184 @@
-import React from "react";
-import { Box, Flex } from "styled-system/jsx";
-import {
-  IconX,
-  IconHome2,
-  IconPigMoney,
-  IconCurrencyDollar,
-} from "@tabler/icons-react";
+import * as React from "react";
+import Box from "@mui/joy/Box";
+import List from "@mui/joy/List";
+import Menu from "@mui/joy/Menu";
+import { Reducers } from "@core";
+import Sheet from "@mui/joy/Sheet";
+import { useAuth } from "@contexts";
+import Avatar from "@mui/joy/Avatar";
+import { SidebarUtils } from "@utils";
+import Divider from "@mui/joy/Divider";
+import MenuItem from "@mui/joy/MenuItem";
+import Dropdown from "@mui/joy/Dropdown";
+import MenuButton from "@mui/joy/MenuButton";
+import Typography from "@mui/joy/Typography";
+import IconButton from "@mui/joy/IconButton";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import { listItemButtonClasses } from "@mui/joy/ListItemButton";
 
 import { NavLink } from "../navlink";
-import { Drawer } from "../park-ui/drawer";
-import { Avatar, Heading, IconButton, Text } from "../park-ui";
+import { ColorSchemeToggle } from "../color-scheme-toggle";
+import { ProfileFormModal } from "../profile-form-modal";
 
-type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
+const Sidebar = () => {
+  const { user, logout } = useAuth();
 
-export interface SidebarProps {
-  (): React.JSX.Element;
-  Drawer: React.FC<DrawerRootProps>;
-}
+  const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
+    id: 0,
+    open: false,
+  });
 
-const SidebarContent = () => {
   return (
     <>
-      <Flex id="Navbar" flexDir="column" flex={1} gap="2" px="4">
-        <NavLink to="/" title="Inicio" icon={IconHome2} />
-        <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
-        <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
-      </Flex>
-      <Flex px="4" py="2" _hover={{ bg: "Silver" }} gap="2">
-        <Avatar src="https://i.pravatar.cc/300" name="John Doe" />
-        <Box>
-          <Text size="sm" fontWeight="semibold">
-            Johan Sierra Linares
-          </Text>
-          <Text size="xs" color="neutral.10">
-            johan@finazapp.com
-          </Text>
+      <Sheet
+        className="Sidebar"
+        sx={{
+          position: { xs: "fixed", md: "sticky" },
+          transform: {
+            xs: "translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1)))",
+            md: "none",
+          },
+          transition: "transform 0.4s, width 0.4s",
+          zIndex: 50,
+          height: "100dvh",
+          width: "var(--Sidebar-width)",
+          top: 0,
+          p: 2,
+          flexShrink: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          borderRight: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <GlobalStyles
+          styles={(theme) => ({
+            ":root": {
+              "--Sidebar-width": "220px",
+              [theme.breakpoints.up("lg")]: {
+                "--Sidebar-width": "240px",
+              },
+            },
+          })}
+        />
+        <Box
+          className="Sidebar-overlay"
+          sx={{
+            position: "fixed",
+            zIndex: 9998,
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            opacity: "var(--SideNavigation-slideIn)",
+            backgroundColor: "var(--joy-palette-background-backdrop)",
+            transition: "opacity 0.4s",
+            transform: {
+              xs: "translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1) + var(--SideNavigation-slideIn, 0) * var(--Sidebar-width, 0px)))",
+              lg: "translateX(-100%)",
+            },
+          }}
+          onClick={() => SidebarUtils.closeSidebar()}
+        />
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <IconButton variant="soft" color="primary" size="sm">
+            <i className="ti ti-cash" style={{ fontSize: 20 }}></i>
+          </IconButton>
+          <Typography level="title-lg">FinazApp</Typography>
+          <ColorSchemeToggle sx={{ ml: "auto" }} />
         </Box>
-      </Flex>
+        <Box
+          sx={{
+            minHeight: 0,
+            overflow: "hidden auto",
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            [`& .${listItemButtonClasses.root}`]: {
+              gap: 1.5,
+            },
+          }}
+        >
+          <List
+            size="sm"
+            sx={{
+              gap: 1,
+              "--List-nestedInsetStart": "30px",
+              "--ListItem-radius": (theme) => theme.vars.radius.sm,
+            }}
+          >
+            <NavLink
+              to="/"
+              title="Inicio"
+              icon={<i className="ti ti-home-2" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/incomes"
+              title="Ingresos"
+              icon={<i className="ti ti-pig-money" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/bills"
+              title="Gastos"
+              icon={<i className="ti ti-currency-dollar" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/savings"
+              title="Metas de ahorros"
+              icon={<i className="ti ti-flag" style={{ fontSize: 20 }}></i>}
+            />
+            <Divider />
+            <NavLink
+              to="/categories"
+              title="Categorías"
+              icon={<i className="ti ti-category" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/users"
+              title="Usuarios"
+              icon={<i className="ti ti-users" style={{ fontSize: 20 }}></i>}
+            />
+          </List>
+        </Box>
+        <Divider />
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Avatar
+            variant="outlined"
+            size="sm"
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+          />
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography level="title-sm">{user?.nombre ?? ""}</Typography>
+            <Typography level="body-xs">
+              {user?.correoElectronico ?? ""}
+            </Typography>
+          </Box>
+          <Dropdown>
+            <MenuButton
+              slots={{ root: IconButton }}
+              slotProps={{ root: { variant: "outlined", color: "neutral" } }}
+            >
+              <i className="ti ti-dots-vertical"></i>
+            </MenuButton>
+            <Menu>
+              <MenuItem
+                onClick={() => {
+                  dispatch({ type: "OPEN_DRAWER", payload: 0 });
+                }}
+              >
+                Perfil
+              </MenuItem>
+              <MenuItem onClick={() => logout()}>Cerrar Sesión</MenuItem>
+            </Menu>
+          </Dropdown>
+        </Box>
+      </Sheet>
+      <ProfileFormModal
+        open={state.open}
+        onClose={() => dispatch({ type: "CLOSE_DRAWER" })}
+      />
     </>
-  );
-};
-
-const Sidebar: SidebarProps = () => {
-  return (
-    <Flex
-      w="64"
-      h="full"
-      bg="Background"
-      boxShadow="lg"
-      flexDirection="column"
-      justifyContent="space-between"
-      display={{ lgDown: "none", lg: "flex" }}
-    >
-      <Box p="4">
-        <Heading as="h2" size="2xl">
-          FinazApp
-        </Heading>
-      </Box>
-      <SidebarContent />
-    </Flex>
-  );
-};
-
-Sidebar.Drawer = ({ children, ...props }) => {
-  return (
-    <Drawer.Root variant="left" {...props}>
-      <Drawer.Backdrop />
-      <Drawer.Positioner>
-        <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title>FinazApp</Drawer.Title>
-            <Drawer.CloseTrigger asChild position="absolute" top="3" right="4">
-              <IconButton variant="ghost">
-                <IconX />
-              </IconButton>
-            </Drawer.CloseTrigger>
-          </Drawer.Header>
-          <Drawer.Body className="p-0 m-0">
-            <SidebarContent />
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Positioner>
-    </Drawer.Root>
   );
 };
 

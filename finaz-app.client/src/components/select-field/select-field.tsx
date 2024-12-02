@@ -1,11 +1,16 @@
 import React from "react";
 import { useField } from "formik";
-import { IconCheck, IconSelector } from "@tabler/icons-react";
+import Stack from "@mui/joy/Stack";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
+import Skeleton from "@mui/joy/Skeleton";
+import FormLabel from "@mui/joy/FormLabel";
+import FormControl from "@mui/joy/FormControl";
+import FormHelperText from "@mui/joy/FormHelperText";
 
-import { Field, Select } from "../park-ui";
-import { omit } from "radash";
+type SelectProps = React.ComponentProps<typeof Select>;
 
-export interface ISelectFieldProps {
+export interface ISelectFieldProps extends SelectProps {
   name: string;
   label: string;
   helperText?: string;
@@ -20,6 +25,7 @@ const SelectField = ({
   helperText,
   placeholder,
   items,
+  ...props
 }: ISelectFieldProps) => {
   const [field, { touched, error }, { setValue }] = useField({ name });
 
@@ -29,44 +35,38 @@ const SelectField = ({
   }, [error, touched]);
 
   return (
-    <Field.Root invalid={invalid}>
-      <Select.Root
-        items={items}
-        {...omit(field, ["onChange", "value"])}
-        value={[field.value]}
-        positioning={{ sameWidth: true }}
-        onValueChange={(details) => {
-          setValue(details.value[0], true);
-        }}
+    <FormControl error={invalid}>
+      <FormLabel>{label}</FormLabel>
+      <Select
+        {...field}
+        onChange={(_, value) => setValue(value)}
+        {...props}
+        id={name}
+        placeholder={placeholder}
       >
-        <Select.Label>{label}</Select.Label>
-        <Select.Control>
-          <Select.Trigger>
-            <Select.ValueText placeholder={placeholder} />
-            <IconSelector stroke={2} style={{ width: 20, height: 20 }} />
-          </Select.Trigger>
-        </Select.Control>
-        <Select.Positioner>
-          <Select.Content>
-            <Select.ItemGroup>
-              <Select.ItemGroupLabel>{label}</Select.ItemGroupLabel>
-              {items.map((item) => (
-                <Select.Item key={item.value} item={item}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                  <Select.ItemIndicator>
-                    <IconCheck stroke={2} style={{ width: 20, height: 20 }} />
-                  </Select.ItemIndicator>
-                </Select.Item>
-              ))}
-            </Select.ItemGroup>
-          </Select.Content>
-        </Select.Positioner>
-      </Select.Root>
-      {error && <Field.ErrorText>{error}</Field.ErrorText>}
-      {helperText && !error && (
-        <Field.HelperText>{helperText}</Field.HelperText>
-      )}
-    </Field.Root>
+        {items.map((item) => (
+          <Option key={item.label} value={item.value} disabled={item.disabled}>
+            {item.label}
+          </Option>
+        ))}
+      </Select>
+      {helperText ||
+        (error && (
+          <FormHelperText>
+            {invalid && error}
+            {helperText && !invalid && helperText}
+          </FormHelperText>
+        ))}
+    </FormControl>
+  );
+};
+
+SelectField.Skeleton = function SelectFieldSkeleton() {
+  return (
+    <Stack direction="column" spacing={1}>
+      <Skeleton variant="rectangular" height={10} />
+      <Skeleton variant="rectangular" height={40} />
+    </Stack>
   );
 };
 

@@ -12,6 +12,10 @@ const AuthApi = {
         const result = await API().post(Endpoints.LOGIN_USER, data);
         return result.data;
     },
+    logout: async () => {
+        const result = await API().post(Endpoints.LOGOUT_USER);
+        return result.data;
+    },
 }
 
 export default AuthApi;

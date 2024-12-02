@@ -53,7 +53,7 @@ namespace finaz_app.Server.Controllers
 
                 var ingresos = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .Where(i => (i.CreadoPor == userID || i.CreadoPor == null) && !i.isDeleted)
+                    .Where(i => (i.CreadoPor == userID || i.CreadoPor == null))
                     .ToListAsync();
 
                 var ingresosDTO = _mapper.Map<IEnumerable<IngresosDTO>>(ingresos);
@@ -80,7 +80,7 @@ namespace finaz_app.Server.Controllers
             {
                 var ingreso = await _context.Ingresos
                     .Include(i => i.Categoria)
-                    .SingleOrDefaultAsync(i => i.IngresoId == id && !i.isDeleted);
+                    .SingleOrDefaultAsync(i => i.IngresoId == id);
 
                 if (ingreso == null)
                 {

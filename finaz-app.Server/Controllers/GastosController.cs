@@ -54,8 +54,10 @@ namespace finaz_app.Server.Controllers
 
                 var gastos = await _context.Gastos
                     .Include(g => g.Categoria)
-                    .Where(g => g.CreadoPor == userIDT && !g.isDeleted)
+                    .Where(g => g.CreadoPor == userIDT)
                     .ToListAsync();
+
+                Console.WriteLine(gastos);
 
                 var gastosDTO = _mapper.Map<IEnumerable<GastosDTO>>(gastos);
 
@@ -87,7 +89,7 @@ namespace finaz_app.Server.Controllers
             {
                 var gasto = await _context.Gastos
                     .Include(g => g.Categoria)
-                    .SingleOrDefaultAsync(a => a.GastoId == id && !a.isDeleted);
+                    .SingleOrDefaultAsync(a => a.GastoId == id);
 
                 if (gasto == null)
                 {

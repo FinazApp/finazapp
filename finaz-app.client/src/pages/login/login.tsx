@@ -1,111 +1,193 @@
 import React from "react";
 import * as Yup from "yup";
-import toast from "react-hot-toast";
-import { Form, Formik } from "formik";
-import { Box, Flex } from "styled-system/jsx";
-
+import Box from "@mui/joy/Box";
+import Link from "@mui/joy/Link";
 import { useLogin } from "@hooks";
+import Stack from "@mui/joy/Stack";
+import { useAuth } from "@contexts";
+import toast from "react-hot-toast";
+import Button from "@mui/joy/Button";
+import { Form, Formik } from "formik";
 import { ILoginUser } from "@interfaces";
-import { Button, Heading, Link, Text, TextField } from "@components";
+import { useNavigate } from "react-router";
+import Typography from "@mui/joy/Typography";
+import IconButton from "@mui/joy/IconButton";
+import { ColorSchemeToggle, InputField } from "@components";
+import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
+
 
 const validationSchema = Yup.object({
-  email: Yup.string()
+  correoElectronico: Yup.string()
     .email("Correo inválido")
     .required("El correo es obligatorio"),
-  hashContraseña: Yup.string().required("La contraseña es obligatoria"),
+  passwordHash: Yup.string().required("La contraseña es obligatoria"),
 });
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const { isLogged } = useAuth();
+
   const { mutateAsync, isPending } = useLogin();
 
+  React.useEffect(() => {
+    const fn = async () => {
+      if (isLogged) {
+        navigate("/");
+        return;
+      }
+    };
+
+    fn();
+  }, [isLogged, navigate]);
+
   return (
-    <Flex
-      h="screen"
-      w="screen"
-      bg="neutral.2"
-      flexDirection={{ mdDown: "column", lg: "row" }}
-    >
-      <Flex flex={1} px={[2, 2, 6, 8]} justifyContent="center" alignItems="center">
-        <Box
-          py={8}
-          boxShadow="lg"
-          bg="Background"
-          borderRadius="lg"
-          px={{ mdDown: 6, md: 6, lg: 8 }}
-        >
-          <Box mb="5">
-            <Heading as="h1" textAlign="center" fontSize="3xl">
-              Iniciar Sesión
-            </Heading>
-            <Text color="neutral.11" textAlign="center">
-              Rellena para iniciar sesión
-            </Text>
-          </Box>
-          <Formik<ILoginUser>
-            initialValues={{ email: "", hashContraseña: "" }}
-            onSubmit={async (values) => {
-              toast.promise(
-                mutateAsync(values, {
-                  onSuccess: (data) => {
-                    console.log("Datos recibidos:", data);
-                  },
-                }),
-                {
-                  error: (result) => `${result}`,
-                  loading: "Iniciando sesión...",
-                  success: (result) => `${result.message ?? ""}`,
-                }
-              );
-            }}
-            validationSchema={validationSchema}
-          >
-            {(formik) => (
-              <Form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-                <Flex gap={5} flexDir="column">
-                  <TextField
-                    type="email"
-                    name="email"
-                    label="Correo Electrónico"
-                    placeholder="emelyn@finazapp.com"
-                  />
-                  <TextField
-                    type="password"
-                    label="Contraseña"
-                    name="hashContraseña"
-                    placeholder="**********"
-                  />
-                  <Button type="submit" variant="solid" loading={isPending}>
-                    Iniciar sesión
-                  </Button>
-                </Flex>
-              </Form>
-            )}
-          </Formik>
-          <Text
-            as="p"
-            textAlign="center"
-            fontSize="sm"
-            color="neutral.11"
-            mt={4}
-          >
-            ¿No tienes cuenta?
-            <Link href="/register" fontSize="sm" ml={1}>
-              Regístrate
-            </Link>
-          </Text>
-        </Box>
-      </Flex>
-      <Flex
-        flex={1}
-        bg="blue"
-        backgroundSize="cover"
-        backgroundPosition="center"
-        display={{ mdDown: "none" }}
-        backgroundImage="url('/bg-login.jpeg')"
+    <>
+      <Box
+        sx={(theme) => ({
+          width: { xs: "100%", md: "50vw" },
+          transition: "width var(--Transition-duration)",
+          transitionDelay: "calc(var(--Transition-duration) + 0.1s)",
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          justifyContent: "flex-end",
+          backdropFilter: "blur(12px)",
+          backgroundColor: "rgba(255 255 255 / 0.2)",
+          [theme.getColorSchemeSelector("dark")]: {
+            backgroundColor: "rgba(19 19 24 / 0.4)",
+          },
+        })}
       >
-        s
-      </Flex>
-    </Flex>
+        <Box
+          sx={{
+            px: 2,
+            width: "100%",
+            display: "flex",
+            minHeight: "100dvh",
+            flexDirection: "column",
+          }}
+        >
+          <Box
+            component="header"
+            sx={{ py: 3, display: "flex", justifyContent: "space-between" }}
+          >
+            <Box sx={{ gap: 2, display: "flex", alignItems: "center" }}>
+              <IconButton variant="soft" color="primary" size="sm">
+                <BadgeRoundedIcon />
+              </IconButton>
+              <Typography level="title-lg">FinazApp</Typography>
+            </Box>
+            <ColorSchemeToggle />
+          </Box>
+          <Box
+            component="main"
+            sx={{
+              my: "auto",
+              py: 2,
+              pb: 5,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: 400,
+              maxWidth: "100%",
+              mx: "auto",
+              borderRadius: "sm",
+              "& form": {
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              },
+              [`& .MuiFormLabel-asterisk`]: {
+                visibility: "hidden",
+              },
+            }}
+          >
+            <Stack sx={{ gap: 4, mb: 2 }}>
+              <Stack sx={{ gap: 1 }}>
+                <Typography component="h1" level="h3">
+                  Iniciar Sesión
+                </Typography>
+                <Typography level="body-sm">
+                  ¿Eres nuevo?{" "}
+                  <Link href="/register" level="title-sm">
+                    Regístrate!
+                  </Link>
+                </Typography>
+              </Stack>
+            </Stack>
+            <Stack sx={{ gap: 4, mt: 2 }}>
+              <Formik<ILoginUser>
+                initialValues={{ correoElectronico: "", passwordHash: "" }}
+                onSubmit={async (values) => {
+                  toast.promise(
+                    mutateAsync(values, {
+                      onSuccess: () => {
+                        window.location.reload();
+                      },
+                    }),
+                    {
+                      error: (result) => `${result}`,
+                      loading: "Iniciando sesión...",
+                      success: (result) => `${result.message ?? ""}`,
+                    }
+                  );
+                }}
+                validationSchema={validationSchema}
+              >
+                {(formik) => (
+                  <Form
+                    onSubmit={formik.handleSubmit}
+                    onReset={formik.handleReset}
+                  >
+                    <InputField
+                      type="email"
+                      name="correoElectronico"
+                      label="Correo electrónico"
+                      placeholder="jesimiel@finazapp.com"
+                    />
+                    <InputField
+                      type="password"
+                      name="passwordHash"
+                      label="Contraseña"
+                      placeholder="**************"
+                    />
+                    <Stack sx={{ mt: 2 }}>
+                      <Button type="submit" loading={isPending} fullWidth>
+                        Ingresar
+                      </Button>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
+            </Stack>
+          </Box>
+          <Box component="footer" sx={{ py: 3 }}>
+            <Typography level="body-xs" sx={{ textAlign: "center" }}>
+              © FinazApp {new Date().getFullYear()}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+      <Box
+        sx={() => ({
+          display: ["none", "none", "block"],
+          height: "100%",
+          position: "fixed",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          left: { xs: 0, md: "50vw" },
+          transition:
+            "background-image var(--Transition-duration), left var(--Transition-duration) !important",
+          transitionDelay: "calc(var(--Transition-duration) + 0.1s)",
+          backgroundColor: "background.level1",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundImage: "url(/bg-login.jpeg)",
+        })}
+      />
+    </>
   );
 };
 

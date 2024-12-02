@@ -1,1 +1,0 @@
-export { default as IncomeFormDrawer } from "./income-form-drawer";

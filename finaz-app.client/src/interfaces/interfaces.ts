@@ -1,69 +1,108 @@
 export interface IRegisterUser {
+    rol: "usuario";
     nombre: string;
-    correo: string;
     passwordHash: string;
+    correoElectronico: string;
 }
 
 export interface ILoginUser {
-    email: string;
-    hashContraseña: string;
+    correoElectronico: string;
+    passwordHash: string;
 }
 
 export interface IUser {
+    rol: string;
     nombre: string;
-    correo: string;
     usuarioId: number;
+    correoElectronico: string;
 }
 
 export interface ICategory {
     nombre: string;
     usuario: IUser;
+    isSystem: boolean;
+    isDeleted: boolean;
     descripcion: string;
     categoriaId: number;
 }
 
-export interface IIncomes {
+export type ICategoryCreate = {
+    nombre: string;
+    categoriaId?: number;
+    descripcion: string;
+}
+
+export interface IIncome {
     monto: number;
     usuario: IUser;
     nombre: string;
-    ingresosId: number;
+    ingresoId: number;
+    isDeleted: boolean;
+    categoriaId: number;
     categoria: ICategory;
 }
 
 export interface IIncomesUpdate {
     monto: number;
     nombre: string;
-    usuarioId: number;
-    ingresosId: number;
+    ingresoId: number;
     categoriaId: number;
 }
 
 export interface IIncomesCreate {
     monto: number;
     nombre: string;
-    usuarioId: number;
+    ingresoId: number;
     categoriaId: number;
 }
 
-export interface IBills {
+export interface IBill {
     monto: number;
-    usuario: IUser;
     nombre: string;
-    gastosId: number;
+    gastoId: number;
+    isDeleted: boolean;
+    categoriaId: number;
     categoria: ICategory;
 }
 
-export interface IBillsUpdate {
+export interface IBillUpdate {
     monto: number;
     nombre: string;
-    gastosId: number;
-    usuarioId: number;
+    gastoId: number;
     categoriaId: number;
 }
 
-export interface IBillsCreate {
+export interface IBillCreate {
     monto: number;
     nombre: string;
-    usuarioId: number;
+    gastoId: number;
     categoriaId: number;
+}
+
+export type PercentageKpi = { tipo: "Negativo" | "Neutro" | "Positivo"; porcentaje: number; }
+
+export interface IDashboardBalance {
+    totales: Record<"balance" | "ingresos" | "gastos", number>;
+    porcentajes: Record<"balance" | "ingresos" | "gastos", PercentageKpi>;
+    ultimosMovimientos: {
+        monto: number;
+        nombre: string;
+        fechaCreacion: string,
+        tipo: string
+    }[];
+    categoriasUsadas: { categoria: number, total: number }[]
+}
+
+export interface ISavingGoal {
+    metaId: number;
+    nombre: string;
+    fechaMeta: string;
+    isDeleted: boolean;
+    montoObjetivo: number;
+    montoAhorrado: number;
+}
+
+export interface ISavingGoalUpdateMonto {
+    metaId: number;
+    nuevoFondo: number;
 }

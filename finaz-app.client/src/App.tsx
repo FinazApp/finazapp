@@ -1,51 +1,22 @@
 import React from "react";
-import {
-  RouteObject,
-  RouterProvider,
-  createBrowserRouter,
-} from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import CssBaseline from "@mui/joy/CssBaseline";
+import { AuthContextProvider } from "@contexts";
+import { CssVarsProvider } from "@mui/joy/styles";
+import { QueryClientProvider } from "@tanstack/react-query";
 
-import { ErrorBoundary, MainLayout } from "@components";
-import { DashboardPage, IncomesPage, BillsPage, RegisterPage, LoginPage } from "@pages";
+import queryClient from "./query.config.ts";
 
 function App() {
-  const routes: RouteObject[] = [
-    {
-      path: "/",
-      element: <MainLayout withOutlet />,
-      errorElement: <ErrorBoundary />,
-      children: [
-        {
-          path: "",
-          index: true,
-          id: "dashboard-page",
-          element: <DashboardPage />,
-        },
-        {
-          path: "incomes",
-          id: "incomes-page",
-          element: <IncomesPage />,
-        },
-        {
-          path: "bills",
-          id: "bills-page",
-          element: <BillsPage />,
-        },
-      ],
-    },
-    {
-      id: "register-page",
-      path: "register",
-      element: <RegisterPage />,
-    },
-    {
-      id: "login-page",
-      path: "login",
-      element: <LoginPage />,
-    },
-  ];
-
-  return <RouterProvider router={createBrowserRouter(routes)} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CssVarsProvider>
+        <CssBaseline />
+        <AuthContextProvider />
+      </CssVarsProvider>
+      <Toaster position="top-center" />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

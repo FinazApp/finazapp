@@ -9,7 +9,7 @@ export const useFetchBills = () => {
   });
 };
 
-export const useFetchOneBills = (id: number) => {
+export const useFetchOneBill = (id: number) => {
   return useQuery({
     enabled: !!id,
     queryKey: [Tags.BILLS, id],

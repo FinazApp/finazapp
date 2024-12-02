@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using finaz_app.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using finaz_app.Server.Models;
-using AutoMapper;
 using finaz_app.Server.Models.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using finaz_app.Server.Security.JWT;
-using System.Numerics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace finaz_app.Server.Controllers
 {
@@ -32,6 +27,12 @@ namespace finaz_app.Server.Controllers
             _restore = restore ?? throw new ArgumentNullException(nameof(restore));
         }
 
+        public class MetaAhorroFondo
+        {
+            public int MetaId { get; set; }
+            public int NuevoFondo { get; set; }
+        }
+
         /// <summary>
         /// Obtiene todas las metas de ahorro.
         /// </summary>
@@ -52,7 +53,7 @@ namespace finaz_app.Server.Controllers
                 }
 
                 var metasAhorro = await _context.MetasAhorro
-                    .Where(m => m.CreadoPor == userId && !m.isDeleted)
+                    .Where(m => m.CreadoPor == userId)
                     .ToListAsync();
 
                 var metasAhorroDTO = _mapper.Map<IEnumerable<MetasAhorroDTO>>(metasAhorro);
@@ -257,6 +258,44 @@ namespace finaz_app.Server.Controllers
                 "MetaId");
 
             return StatusCode(statusCode, message);
+        }
+
+        /// <summary>
+        /// Agrega fondos una meta de ahorro existente por su ID.
+        /// </summary>
+        [HttpPost("AddFondo")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddFondoMetaAhorro([FromBody] MetaAhorroFondo request)
+        {
+            try
+            {
+                var metaAhorro = await _context.MetasAhorro.FindAsync(request.MetaId);
+                if (metaAhorro == null)
+                {
+                    return NotFound();
+                }
+
+                var userId = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userId == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                metaAhorro.ModificadoPor = userId.Value;
+                metaAhorro.FechaModificado = DateTime.UtcNow;
+                metaAhorro.MontoAhorrado += request.NuevoFondo;
+                _context.Entry(metaAhorro).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                var innerExceptionMessage = ex.InnerException?.Message ?? "Sin detalles adicionales.";
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al eliminar la meta de ahorro: {ex.Message} - Detalles: {innerExceptionMessage}");
+            }
         }
 
         /// <summary>
