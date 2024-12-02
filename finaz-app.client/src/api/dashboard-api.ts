@@ -9,7 +9,7 @@ const DashboardApi = {
         return result.data;
     },
     generateReport: async ({ startDate, endDate }: { startDate: string, endDate: string }) => {
-        const result = await API().get<{ fileUrl: string }>(`${Endpoints.REPORT_CSV}?inicioFecha=${startDate}&finFecha=${endDate}`);
+        const result = await API().post<{ url: string }>(`${Endpoints.REPORT_CSV}?inicioFecha=${startDate}&finFecha=${endDate}`);
         return result.data;
     },
 }

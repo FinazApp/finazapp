@@ -1,18 +1,23 @@
-import React from "react";
 import dayjs from "dayjs";
 import Box from "@mui/joy/Box";
+import * as React from "react";
 import Stack from "@mui/joy/Stack";
 import { capitalize } from "radash";
+import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
 import Grid from "@mui/material/Grid2";
+import { AgCharts } from "ag-charts-react";
 import Typography from "@mui/joy/Typography";
 import { createColumnHelper } from "@tanstack/react-table";
 import ToggleButtonGroup from "@mui/joy/ToggleButtonGroup";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import { DataTable, IKPICardProps, KPICard } from "@components";
-import { useDashboardGenerateReport, useFetchDashboardSummary } from "@hooks";
-import toast from "react-hot-toast";
+import {
+  useDashboardGenerateReport,
+  useFetchCategories,
+  useFetchDashboardSummary,
+} from "@hooks";
 
 const columnHelper = createColumnHelper<{
   nombre: string;
@@ -75,28 +80,29 @@ const DashboardPage = () => {
     ];
   }, [filter]);
 
-  const reportCsv = useDashboardGenerateReport(startDate, endDate);
+  const categories = useFetchCategories();
   const dashboard = useFetchDashboardSummary(startDate, endDate);
+  const reportCsv = useDashboardGenerateReport(startDate, endDate);
 
   const handleOnGenerateReport = React.useCallback(() => {
     return toast.promise(
       reportCsv.mutateAsync(
         { startDate, endDate },
         {
-          onSuccess: ({ fileUrl }) => {
-            console.log(fileUrl);
+          onSuccess: ({ url }) => {
+            window.open(url, "_blank");
           },
         }
       ),
       {
         error: (e) => e,
-        loading: "Actualizando el gasto...",
-        success: "Gasto actualizado correctamente.",
+        loading: "Generando reporte...",
+        success: "Reporte generado correctamente.",
       }
     );
   }, [endDate, reportCsv, startDate]);
 
-  const options = [
+  const datesOptions = [
     { label: "Este mes", value: "1" },
     { label: "Ultimo mes", value: "2" },
     { label: "Este año", value: "3" },
@@ -123,6 +129,19 @@ const DashboardPage = () => {
       value: dashboard.data?.totales.ingresos ?? 0,
     },
   ];
+
+  const data = React.useMemo(() => {
+    return dashboard.data?.categoriasUsadas.map((category) => {
+      const categoryFound = categories.data?.find(
+        (item) => item.categoriaId === category.categoria
+      );
+      return {
+        asset: categoryFound?.nombre ?? "",
+        amount: category.total ?? 0,
+      };
+    });
+  }, [categories.data, dashboard.data?.categoriasUsadas]);
+  console.log("🚀 ~ data ~ data:", data);
 
   return (
     <>
@@ -157,7 +176,7 @@ const DashboardPage = () => {
               setFilter(newValue ?? "");
             }}
           >
-            {options.map((option) => (
+            {datesOptions.map((option) => (
               <Button key={option.label} value={option.value}>
                 {option.label}
               </Button>
@@ -195,7 +214,21 @@ const DashboardPage = () => {
               alignItems: "center",
             }}
           >
-            Grafico aqui
+            <AgCharts
+              options={{
+                data,
+                title: {
+                  text: "Gastos por categorías",
+                },
+                series: [
+                  {
+                    type: "pie",
+                    angleKey: "amount",
+                    legendItemKey: "asset",
+                  },
+                ],
+              }}
+            />
           </Stack>
         </Grid>
         <Grid size={8}>

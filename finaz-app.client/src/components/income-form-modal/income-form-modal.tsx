@@ -55,7 +55,6 @@ const model = {
 };
 
 const IncomeFormModal = ({ id, open, onClose }: IIncomeFormModalProps) => {
-  console.log(id);
   const income = useFetchOneIncome(id);
   const createIncome = useCreateIncome();
   const updateIncome = useUpdateIncome();

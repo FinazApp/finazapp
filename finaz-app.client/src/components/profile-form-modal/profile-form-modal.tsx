@@ -53,7 +53,6 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={(values, actions) => {
-            console.log("🚀 ~ ProfileFormModal ~ values:", values);
             return toast.promise(
               updateUser.mutateAsync(values, {
                 onSettled: () => {
