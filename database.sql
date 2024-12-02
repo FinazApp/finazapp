@@ -51,3 +51,19 @@ CREATE TABLE Ingresos (
     FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId),
     FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId)
 );
+
+CREATE TABLE MetasAhorro (
+    MetaId INT PRIMARY KEY IDENTITY(1,1),
+    Nombre NVARCHAR(100) NOT NULL,
+    MontoObjetivo DECIMAL(18, 2) NOT NULL CHECK (MontoObjetivo > 0),
+    MontoAhorrado DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    FechaMeta DATETIME2 NOT NULL,
+    isDeleted BIT NOT NULL DEFAULT 0,
+    CreadoPor INT NOT NULL,
+    FechaCreacion DATETIME2 NOT NULL DEFAULT GETDATE(),
+    ModificadoPor INT NULL,
+    FechaModificado DATETIME2 NULL,
+    FOREIGN KEY (CreadoPor) REFERENCES Usuarios(UsuarioId),
+    FOREIGN KEY (ModificadoPor) REFERENCES Usuarios(UsuarioId),
+    CONSTRAINT CHK_MontoAhorrado CHECK (MontoAhorrado <= MontoObjetivo)
+);
