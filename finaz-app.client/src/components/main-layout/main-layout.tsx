@@ -2,6 +2,7 @@ import React from "react";
 import Box from "@mui/joy/Box";
 import Link from "@mui/joy/Link";
 import Alert from "@mui/joy/Alert";
+import { useAuth } from "@contexts";
 import Button from "@mui/joy/Button";
 import IconButton from "@mui/joy/IconButton";
 import { useLocalStorage } from "usehooks-ts";
@@ -9,12 +10,10 @@ import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { Outlet, useMatches, useNavigate } from "react-router";
-import { IconCheckbox, IconHomeFilled } from "@tabler/icons-react";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 import { Sidebar } from "../sidebar";
 import { Header } from "../header";
-import { useAuth } from "@contexts";
 
 export interface IMainLayoutProps {
   withOutlet?: boolean;
@@ -77,7 +76,10 @@ const MainLayout = ({
               href={matches[0].pathname}
               aria-label="Home"
             >
-              <IconHomeFilled size="16" style={{ width: 16, height: 16 }} />
+              <i
+                className="ti ti-home-filled"
+                style={{ width: 16, height: 16 }}
+              ></i>
             </Link>
             {matches.slice(1).map((match) => (
               <Link
@@ -96,7 +98,7 @@ const MainLayout = ({
           <Alert
             variant="soft"
             color="primary"
-            startDecorator={<IconCheckbox />}
+            startDecorator={<i className="ti ti-checkbox"></i>}
             endDecorator={
               <Box>
                 <Button

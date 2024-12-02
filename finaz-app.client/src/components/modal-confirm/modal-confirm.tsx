@@ -5,7 +5,6 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import DialogTitle from "@mui/joy/DialogTitle";
 import DialogContent from "@mui/joy/DialogContent";
 import DialogActions from "@mui/joy/DialogActions";
-import { IconPlug, IconTriangleFilled } from "@tabler/icons-react";
 
 export interface IModalConfirmProps {
   title: string;
@@ -31,9 +30,9 @@ const ModalConfirm = ({
       <ModalDialog variant="outlined" role="alertdialog">
         <DialogTitle>
           {type === "delete" ? (
-            <IconTriangleFilled style={{ width: 24, height: 24 }} />
+            <i className="ti ti-alert-triangle" style={{ width: 24, height: 24 }}></i>
           ) : (
-            <IconPlug style={{ width: 24, height: 24 }} />
+            <i className="ti ti-plug" style={{ width: 24, height: 24 }}></i>
           )}
           {title}
         </DialogTitle>

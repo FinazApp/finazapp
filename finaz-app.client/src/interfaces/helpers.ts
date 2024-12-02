@@ -1,7 +1,5 @@
-import { Icon } from "@tabler/icons-react";
-
 type ActionWithoutDivider = {
-    icon: Icon;
+    icon: React.ReactNode;
     title: string;
     color?: string;
     divider?: false;

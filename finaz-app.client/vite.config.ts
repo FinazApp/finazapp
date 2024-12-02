@@ -49,6 +49,11 @@ export default defineConfig(({ mode }) => {
                 env.SERVER_URL,
             ),
         },
+        esbuild: {
+            exclude: [],
+            loader: "tsx",
+            include: /src\/.*\.tsx?$/,
+        },
         optimizeDeps: {
             include: ['@emotion/styled'],
         },

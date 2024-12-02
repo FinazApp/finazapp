@@ -1,24 +1,23 @@
 import React from "react";
-import { Icon } from "@tabler/icons-react";
-import { NavLink as NavLinkRRD } from "react-router-dom";
 import ListItem from "@mui/joy/ListItem";
+import Typography from "@mui/joy/Typography";
 import ListItemButton from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
-import Typography from "@mui/joy/Typography";
+import { NavLink as NavLinkRRD } from "react-router-dom";
 
 export interface INavLinkProps {
   to: string;
   title: string;
-  icon: Icon;
+  icon: React.ReactNode;
 }
 
-const NavLink = ({ title, icon: IconLink, to }: INavLinkProps) => {
+const NavLink = ({ title, icon, to }: INavLinkProps) => {
   return (
     <NavLinkRRD to={to} style={{ textDecoration: "none" }}>
       {({ isActive }) => (
         <ListItem>
           <ListItemButton selected={isActive}>
-            <IconLink size="22" style={{ width: 22, height: 22 }} />
+            {icon}
             <ListItemContent>
               <Typography level="title-sm">{title}</Typography>
             </ListItemContent>

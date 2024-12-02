@@ -3,19 +3,17 @@ import * as Yup from "yup";
 import Stack from "@mui/joy/Stack";
 import Modal from "@mui/joy/Modal";
 import toast from "react-hot-toast";
+import { useAuth } from "@contexts";
 import Button from "@mui/joy/Button";
 import { Form, Formik } from "formik";
+import { useUpdateUser } from "@hooks";
+import { InputField } from "@components";
 import ModalClose from "@mui/joy/ModalClose";
 import IconButton from "@mui/joy/IconButton";
 import ModalDialog from "@mui/joy/ModalDialog";
 import AspectRatio from "@mui/joy/AspectRatio";
 import DialogTitle from "@mui/joy/DialogTitle";
 import DialogContent from "@mui/joy/DialogContent";
-import { IconEdit, IconMail } from "@tabler/icons-react";
-
-import { useAuth } from "@contexts";
-import { useUpdateUser } from "@hooks";
-import { InputField } from "@components";
 
 export interface IProfileFormModalProps {
   open: boolean;
@@ -106,7 +104,7 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                       boxShadow: "sm",
                     }}
                   >
-                    <IconEdit />
+                    <i className="ti ti-edit" style={{ fontSize: 20 }}></i>
                   </IconButton>
                 </AspectRatio>
               </Stack>
@@ -123,8 +121,8 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                   type="text"
                   label="Correo electrónico"
                   name="correoElectronico"
-                  startDecorator={<IconMail />}
                   placeholder="siriwatk@test.com"
+                  startDecorator={<i className="ti ti-mail"></i>}
                 />
               </Stack>
               <Button type="submit" loading={false} fullWidth>

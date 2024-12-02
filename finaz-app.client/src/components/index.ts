@@ -9,5 +9,7 @@ export * from "./bill-form-modal";
 export * from "./income-form-modal";
 export * from "./categories-select";
 export * from "./profile-form-modal";
+export * from "./savings-form-modal";
 export * from "./color-scheme-toggle";
 export * from "./category-form-modal";
+export * from "./add-fondo-form-modal";

@@ -8,4 +8,5 @@ export const LOGIN_USER = "Auth/Login";
 export const LOGOUT_USER = "Auth/Logout";
 export const REGISTER_USER = "Auth/Register";
 export const REPORT_CSV = "Reports/reporte-csv";
+export const SAVINGS_FONDO = "MetasAhorro/AddFondo";
 export const DASHBOARD_SUMMARY = "Dashboard/Summary";

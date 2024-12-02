@@ -9,7 +9,6 @@ import AddIcon from "@mui/icons-material/Add";
 import FormControl from "@mui/joy/FormControl";
 import SearchIcon from "@mui/icons-material/Search";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconPlug, IconTrash, IconPencil } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { ICategory } from "@interfaces";
@@ -161,13 +160,13 @@ const CategoriesPage = () => {
         tableActions={(data) => [
           {
             title: "Editar",
-            icon: IconPencil,
+            icon: <i className="ti ti-pencil" style={{ fontSize: 20 }}></i>,
             onClick: () =>
               dispatch({ type: "OPEN_DRAWER", payload: data.categoriaId }),
           },
           {
             color: "danger",
-            icon: IconTrash,
+            icon: <i className="ti ti-trash" style={{ fontSize: 20 }}></i>,
             title: "Eliminar",
             disabled: data.isDeleted,
             onClick: () => {
@@ -177,7 +176,7 @@ const CategoriesPage = () => {
           },
           {
             color: "success",
-            icon: IconPlug,
+            icon: <i className="ti ti-plug" style={{ fontSize: 20 }}></i>,
             title: "Restaurar",
             disabled: !data.isDeleted,
             onClick: () => {

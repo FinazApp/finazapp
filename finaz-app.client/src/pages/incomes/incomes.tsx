@@ -11,7 +11,6 @@ import AddIcon from "@mui/icons-material/Add";
 import FormControl from "@mui/joy/FormControl";
 import SearchIcon from "@mui/icons-material/Search";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconPencil, IconTrash, IconPlug } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { IIncome } from "@interfaces";
@@ -211,13 +210,13 @@ const IncomesPage = () => {
         tableActions={(data) => [
           {
             title: "Editar",
-            icon: IconPencil,
+            icon: <i className="ti ti-pencil" style={{ fontSize: 20 }}></i>,
             onClick: () =>
               dispatch({ type: "OPEN_DRAWER", payload: data.ingresoId }),
           },
           {
             color: "danger",
-            icon: IconTrash,
+            icon: <i className="ti ti-trash" style={{ fontSize: 20 }}></i>,
             title: "Eliminar",
             disabled: data.isDeleted,
             onClick: () => {
@@ -227,7 +226,7 @@ const IncomesPage = () => {
           },
           {
             color: "success",
-            icon: IconPlug,
+            icon: <i className="ti ti-plug" style={{ fontSize: 20 }}></i>,
             title: "Restaurar",
             disabled: !data.isDeleted,
             onClick: () => {

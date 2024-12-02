@@ -1,5 +1,5 @@
 import { Endpoints } from "@core";
-import { ISavingGoal } from "@interfaces";
+import { ISavingGoal, ISavingGoalUpdateMonto } from "@interfaces";
 
 import API from "./api";
 
@@ -18,6 +18,10 @@ const SavingsApi = {
     },
     update: async (data: Partial<ISavingGoal>) => {
         const result = await API().patch(`${Endpoints.SAVINGS}/${data.metaId}`, data);
+        return result.data;
+    },
+    addFondo: async (data: ISavingGoalUpdateMonto) => {
+        const result = await API().post(Endpoints.SAVINGS_FONDO, data);
         return result.data;
     },
     getAll: async () => {

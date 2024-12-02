@@ -14,5 +14,6 @@ namespace finaz_app.Server.Models.DTOs
         public decimal MontoAhorrado { get; set; } = 0;
 
         public DateTime FechaMeta { get; set; }
+        public bool isDeleted { get; set; } = false;
     }
 }

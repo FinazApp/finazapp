@@ -11,8 +11,6 @@ import Divider from "@mui/joy/Divider";
 import Dropdown from "@mui/joy/Dropdown";
 import MenuItem from "@mui/joy/MenuItem";
 import MenuButton from "@mui/joy/MenuButton";
-import { IconClick } from "@tabler/icons-react";
-import MoreVert from "@mui/icons-material/MoreVert";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -137,7 +135,7 @@ const DataTable = <T extends object>({
                 {!!actions({} as never)?.length && (
                   <th style={{ width: 50, padding: "12px 6px" }}>
                     <Box style={{ display: "flex", justifyContent: "center" }}>
-                      <IconClick size="20" style={{ height: 20, width: 20 }} />
+                      <i className="ti ti-click" style={{ fontSize: 20 }}></i>
                     </Box>
                   </th>
                 )}
@@ -181,12 +179,12 @@ const DataTable = <T extends object>({
                           },
                         }}
                       >
-                        <MoreVert />
+                        <i className="ti ti-dots-vertical" style={{ fontSize: 20 }}></i>
                       </MenuButton>
                       <Menu size="sm" sx={{ minWidth: 140 }}>
                         {actions(row.original)?.map(
                           ({
-                            icon: ActionIcon,
+                            icon,
                             onClick,
                             color,
                             divider,
@@ -204,7 +202,7 @@ const DataTable = <T extends object>({
                                 color={color as never}
                                 onClick={onClick}
                               >
-                                <ActionIcon style={{ height: 20, width: 20 }} />
+                                {icon}
                                 {title}
                               </MenuItem>
                             );
@@ -270,7 +268,9 @@ const DataTable = <T extends object>({
           onChange={(_, value) => table.setPageSize(value ?? 0)}
         >
           {pageSizes.map((pageSize) => (
-            <Option key={pageSize} value={pageSize}>Mostrar {pageSize}</Option>
+            <Option key={pageSize} value={pageSize}>
+              Mostrar {pageSize}
+            </Option>
           ))}
         </Select>
       </Box>

@@ -45,3 +45,14 @@ export const useRestoreSaving = () => {
     }
   });
 };
+
+export const useAddFondoSaving = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: SavingsApi.addFondo,
+    mutationKey: [Tags.SAVINGS_FONDO, Tags.MUTATION_UPDATE],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [Tags.SAVINGS] })
+    }
+  });
+};

@@ -2,8 +2,11 @@ import * as React from "react";
 import Box from "@mui/joy/Box";
 import List from "@mui/joy/List";
 import Menu from "@mui/joy/Menu";
+import { Reducers } from "@core";
 import Sheet from "@mui/joy/Sheet";
+import { useAuth } from "@contexts";
 import Avatar from "@mui/joy/Avatar";
+import { SidebarUtils } from "@utils";
 import Divider from "@mui/joy/Divider";
 import MenuItem from "@mui/joy/MenuItem";
 import Dropdown from "@mui/joy/Dropdown";
@@ -12,23 +15,10 @@ import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import { listItemButtonClasses } from "@mui/joy/ListItemButton";
-import { SidebarUtils } from "@utils";
-import {
-  IconCategory,
-  IconCurrencyDollar,
-  IconHome2,
-  IconDotsVertical,
-  IconPigMoney,
-  IconUsers,
-  IconCash,
-  IconFlag,
-} from "@tabler/icons-react";
-import { useAuth } from "@contexts";
 
 import { NavLink } from "../navlink";
 import { ColorSchemeToggle } from "../color-scheme-toggle";
 import { ProfileFormModal } from "../profile-form-modal";
-import { Reducers } from "@core";
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
@@ -93,7 +83,7 @@ const Sidebar = () => {
         />
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <IconButton variant="soft" color="primary" size="sm">
-            <IconCash />
+            <i className="ti ti-cash" style={{ fontSize: 20 }}></i>
           </IconButton>
           <Typography level="title-lg">FinazApp</Typography>
           <ColorSchemeToggle sx={{ ml: "auto" }} />
@@ -118,13 +108,37 @@ const Sidebar = () => {
               "--ListItem-radius": (theme) => theme.vars.radius.sm,
             }}
           >
-            <NavLink to="/" title="Inicio" icon={IconHome2} />
-            <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
-            <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
-            <NavLink to="/savings" title="Metas de ahorros" icon={IconFlag} />
+            <NavLink
+              to="/"
+              title="Inicio"
+              icon={<i className="ti ti-home-2" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/incomes"
+              title="Ingresos"
+              icon={<i className="ti ti-pig-money" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/bills"
+              title="Gastos"
+              icon={<i className="ti ti-currency-dollar" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/savings"
+              title="Metas de ahorros"
+              icon={<i className="ti ti-flag" style={{ fontSize: 20 }}></i>}
+            />
             <Divider />
-            <NavLink to="/categories" title="Categorías" icon={IconCategory} />
-            <NavLink to="/users" title="Usuarios" icon={IconUsers} />
+            <NavLink
+              to="/categories"
+              title="Categorías"
+              icon={<i className="ti ti-category" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
+              to="/users"
+              title="Usuarios"
+              icon={<i className="ti ti-users" style={{ fontSize: 20 }}></i>}
+            />
           </List>
         </Box>
         <Divider />
@@ -145,7 +159,7 @@ const Sidebar = () => {
               slots={{ root: IconButton }}
               slotProps={{ root: { variant: "outlined", color: "neutral" } }}
             >
-              <IconDotsVertical style={{ width: 18, height: 18 }} />
+              <i className="ti ti-dots-vertical"></i>
             </MenuButton>
             <Menu>
               <MenuItem

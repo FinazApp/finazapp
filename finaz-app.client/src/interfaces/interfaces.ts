@@ -101,3 +101,8 @@ export interface ISavingGoal {
     montoObjetivo: number;
     montoAhorrado: number;
 }
+
+export interface ISavingGoalUpdateMonto {
+    metaId: number;
+    nuevoFondo: number;
+}

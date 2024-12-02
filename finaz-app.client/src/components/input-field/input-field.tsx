@@ -11,7 +11,7 @@ export interface IInputFieldProps extends InputProps {
   name: string;
   label: string;
   helperText?: string;
-  placeholder: string;
+  placeholder?: string;
 }
 
 const InputField = ({

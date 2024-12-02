@@ -2,18 +2,22 @@ import React from "react";
 import Box from "@mui/joy/Box";
 import Input from "@mui/joy/Input";
 import toast from "react-hot-toast";
+import Chip from "@mui/joy/Chip";
 import Button from "@mui/joy/Button";
 import Typography from "@mui/joy/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import FormControl from "@mui/joy/FormControl";
 import SearchIcon from "@mui/icons-material/Search";
 import { createColumnHelper } from "@tanstack/react-table";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { IconPencil, IconTrash, IconPlug } from "@tabler/icons-react";
 
 import { Reducers } from "@core";
 import { ISavingGoal } from "@interfaces";
-import { DataTable, BillFormModal, ModalConfirm } from "@components";
+import {
+  AddFondoFormModal,
+  DataTable,
+  ModalConfirm,
+  SavingsFormModal,
+} from "@components";
 import { useDeleteSaving, useFetchSavings, useRestoreSaving } from "@hooks";
 
 const columnHelper = createColumnHelper<ISavingGoal>();
@@ -24,9 +28,9 @@ const columns = [
     header: "Nombre",
     cell: (info) => <b>{info.getValue()}</b>,
   }),
-  columnHelper.accessor("montoAhorrado", {
-    id: "monto",
-    header: "Monto Ahorrado",
+  columnHelper.accessor("montoObjetivo", {
+    id: "montoObjetivo",
+    header: "Monto Objetivo",
     cell: (info) => (
       <span>
         {new Intl.NumberFormat("es-DO", {
@@ -36,9 +40,9 @@ const columns = [
       </span>
     ),
   }),
-  columnHelper.accessor("montoObjetivo", {
-    id: "monto",
-    header: "Monto Objetivo",
+  columnHelper.accessor("montoAhorrado", {
+    id: "montoAhorrado",
+    header: "Monto Ahorrado",
     cell: (info) => (
       <span>
         {new Intl.NumberFormat("es-DO", {
@@ -52,19 +56,19 @@ const columns = [
     id: "categoriaId",
     header: "Fecha final",
   }),
-  // columnHelper.accessor("isDeleted", {
-  //   id: "isDeleted",
-  //   header: "Estado",
-  //   cell: (info) => (
-  //     <Chip
-  //       size="sm"
-  //       variant="solid"
-  //       color={info.getValue() ? "danger" : "success"}
-  //     >
-  //       {info.getValue() ? "Eliminado" : "Activo"}
-  //     </Chip>
-  //   ),
-  // }),
+  columnHelper.accessor("isDeleted", {
+    id: "isDeleted",
+    header: "Estado",
+    cell: (info) => (
+      <Chip
+        size="sm"
+        variant="solid"
+        color={info.getValue() ? "danger" : "success"}
+      >
+        {info.getValue() ? "Eliminado" : "Activo"}
+      </Chip>
+    ),
+  }),
 ];
 
 const SavingsPage = () => {
@@ -79,6 +83,10 @@ const SavingsPage = () => {
     id: 0,
     open: false,
   });
+  const [stateFondo, dispatchFondo] = React.useReducer(
+    Reducers.DrawersReducer,
+    { id: 0, open: false }
+  );
 
   const handleDelete = React.useCallback(() => {
     return toast.promise(
@@ -105,32 +113,6 @@ const SavingsPage = () => {
       }
     );
   }, [saving?.metaId, saving?.nombre, restoreSaving]);
-
-  const renderFilters = () => (
-    <React.Fragment>
-      <FormControl size="sm">
-        <DatePicker />
-        {/* <Select<number>
-          size="sm"
-          value={categoryId}
-          placeholder="Filtrar por categoría"
-          onChange={(_, value) => setCategoryId(value ?? 0)}
-          slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-        >
-          <Option value="">Filtrar por categoría</Option>
-          {categoriesOptions.map((item) => (
-            <Option
-              key={item.label}
-              value={item.value}
-              disabled={item.disabled}
-            >
-              {item.label}
-            </Option>
-          ))}
-        </Select> */}
-      </FormControl>
-    </React.Fragment>
-  );
 
   const data = React.useMemo(() => {
     if (!savingsGoals.data?.length) return [];
@@ -196,7 +178,6 @@ const SavingsPage = () => {
             startDecorator={<SearchIcon />}
             onChange={(e) => setSearchText(e.target.value)}
           />
-          {renderFilters()}
         </FormControl>
       </Box>
       <DataTable<ISavingGoal>
@@ -204,14 +185,21 @@ const SavingsPage = () => {
         columns={columns}
         tableActions={(data) => [
           {
+            title: "Agregar fondo",
+            disabled: data.isDeleted,
+            icon: <i className="ti ti-plus" style={{ fontSize: 20 }}></i>,
+            onClick: () =>
+              dispatchFondo({ type: "OPEN_DRAWER", payload: data.metaId }),
+          },
+          {
             title: "Editar",
-            icon: IconPencil,
+            icon: <i className="ti ti-pencil" style={{ fontSize: 20 }}></i>,
             onClick: () =>
               dispatch({ type: "OPEN_DRAWER", payload: data.metaId }),
           },
           {
             color: "danger",
-            icon: IconTrash,
+            icon: <i className="ti ti-trash" style={{ fontSize: 20 }}></i>,
             title: "Eliminar",
             disabled: data.isDeleted,
             onClick: () => {
@@ -221,7 +209,7 @@ const SavingsPage = () => {
           },
           {
             color: "success",
-            icon: IconPlug,
+            icon: <i className="ti ti-plug" style={{ fontSize: 20 }}></i>,
             title: "Restaurar",
             disabled: !data.isDeleted,
             onClick: () => {
@@ -231,10 +219,15 @@ const SavingsPage = () => {
           },
         ]}
       />
-      <BillFormModal
+      <SavingsFormModal
         id={state.id}
         open={state.open}
         onClose={() => dispatch({ type: "CLOSE_DRAWER" })}
+      />
+      <AddFondoFormModal
+        id={stateFondo.id}
+        open={stateFondo.open}
+        onClose={() => dispatchFondo({ type: "CLOSE_DRAWER" })}
       />
       <ModalConfirm
         type={type}

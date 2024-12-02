@@ -34,14 +34,18 @@ const columns = [
   columnHelper.accessor("monto", {
     id: "monto",
     header: "Monto",
-    cell: (info) => (
-      <span>
-        {new Intl.NumberFormat("es-DO", {
-          style: "currency",
-          currency: "DOP",
-        }).format(info.getValue())}
-      </span>
-    ),
+    cell: (info) => {
+      const isIncome = info.row.original.tipo === "Ingreso";
+      return (
+        <span style={{ color: isIncome ? "green" : "red", fontWeight: 500 }}>
+          {isIncome ? "+ " : "- "}
+          {new Intl.NumberFormat("es-DO", {
+            style: "currency",
+            currency: "DOP",
+          }).format(info.getValue())}
+        </span>
+      );
+    },
   }),
   columnHelper.accessor("tipo", {
     id: "tipo",
@@ -141,7 +145,6 @@ const DashboardPage = () => {
       };
     });
   }, [categories.data, dashboard.data?.categoriasUsadas]);
-  console.log("🚀 ~ data ~ data:", data);
 
   return (
     <>

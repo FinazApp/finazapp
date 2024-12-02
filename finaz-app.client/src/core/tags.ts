@@ -4,10 +4,11 @@ export const INCOMES = "INCOMES";
 export const USER_ME = "USER_ME";
 export const SAVINGS = "SAVINGS";
 export const CATEGORIES = "CATEGORIES";
+export const REPORT_CSV = "REPORT_CSV";
 export const LOGIN_USER = "LOGIN_USER";
 export const LOGOUT_USER = "LOGOUT_USER";
 export const REGISTER_USER = "REGISTER_USER";
-export const REPORT_CSV = "REPORT_CSV";
+export const SAVINGS_FONDO = "SAVINGS_FONDO";
 export const DASHBOARD_SUMMARY = "DASHBOARD_SUMMARY";
 
 //--------------------------------------------------------------------------------------//
