@@ -1,10 +1,13 @@
 export const BILLS = "BILLS";
-export const USER_ME = "USER_ME";
+export const USERS = "USERS";
 export const INCOMES = "INCOMES";
-export const LOGIN_USER = "LOGIN_USER";
+export const USER_ME = "USER_ME";
 export const CATEGORIES = "CATEGORIES";
+export const LOGIN_USER = "LOGIN_USER";
+export const LOGOUT_USER = "LOGOUT_USER";
 export const REGISTER_USER = "REGISTER_USER";
-export const PANEL_ADMIN_BALANCE = "PANEL_ADMIN_BALANCE";
+export const REPORT_CSV = "REPORT_CSV";
+export const DASHBOARD_SUMMARY = "DASHBOARD_SUMMARY";
 
 //--------------------------------------------------------------------------------------//
 //                                      Mutations                                       //

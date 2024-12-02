@@ -1,7 +1,10 @@
 export const BILLS = "Gastos";
-export const LOGIN_USER = "Login";
+export const USERS = "Usuarios";
 export const INCOMES = "Ingresos";
 export const USER_ME = "Usuarios/Me";
 export const CATEGORIES = "Categorias";
-export const REGISTER_USER = "Register";
-export const PANEL_ADMIN_BALANCE = "PanelAdmin/Balance";
+export const LOGIN_USER = "Auth/Login";
+export const LOGOUT_USER = "Auth/Logout";
+export const REGISTER_USER = "Auth/Register";
+export const REPORT_CSV = "Reports/reporte-csv";
+export const DASHBOARD_SUMMARY = "Dashboard/Summary";

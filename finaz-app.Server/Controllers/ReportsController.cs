@@ -1,8 +1,7 @@
 ﻿using finaz_app.Server.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 
 namespace finaz_app.Server.Controllers
@@ -21,19 +20,22 @@ namespace finaz_app.Server.Controllers
             _environment = environment;
         }
 
-        [HttpGet("reporte-csv")]
-        public IActionResult GenerarReporteCsv(DateOnly fechaInicio, DateOnly fechaFin)
+        [HttpPost("reporte-csv")]
+        public IActionResult GenerarReporteCsv(string inicioFecha, string finFecha)
         {
-            if (fechaInicio == default || fechaFin == default)
+            // Validar y convertir las fechas
+            if (!DateOnly.TryParseExact(inicioFecha, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fechaInicioParsed) ||
+                !DateOnly.TryParseExact(finFecha, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fechaFinParsed))
             {
-                return BadRequest("Por favor, proporciona una fecha de inicio y una fecha de fin válidas.");
+                return BadRequest("Por favor, proporciona fechas válidas en el formato DD/MM/YYYY.");
             }
 
             var ingresos = _context.Ingresos
-                .Where(i => i.FechaCreacion >= fechaInicio.ToDateTime(TimeOnly.MinValue) && 
-                            i.FechaCreacion <= fechaFin.ToDateTime(TimeOnly.MaxValue) && 
+                .Where(i => i.FechaCreacion >= fechaInicioParsed.ToDateTime(TimeOnly.MinValue) &&
+                            i.FechaCreacion <= fechaFinParsed.ToDateTime(TimeOnly.MaxValue) &&
                             !i.isDeleted)
-                .Select(i => new {
+                .Select(i => new
+                {
                     Tipo = "Ingreso",
                     Transaccion = i.Nombre,
                     Monto = i.Monto,
@@ -42,10 +44,11 @@ namespace finaz_app.Server.Controllers
                 }).ToList();
 
             var gastos = _context.Gastos
-                .Where(g => g.FechaCreacion >= fechaInicio.ToDateTime(TimeOnly.MinValue) && 
-                            g.FechaCreacion <= fechaFin.ToDateTime(TimeOnly.MaxValue) && 
+                .Where(g => g.FechaCreacion >= fechaInicioParsed.ToDateTime(TimeOnly.MinValue) &&
+                            g.FechaCreacion <= fechaFinParsed.ToDateTime(TimeOnly.MaxValue) &&
                             !g.isDeleted)
-                .Select(g => new {
+                .Select(g => new
+                {
                     Tipo = "Gasto",
                     Transaccion = g.Nombre,
                     Monto = g.Monto,

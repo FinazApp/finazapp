@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "@mui/joy/Box";
-import { Chip } from "@mui/joy";
+import Chip from "@mui/joy/Chip";
 import Input from "@mui/joy/Input";
 import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";

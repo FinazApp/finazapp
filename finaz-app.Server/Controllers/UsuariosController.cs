@@ -79,6 +79,7 @@ namespace finaz_app.Server.Controllers
 
                 var usuariosDto = new UsuariosDTO
                 {
+                    Rol = usuario.Rol,
                     Nombre = usuario.Nombre,
                     UsuarioId = usuario.UsuarioId,
                     CorreoElectronico = usuario.CorreoElectronico,
@@ -99,27 +100,30 @@ namespace finaz_app.Server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> PutUsuario(Usuario request)
+        public async Task<IActionResult> PutUsuario(UsuariosDTO request)
         {
             var userID = JwtHelper.ObtenerIdDeJwt(HttpContext) ?? 0;
+            var userRole = JwtHelper.ObtenerRolDeJwt(HttpContext); // Suponiendo que el rol se puede obtener del JWT.
 
             try
             {
                 if (userID <= 0)
                     return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
 
-                if (userID != request.UsuarioId)
-                    return BadRequest("El ID del usuario no coincide con el parámetro proporcionado.");
+                // Solo el usuario mismo o un administrador pueden realizar cambios
+                if (userID != request.UsuarioId && userRole != "admin")
+                    return Forbid("No tienes permisos para actualizar este usuario.");
 
-                var existingUser = await _context.Usuarios.FindAsync(userID);
+                var existingUser = await _context.Usuarios.FindAsync(request.UsuarioId);
                 if (existingUser == null)
                     return NotFound("Usuario no encontrado.");
 
                 // Validar el nombre del usuario
                 var nombreExistente = await _context.Usuarios
-                    .AnyAsync(u => u.Nombre == request.Nombre && u.UsuarioId != userID);
+                    .AnyAsync(u => u.Nombre == request.Nombre && u.UsuarioId != request.UsuarioId);
                 if (nombreExistente)
                     return Conflict("El nombre ya está en uso.");
 
@@ -132,17 +136,13 @@ namespace finaz_app.Server.Controllers
                 existingUser.Nombre = request.Nombre;
                 existingUser.CorreoElectronico = request.CorreoElectronico;
 
-                if (!string.IsNullOrWhiteSpace(request.PasswordHash))
-                    existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
-
                 // Marcar el usuario como modificado en el contexto
                 _context.Entry(existingUser).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Manejar errores de concurrencia
-                if (!UsuarioExists(userID))
+                if (!UsuarioExists(request.UsuarioId))
                     return NotFound("Usuario no encontrado durante la actualización.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error de concurrencia al actualizar el usuario.");
             }

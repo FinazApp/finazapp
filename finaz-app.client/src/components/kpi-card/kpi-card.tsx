@@ -1,6 +1,7 @@
 import React from "react";
 import millify from "millify";
 import SvgIcon from "@mui/joy/SvgIcon";
+import { PercentageKpi } from "@interfaces";
 import Typography from "@mui/joy/Typography";
 import CardContent from "@mui/joy/CardContent";
 import Card, { CardProps } from "@mui/joy/Card";
@@ -10,20 +11,17 @@ import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 export interface IKPICardProps {
   title: string;
   value: number;
+  data?: PercentageKpi;
   color: CardProps["color"];
-  data: {
-    percent: number;
-    type: "down" | "up";
-  };
 }
 
 const KPICard = ({ title, value, data, color = "primary" }: IKPICardProps) => {
   return (
     <Card variant="soft" color={color} sx={{ width: "100%" }} invertedColors>
       <CardContent orientation="horizontal">
-        <CircularProgress size="lg" determinate value={data.percent}>
+        <CircularProgress size="lg" determinate value={data?.porcentaje ?? 0}>
           <SvgIcon>
-            {data.type === "down" ? <IconTrendingDown /> : <IconTrendingUp />}
+            {data?.tipo === "Negativo" ? <IconTrendingDown /> : <IconTrendingUp />}
           </SvgIcon>
         </CircularProgress>
         <CardContent>

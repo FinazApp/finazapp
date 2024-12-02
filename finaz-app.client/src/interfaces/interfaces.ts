@@ -11,6 +11,7 @@ export interface ILoginUser {
 }
 
 export interface IUser {
+    rol: string;
     nombre: string;
     usuarioId: number;
     correoElectronico: string;
@@ -78,14 +79,16 @@ export interface IBillCreate {
     categoriaId: number;
 }
 
-type Kpi = { value: number; percentage: number; }
+export type PercentageKpi = { tipo: "Negativo" | "Neutro" | "Positivo"; porcentaje: number; }
 
 export interface IDashboardBalance {
-    kpi: Record<"balance" | "ingresos" | "gastos", Kpi>;
-    last: {
+    totales: Record<"balance" | "ingresos" | "gastos", number>;
+    porcentajes: Record<"balance" | "ingresos" | "gastos", PercentageKpi>;
+    ultimosMovimientos: {
         monto: number;
         nombre: string;
         fechaCreacion: string,
         tipo: string
-    }[]
+    }[];
+    categoriasUsadas: { categoria: number, total: number }[]
 }

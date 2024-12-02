@@ -2,6 +2,7 @@ import React from "react";
 import dayjs from "dayjs";
 import Box from "@mui/joy/Box";
 import Stack from "@mui/joy/Stack";
+import { capitalize } from "radash";
 import Button from "@mui/joy/Button";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/joy/Typography";
@@ -10,8 +11,8 @@ import ToggleButtonGroup from "@mui/joy/ToggleButtonGroup";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import { DataTable, IKPICardProps, KPICard } from "@components";
-import { useFetchDashboardBalance } from "@hooks";
-import { capitalize } from "radash";
+import { useDashboardGenerateReport, useFetchDashboardSummary } from "@hooks";
+import toast from "react-hot-toast";
 
 const columnHelper = createColumnHelper<{
   nombre: string;
@@ -53,7 +54,7 @@ const DashboardPage = () => {
       return [
         lastMonth.startOf("month").format("DD/MM/YYYY"),
         lastMonth.endOf("month").format("DD/MM/YYYY"),
-      ]
+      ];
     }
     if (filter === "3") {
       return [
@@ -74,7 +75,26 @@ const DashboardPage = () => {
     ];
   }, [filter]);
 
-  const dashboard = useFetchDashboardBalance(startDate, endDate);
+  const reportCsv = useDashboardGenerateReport(startDate, endDate);
+  const dashboard = useFetchDashboardSummary(startDate, endDate);
+
+  const handleOnGenerateReport = React.useCallback(() => {
+    return toast.promise(
+      reportCsv.mutateAsync(
+        { startDate, endDate },
+        {
+          onSuccess: ({ fileUrl }) => {
+            console.log(fileUrl);
+          },
+        }
+      ),
+      {
+        error: (e) => e,
+        loading: "Actualizando el gasto...",
+        success: "Gasto actualizado correctamente.",
+      }
+    );
+  }, [endDate, reportCsv, startDate]);
 
   const options = [
     { label: "Este mes", value: "1" },
@@ -86,30 +106,21 @@ const DashboardPage = () => {
   const stats: IKPICardProps[] = [
     {
       title: "Balance",
-      value: dashboard.data?.kpi.balance.value ?? 0,
       color: "primary",
-      data: {
-        type: "down",
-        percent: dashboard.data?.kpi.balance.percentage ?? 0,
-      },
+      data: dashboard.data?.porcentajes.balance,
+      value: dashboard.data?.totales.balance ?? 0,
     },
     {
       title: "Gastos",
-      value: dashboard.data?.kpi.gastos.value ?? 0,
       color: "danger",
-      data: {
-        type: "up",
-        percent: dashboard.data?.kpi.gastos.percentage ?? 0,
-      },
+      data: dashboard.data?.porcentajes.gastos,
+      value: dashboard.data?.totales.gastos ?? 0,
     },
     {
       title: "Ingresos",
-      value: dashboard.data?.kpi.ingresos.value ?? 0,
       color: "success",
-      data: {
-        type: "down",
-        percent: dashboard.data?.kpi.ingresos.percentage ?? 0,
-      },
+      data: dashboard.data?.porcentajes.ingresos,
+      value: dashboard.data?.totales.ingresos ?? 0,
     },
   ];
 
@@ -152,7 +163,11 @@ const DashboardPage = () => {
               </Button>
             ))}
           </ToggleButtonGroup>
-          <Button color="primary" startDecorator={<DownloadRoundedIcon />}>
+          <Button
+            color="primary"
+            onClick={handleOnGenerateReport}
+            startDecorator={<DownloadRoundedIcon />}
+          >
             Descargar reporte
           </Button>
         </Box>
@@ -167,10 +182,9 @@ const DashboardPage = () => {
         }}
       >
         {stats.map((stat) => (
-          <KPICard {...stat} />
+          <KPICard key={stat.title} {...stat} />
         ))}
       </Box>
-
       <Grid container spacing={2} sx={{ flexGrow: 1 }}>
         <Grid size={4}>
           <Stack
@@ -188,7 +202,7 @@ const DashboardPage = () => {
           <DataTable
             columns={columns}
             tableActions={[]}
-            data={dashboard.data?.last ?? []}
+            data={dashboard.data?.ultimosMovimientos ?? []}
           />
         </Grid>
       </Grid>

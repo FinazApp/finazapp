@@ -4,8 +4,12 @@ import { IDashboardBalance } from "@interfaces";
 import API from "./api";
 
 const DashboardApi = {
-    balance: async (startDate: string, endDate: string) => {
-        const result = await API().get<IDashboardBalance>(`${Endpoints.PANEL_ADMIN_BALANCE}?inicioFecha=${startDate}&finFecha=${endDate}`);
+    summary: async (startDate: string, endDate: string) => {
+        const result = await API().get<IDashboardBalance>(`${Endpoints.DASHBOARD_SUMMARY}?inicioFecha=${startDate}&finFecha=${endDate}`);
+        return result.data;
+    },
+    generateReport: async ({ startDate, endDate }: { startDate: string, endDate: string }) => {
+        const result = await API().get<{ fileUrl: string }>(`${Endpoints.REPORT_CSV}?inicioFecha=${startDate}&finFecha=${endDate}`);
         return result.data;
     },
 }

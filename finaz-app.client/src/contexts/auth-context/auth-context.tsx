@@ -1,10 +1,7 @@
 import React from "react";
 import { IUser } from "@interfaces";
-import { useFetchUserMe } from "@hooks";
-
-// import { Routes, Constants } from "#core";
-// import { useTranslation } from "react-i18next";
-// import { IUser } from "@nubeteck/queries";
+import toast from "react-hot-toast";
+import { useFetchUserMe, useLogout } from "@hooks";
 
 interface IAuthContextProps {
   isLogged: boolean;
@@ -48,8 +45,8 @@ const Provider = ({ children, renderLoading }: IProviderProps) => {
     user: null,
   });
 
+  const logoutUser = useLogout();
   const userMe = useFetchUserMe();
-  console.log("🚀 ~ Provider ~ userMe:", userMe)
 
   React.useEffect(() => {
     if (userMe.data) {
@@ -59,10 +56,12 @@ const Provider = ({ children, renderLoading }: IProviderProps) => {
 
   const logout = React.useCallback(async () => {
     dispatch({ type: "CLEAR_AUTH" });
-    // localStorage.removeItem(Constants.TOKEN_KEY_NAME);
-    // localStorage.removeItem(Constants.REFRESH_TOKEN_KEY_NAME);
-    // window.location.href = Routes.BASE_ROUTE;
-  }, []);
+    return toast.promise(logoutUser.mutateAsync(), {
+      error: (e) => e,
+      loading: "Cerrando sesión....",
+      success: "Sesión cerrada.",
+    });
+  }, [logoutUser]);
 
   return (
     <AuthContext.Provider

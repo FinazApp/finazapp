@@ -119,7 +119,6 @@ const LoginPage = () => {
               <Formik<ILoginUser>
                 initialValues={{ correoElectronico: "", passwordHash: "" }}
                 onSubmit={async (values) => {
-                  console.log(values);
                   toast.promise(
                     mutateAsync(values, {
                       onSuccess: () => {

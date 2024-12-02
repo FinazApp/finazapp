@@ -35,5 +35,37 @@ namespace finaz_app.Server.Security.JWT
                 return null;
             }
         }
+
+        public static string? ObtenerRolDeJwt(HttpContext httpContext)
+        {
+            if (!httpContext.Request.Cookies.TryGetValue("JWT", out var jwtCookie) || string.IsNullOrEmpty(jwtCookie))
+            {
+                return null;
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(jwtCookie) as JwtSecurityToken;
+
+                if (token == null)
+                {
+                    return null;
+                }
+
+                var role = token.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+
+                if (string.IsNullOrEmpty(role))
+                {
+                    return null;
+                }
+
+                return role;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }

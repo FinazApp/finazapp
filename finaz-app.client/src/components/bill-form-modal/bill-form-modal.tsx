@@ -5,7 +5,7 @@ import Modal from "@mui/joy/Modal";
 import toast from "react-hot-toast";
 import Button from "@mui/joy/Button";
 import { Form, Formik } from "formik";
-import { ModalClose } from "@mui/joy";
+import ModalClose from "@mui/joy/ModalClose";
 import ModalDialog from "@mui/joy/ModalDialog";
 import DialogTitle from "@mui/joy/DialogTitle";
 import DialogContent from "@mui/joy/DialogContent";

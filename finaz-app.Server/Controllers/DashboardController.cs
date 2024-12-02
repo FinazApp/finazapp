@@ -2,11 +2,8 @@
 using finaz_app.Server.Models;
 using finaz_app.Server.Security.JWT;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.ComponentModel;
 
 namespace finaz_app.Server.Controllers
 {
@@ -28,7 +25,7 @@ namespace finaz_app.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetDashboardSummary(DateTime inicio, DateTime fin)
+        public async Task<IActionResult> PanelPrincipal(string inicioFecha, string finFecha)
         {
             var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
             if (userID == null)
@@ -38,41 +35,83 @@ namespace finaz_app.Server.Controllers
 
             try
             {
-                // Sumar los ingresos del usuario
-                var totalIngresos = await _context.Ingresos
+                // Parsear las fechas
+                var inicio = DateTime.ParseExact(inicioFecha, "dd/MM/yyyy", null);
+                var fin = DateTime.ParseExact(finFecha, "dd/MM/yyyy", null);
+
+                // Datos en el rango
+                var ingresosRango = await _context.Ingresos
                     .Where(i => i.CreadoPor == userID && !i.isDeleted && i.FechaCreacion >= inicio && i.FechaCreacion <= fin)
-                    .SumAsync(i => i.Monto);
+                    .ToListAsync();
 
-                // Sumar los gastos del usuario
-                var totalGastos = await _context.Gastos
+                var gastosRango = await _context.Gastos
                     .Where(g => g.CreadoPor == userID && !g.isDeleted && g.FechaCreacion >= inicio && g.FechaCreacion <= fin)
-                    .SumAsync(g => g.Monto);
+                    .ToListAsync();
 
-                // Calcular el balance actual
-                var balanceActual = totalIngresos - totalGastos;
+                // Datos fuera del rango (solo del pasado)
+                var ingresosPasado = await _context.Ingresos
+                    .Where(i => i.CreadoPor == userID && !i.isDeleted && i.FechaCreacion < inicio)
+                    .ToListAsync();
 
-                // calcular tendencia
+                var gastosPasado = await _context.Gastos
+                    .Where(g => g.CreadoPor == userID && !g.isDeleted && g.FechaCreacion < inicio)
+                    .ToListAsync();
 
-                var tendenciaActual = totalGastos > totalIngresos ? "Negativa" : "Positiva";
+                // Calcular totales y balance
+                var totalIngresosRango = ingresosRango.Sum(i => i.Monto);
+                var totalGastosRango = gastosRango.Sum(g => g.Monto);
+                var balanceRango = totalIngresosRango - totalGastosRango;
 
+                var totalIngresosPasado = ingresosPasado.Sum(i => i.Monto);
+                var totalGastosPasado = gastosPasado.Sum(g => g.Monto);
+                var balancePasado = totalIngresosPasado - totalGastosPasado;
+
+                // Calcular porcentajes de cambio
+                var cambioIngresos = CalcularCambioPorcentual(totalIngresosRango, totalIngresosPasado);
+                var cambioGastos = CalcularCambioPorcentual(totalGastosRango, totalGastosPasado);
+                var cambioBalance = CalcularCambioPorcentual(balanceRango, balancePasado);
+
+                // Últimos 10 movimientos
+                var ultimosMovimientos = ingresosRango
+                    .Select(i => new { i.Nombre, i.Monto, Tipo = "Ingreso", i.FechaCreacion })
+                    .Concat(gastosRango.Select(g => new { g.Nombre, g.Monto, Tipo = "Gasto", g.FechaCreacion }))
+                    .OrderByDescending(m => m.FechaCreacion)
+                    .Take(10)
+                    .ToList();
+
+                // Categorías usadas
+                var categoriasIngresos = ingresosRango
+                    .GroupBy(i => i.CategoriaId)
+                    .Select(g => new { Categoria = g.Key, Total = g.Count() })
+                    .ToList();
+
+                var categoriasGastos = gastosRango
+                    .GroupBy(g => g.CategoriaId)
+                    .Select(g => new { Categoria = g.Key, Total = g.Count() })
+                    .ToList();
+
+                var categoriasUsadas = categoriasIngresos.Concat(categoriasGastos)
+                    .GroupBy(c => c.Categoria)
+                    .Select(g => new { Categoria = g.Key, Total = g.Sum(x => x.Total) })
+                    .ToList();
+
+                // Respuesta
                 return Ok(new
                 {
-                    Dashboard = new
+                    Totales = new
                     {
-                        Balance = new
-                        {
-                            Value = balanceActual,
-                            Tendencia = tendenciaActual
-                        },
-                        Ingresos = new
-                        {
-                            Total = totalIngresos
-                        },
-                        Gastos = new
-                        {
-                            Total = totalGastos
-                        }
-                    }
+                        Ingresos = totalIngresosRango,
+                        Gastos = totalGastosRango,
+                        Balance = balanceRango
+                    },
+                    Porcentajes = new
+                    {
+                        Ingresos = cambioIngresos,
+                        Gastos = cambioGastos,
+                        Balance = cambioBalance
+                    },
+                    UltimosMovimientos = ultimosMovimientos,
+                    CategoriasUsadas = categoriasUsadas
                 });
             }
             catch (Exception ex)
@@ -81,101 +120,24 @@ namespace finaz_app.Server.Controllers
             }
         }
 
-        [HttpGet("ultimos-movimientos")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UltimosMovimientosUser(DateTime fechaInicio, DateTime fechaFin)
+        private static object CalcularCambioPorcentual(decimal actual, decimal pasado)
         {
-            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
-            if (userID == null)
-            {
-                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
-            }
+            // Si ambos valores son cero, el cambio porcentual es neutro.
+            if (pasado == 0 && actual == 0)
+                return new { Porcentaje = 0, Tipo = "Neutro" };
 
-            try
-            {
-                var ingresos = await _context.Ingresos
-                    .Where(i => i.CreadoPor == userID && !i.isDeleted && i.FechaCreacion >= fechaInicio && i.FechaCreacion <= fechaFin)
-                    .OrderByDescending(i => i.FechaCreacion)
-                    .Take(5)
-                    .ToListAsync();
+            // Si el pasado es cero y el actual no lo es, el porcentaje es 100% positivo o negativo
+            if (pasado == 0)
+                return new { Porcentaje = 100, Tipo = actual > 0 ? "Positivo" : "Negativo" };
 
-                var gastos = await _context.Gastos
-                    .Where(g => g.CreadoPor == userID && !g.isDeleted && g.FechaCreacion >= fechaInicio && g.FechaCreacion <= fechaFin)
-                    .OrderByDescending(g => g.FechaCreacion)
-                    .Take(5)
-                    .ToListAsync();
+            // Calcular el porcentaje de cambio
+            var cambio = ((actual - pasado) / Math.Abs(pasado)) * 100;
 
-                var resultados = new
-                {
-                    Ingresos = new
-                    {
-                        Values = ingresos
-                    },
-                    Gastos = new
-                    {
-                        Values = gastos
-                    }
-                };
+            // Determinar si es positivo o negativo con base en el signo del cambio y el balance actual
+            var tipo = cambio >= 0 ? "Positivo" : "Negativo";
 
-                return Ok(resultados);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error en la API: {ex.Message}");
-            }
+            return new { Porcentaje = Math.Round(cambio, 2), Tipo = tipo };
         }
 
-        /*
-         * tomar todas las categorias de un usuario, ver cuantas cosas tiene el usuario asociado a esa categoria**/
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> TotalUserRelations()
-        {
-            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
-            if (userID == null)
-            {
-                return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
-            }
-
-            var ingresos = await _context.Ingresos
-            .Where(i => i.CreadoPor == userID && !i.isDeleted)
-            .GroupBy(i => i.CategoriaId)
-            .Select(g => new
-            {
-                Categoria = g.Key,
-                TotalRelaciones = g.Count()
-            })
-            .ToListAsync();
-
-            var gastos = await _context.Gastos
-            .Where(i => i.CreadoPor == userID && !i.isDeleted)
-            .GroupBy(i => i.CategoriaId)
-            .Select(g => new
-            {
-                Categoria = g.Key,
-                TotalRelaciones = g.Count()
-            })
-            .ToListAsync();
-
-            var resultado = new
-            {
-               Ingresos = new
-               {
-                 Values = ingresos
-               },
-
-               Gastos = new
-               {
-                 Values = gastos
-               }
-            };
-
-            return Ok(resultado);
-        }
     }
 }

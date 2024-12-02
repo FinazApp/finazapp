@@ -29,7 +29,7 @@ const InputField = ({
   }, [error, touched]);
 
   return (
-    <FormControl error={invalid}>
+    <FormControl sx={{ flex: 1 }} error={invalid}>
       <FormLabel>{label}</FormLabel>
       <Input
         {...field}
