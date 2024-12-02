@@ -17,6 +17,7 @@ namespace finaz_app.Server.Models.DTOs
             CreateMap<Gasto, GastosDTO>();
             CreateMap<Ingreso, IngresosDTO>().ReverseMap();
             CreateMap<Categoria, CategoriasDTO>().ReverseMap();
+            CreateMap<MetaAhorro, MetasAhorroDTO>();
         }
     }
 }

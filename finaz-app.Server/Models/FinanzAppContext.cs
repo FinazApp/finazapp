@@ -23,6 +23,8 @@ namespace finaz_app.Server.Models
 
         public virtual DbSet<Usuario> Usuarios { get; set; }
 
+        public virtual DbSet<MetaAhorro> MetasAhorro { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
                 => optionsBuilder.UseSqlServer("Name=ConnectionStrings:AppConnection");
 
@@ -115,6 +117,33 @@ namespace finaz_app.Server.Models
                 entity.Property(e => e.Rol)
                     .HasMaxLength(10)
                     .HasDefaultValue("usuario");
+            });
+
+            modelBuilder.Entity<MetaAhorro>(entity =>
+            {
+                entity.HasKey(e => e.MetaId).HasName("MA_MetaId_PK");
+
+                entity.Property(e => e.MetaId).HasColumnName("MetaId");
+                entity.Property(e => e.Nombre).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.MontoObjetivo).HasColumnType("decimal(18, 2)").IsRequired();
+                entity.Property(e => e.MontoAhorrado).HasColumnType("decimal(18, 2)").HasDefaultValue(0);
+                entity.Property(e => e.FechaMeta).HasColumnType("date").IsRequired();
+                entity.Property(e => e.isDeleted).IsRequired().HasDefaultValue(false);
+                entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(GETDATE())");
+                entity.Property(e => e.FechaModificado).HasDefaultValueSql("(GETDATE())");
+
+                entity.HasOne(d => d.CreadoPorNavigation)
+                    .WithMany(p => p.MetaAhorroCreadoPorNavigations)
+                    .HasForeignKey(d => d.CreadoPor)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("MA_USR_CreadoPor_FK");
+
+                entity.HasOne(d => d.ModificadoPorNavigation)
+                    .WithMany(p => p.MetaAhorroModificadoPorNavigations)
+                    .HasForeignKey(d => d.ModificadoPor)
+                    .HasConstraintName("MA_USR_ModificadoPor_FK");
+
+                entity.HasCheckConstraint("CHK_MontoAhorrado", "[MontoAhorrado] <= [MontoObjetivo]");
             });
 
             OnModelCreatingPartial(modelBuilder);

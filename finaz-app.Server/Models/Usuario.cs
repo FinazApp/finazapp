@@ -34,5 +34,11 @@ namespace finaz_app.Server.Models
 
         [JsonIgnore]
         public virtual ICollection<Ingreso> IngresoModificadoPorNavigations { get; set; } = new List<Ingreso>();
+        
+        [JsonIgnore]
+        public virtual ICollection<MetaAhorro> MetaAhorroCreadoPorNavigations { get; set; } = new List<MetaAhorro>();
+
+        [JsonIgnore]
+        public virtual ICollection<MetaAhorro> MetaAhorroModificadoPorNavigations { get; set; } = new List<MetaAhorro>();
     }
 }
