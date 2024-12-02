@@ -2,6 +2,7 @@ export const BILLS = "BILLS";
 export const USERS = "USERS";
 export const INCOMES = "INCOMES";
 export const USER_ME = "USER_ME";
+export const SAVINGS = "SAVINGS";
 export const CATEGORIES = "CATEGORIES";
 export const LOGIN_USER = "LOGIN_USER";
 export const LOGOUT_USER = "LOGOUT_USER";

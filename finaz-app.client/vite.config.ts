@@ -49,6 +49,9 @@ export default defineConfig(({ mode }) => {
                 env.SERVER_URL,
             ),
         },
+        optimizeDeps: {
+            include: ['@emotion/styled'],
+        },
         plugins: [plugin(), tsconfigPaths({ root: './' })],
         resolve: {
             alias: {

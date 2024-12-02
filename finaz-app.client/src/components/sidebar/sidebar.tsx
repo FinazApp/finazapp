@@ -21,6 +21,7 @@ import {
   IconPigMoney,
   IconUsers,
   IconCash,
+  IconFlag,
 } from "@tabler/icons-react";
 import { useAuth } from "@contexts";
 
@@ -120,11 +121,7 @@ const Sidebar = () => {
             <NavLink to="/" title="Inicio" icon={IconHome2} />
             <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
             <NavLink to="/bills" title="Gastos" icon={IconCurrencyDollar} />
-            <NavLink
-              to="/bills"
-              title="Metas de ahorros"
-              icon={IconCurrencyDollar}
-            />
+            <NavLink to="/savings" title="Metas de ahorros" icon={IconFlag} />
             <Divider />
             <NavLink to="/categories" title="Categorías" icon={IconCategory} />
             <NavLink to="/users" title="Usuarios" icon={IconUsers} />

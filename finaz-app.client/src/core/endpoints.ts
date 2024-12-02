@@ -1,6 +1,7 @@
 export const BILLS = "Gastos";
 export const USERS = "Usuarios";
 export const INCOMES = "Ingresos";
+export const SAVINGS = "MetasAhorro";
 export const USER_ME = "Usuarios/Me";
 export const CATEGORIES = "Categorias";
 export const LOGIN_USER = "Auth/Login";

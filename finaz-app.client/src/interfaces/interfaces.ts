@@ -92,3 +92,12 @@ export interface IDashboardBalance {
     }[];
     categoriasUsadas: { categoria: number, total: number }[]
 }
+
+export interface ISavingGoal {
+    metaId: number;
+    nombre: string;
+    fechaMeta: string;
+    isDeleted: boolean;
+    montoObjetivo: number;
+    montoAhorrado: number;
+}
