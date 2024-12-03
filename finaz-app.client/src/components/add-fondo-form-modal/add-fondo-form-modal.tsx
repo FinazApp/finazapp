@@ -10,7 +10,7 @@ import ModalClose from "@mui/joy/ModalClose";
 import ModalDialog from "@mui/joy/ModalDialog";
 import DialogTitle from "@mui/joy/DialogTitle";
 import DialogContent from "@mui/joy/DialogContent";
-import { useAddFondoSaving, useFetchOneSaving } from "@hooks";
+import { useAddFondoSaving, useFetchBalance, useFetchOneSaving } from "@hooks";
 import { ISavingGoal, ISavingGoalUpdateMonto } from "@interfaces";
 
 export interface IAddFondoFormModalProps {
@@ -50,6 +50,8 @@ const AddFondoFormModal = ({ id, open, onClose }: IAddFondoFormModalProps) => {
   const saving = useFetchOneSaving(id);
   const addFondo = useAddFondoSaving();
 
+  const balance = useFetchBalance();
+
   const initialValues = React.useMemo(() => {
     if (saving.data && id) {
       return model.from(saving.data);
@@ -74,6 +76,13 @@ const AddFondoFormModal = ({ id, open, onClose }: IAddFondoFormModalProps) => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={(values, actions) => {
+            if (values.nuevoFondo > (balance.data ?? 0)) {
+              actions.setErrors({
+                nuevoFondo: "El monto agregado es mayor al balance.",
+              });
+              return;
+            }
+
             return toast.promise(
               addFondo.mutateAsync(model.to(values), {
                 onSettled: () => {
@@ -106,6 +115,10 @@ const AddFondoFormModal = ({ id, open, onClose }: IAddFondoFormModalProps) => {
                   name="nuevoFondo"
                   label="Nuevo fondo"
                   placeholder="Ingresa el monto a llegar en esta meta."
+                  helperText={`Balance actual: ${new Intl.NumberFormat(
+                    "es-DO",
+                    { style: "currency", currency: "DOP" }
+                  ).format(balance.data ?? 0)}`}
                 />
               </Stack>
               <Button type="submit" loading={isPending} fullWidth>

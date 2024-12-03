@@ -2,18 +2,6 @@ import React from "react";
 import { IUser } from "@interfaces";
 import toast from "react-hot-toast";
 import { useFetchUserMe, useLogout } from "@hooks";
-import { createBrowserRouter } from "react-router-dom";
-import { ErrorBoundary, MainLayout } from "@components";
-import { RouteObject, RouterProvider } from "react-router";
-import {
-  DashboardPage,
-  IncomesPage,
-  BillsPage,
-  RegisterPage,
-  LoginPage,
-  CategoriesPage,
-  SavingsPage,
-} from "@pages";
 
 interface IAuthContextProps {
   isLogged: boolean;
@@ -47,7 +35,7 @@ const AuthContext = React.createContext<IAuthContextProps>({
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => React.useContext(AuthContext);
 
-const Provider = () => {
+const Provider = ({ children }: React.PropsWithChildren) => {
   const [state, dispatch] = React.useReducer(reducer, {
     user: null,
   });
@@ -70,55 +58,6 @@ const Provider = () => {
     });
   }, [logoutUser]);
 
-  const routes: RouteObject[] = React.useMemo(
-    () => [
-      {
-        path: "/",
-        element: <MainLayout withOutlet />,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "",
-            index: true,
-            id: "dashboard-page",
-            element: <DashboardPage />,
-          },
-          {
-            path: "incomes",
-            id: "incomes-page",
-            element: <IncomesPage />,
-          },
-          {
-            path: "categories",
-            id: "categories-page",
-            element: <CategoriesPage />,
-          },
-          {
-            path: "bills",
-            id: "bills-page",
-            element: <BillsPage />,
-          },
-          {
-            path: "savings",
-            id: "savings-page",
-            element: <SavingsPage />,
-          },
-        ],
-      },
-      {
-        id: "register-page",
-        path: "register",
-        element: <RegisterPage />,
-      },
-      {
-        id: "login-page",
-        path: "login",
-        element: <LoginPage />,
-      },
-    ],
-    []
-  );
-
   return (
     <AuthContext.Provider
       value={{
@@ -127,11 +66,9 @@ const Provider = () => {
         isLogged: !!Object.keys(state?.user ?? {}).length,
       }}
     >
-      {userMe.isPending && !userMe.data ? (
-        "Cargando datos del usuario..."
-      ) : (
-        <RouterProvider router={createBrowserRouter(routes)} />
-      )}
+      {userMe.isPending && !userMe.data
+        ? "Cargando datos del usuario..."
+        : children}
     </AuthContext.Provider>
   );
 };

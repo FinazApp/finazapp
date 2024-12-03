@@ -14,7 +14,13 @@ export interface IUser {
     rol: string;
     nombre: string;
     usuarioId: number;
+    fotoPerfil: string;
     correoElectronico: string;
+}
+
+export interface IUserChangeRole {
+    action: "Promote" | "Degrade";
+    usuarioId: number;
 }
 
 export interface ICategory {
@@ -105,4 +111,20 @@ export interface ISavingGoal {
 export interface ISavingGoalUpdateMonto {
     metaId: number;
     nuevoFondo: number;
+}
+
+export interface IRecomendacion {
+    totalGastos: number;
+    totalAhorros: number;
+    totalIngresos: number;
+    recomendacionGasto: string;
+    recomendacionDeuda: string;
+    recomendacionAhorro: string;
+    recomendacionIngreso: string;
+    recomendacionIngresoMensual: string;
+    recomendacionGastosPorCategoria: {
+        categoria: string;
+        recomendacion: string;
+        porcentajeGasto: number;
+    }[]
 }

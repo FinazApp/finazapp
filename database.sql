@@ -1,5 +1,6 @@
 CREATE TABLE Usuarios (
     UsuarioId INT PRIMARY KEY IDENTITY(1,1),
+    FotoPerfil VARBINARY(MAX),
     Nombre NVARCHAR(100) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     CorreoElectronico NVARCHAR(100) NOT NULL UNIQUE,

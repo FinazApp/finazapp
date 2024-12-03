@@ -32,6 +32,10 @@ const SavingsApi = {
         const result = await API().get<ISavingGoal>(`${Endpoints.SAVINGS}/${id}`);
         return result.data;
     },
+    balance: async () => {
+        const result = await API().get<number>(Endpoints.SAVINGS_BALANCE);
+        return result.data;
+    },
 }
 
 export default SavingsApi;

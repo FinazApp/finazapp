@@ -27,6 +27,12 @@ namespace finaz_app.Server.Controllers
             _mapper = mapper;
         }
 
+        public class UsuarioAction
+        {
+            public int UsuarioId { get; set; }
+            public required string Action { get; set; }
+        }
+
         /// <summary>
         /// Obtiene todos los usuarios.
         /// </summary>
@@ -49,6 +55,68 @@ namespace finaz_app.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Promueve o degrada a un usuario de su rol.
+        /// </summary>
+        [HttpPost("ChangeRole")]
+        [Authorize(Roles = "admin")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<string>> ChangeRole([FromBody] UsuarioAction action)
+        {
+            try
+            {
+                // Validar el ID del usuario desde el JWT
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                // Buscar el usuario en la base de datos
+                var existingUser = await _context.Usuarios.FindAsync(action.UsuarioId);
+                if (existingUser == null)
+                {
+                    return NotFound("Usuario no encontrado.");
+                }
+
+                // Validar las acciones y roles
+                if (action.Action == "Promote")
+                {
+                    if (existingUser.Rol == "admin")
+                    {
+                        return BadRequest("No se puede promover a un usuario que ya es admin.");
+                    }
+                    existingUser.Rol = "admin";
+                }
+                else if (action.Action == "Degrade")
+                {
+                    if (existingUser.Rol == "User")
+                    {
+                        return BadRequest("No se puede degradar a un usuario que ya tiene el rol de User.");
+                    }
+                    existingUser.Rol = "User";
+                }
+                else
+                {
+                    return BadRequest("La acción especificada no es válida. Use 'Promote' o 'Degrade'.");
+                }
+
+                // Marcar el usuario como modificado y guardar cambios
+                _context.Entry(existingUser).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok($"El rol del usuario con ID {action.UsuarioId} se ha actualizado a {existingUser.Rol}.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al procesar la solicitud: {ex.Message}");
+            }
+        }
+
 
         /// <summary>
         /// Obtiene un usuario específico por ID.
@@ -82,6 +150,7 @@ namespace finaz_app.Server.Controllers
                     Rol = usuario.Rol,
                     Nombre = usuario.Nombre,
                     UsuarioId = usuario.UsuarioId,
+                    FotoPerfil = usuario.FotoPerfil,
                     CorreoElectronico = usuario.CorreoElectronico,
                 };
 
@@ -135,6 +204,7 @@ namespace finaz_app.Server.Controllers
 
                 existingUser.Nombre = request.Nombre;
                 existingUser.CorreoElectronico = request.CorreoElectronico;
+                existingUser.FotoPerfil = request.FotoPerfil;
 
                 // Marcar el usuario como modificado en el contexto
                 _context.Entry(existingUser).State = EntityState.Modified;

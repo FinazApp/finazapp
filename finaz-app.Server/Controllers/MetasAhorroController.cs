@@ -299,6 +299,46 @@ namespace finaz_app.Server.Controllers
         }
 
         /// <summary>
+        /// Consulta si el usuario tiene balance.
+        /// </summary>
+        [HttpGet("ConsultaBalance")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ConsultaBalance()
+        {
+            try
+            {
+                var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+                if (userID == null)
+                {
+                    return Unauthorized("No se ha proporcionado un JWT válido o el ID de usuario no es válido.");
+                }
+
+                // Datos en el rango
+                var ingresos = (await _context.Ingresos
+                    .Where(i => i.CreadoPor == userID && !i.isDeleted)
+                    .ToListAsync()).Sum(i => i.Monto);
+
+                var gastos = (await _context.Gastos
+                    .Where(g => g.CreadoPor == userID && !g.isDeleted)
+                    .ToListAsync()).Sum(i => i.Monto);
+
+                var metasAhorros = (await _context.MetasAhorro
+                    .Where(g => g.CreadoPor == userID && !g.isDeleted)
+                    .ToListAsync()).Sum(i => i.MontoAhorrado);
+
+                var balanceRango = (ingresos - gastos) - metasAhorros;
+
+                return Ok(balanceRango);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error al obtener el usuario: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Verifica si una meta de ahorro existe en la base de datos.
         /// </summary>
         private bool MetaAhorroExists(int id)

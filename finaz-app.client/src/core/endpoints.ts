@@ -10,3 +10,6 @@ export const REGISTER_USER = "Auth/Register";
 export const REPORT_CSV = "Reports/reporte-csv";
 export const SAVINGS_FONDO = "MetasAhorro/AddFondo";
 export const DASHBOARD_SUMMARY = "Dashboard/Summary";
+export const USER_CHANGE_ROLE = "Usuarios/ChangeRole";
+export const RECOMENDACIONES = "Recomendaciones/generar";
+export const SAVINGS_BALANCE = "MetasAhorro/ConsultaBalance";

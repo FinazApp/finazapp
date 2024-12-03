@@ -10,6 +10,8 @@ namespace finaz_app.Server.Models
 
         public required string Nombre { get; set; }
 
+        public string? FotoPerfil { get; set; }
+
         public required string CorreoElectronico { get; set; }
 
         public required string PasswordHash { get; set; }
