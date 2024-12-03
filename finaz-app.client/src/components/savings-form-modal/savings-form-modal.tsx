@@ -21,7 +21,7 @@ export interface ISavingsFormModalProps {
   onClose: () => void;
 }
 
-type FormValues = ISavingGoal
+type FormValues = ISavingGoal;
 
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Nombre requerido"),
@@ -137,8 +137,8 @@ const SavingsFormModal = ({ id, open, onClose }: ISavingsFormModalProps) => {
               <Stack sx={{ mt: 2 }}>
                 <InputField
                   type="number"
-                  name="montoObjetivo"
                   label="Objetivo"
+                  name="montoObjetivo"
                   placeholder="Ingresa el monto a llegar en esta meta."
                 />
               </Stack>

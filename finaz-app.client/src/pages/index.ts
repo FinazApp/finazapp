@@ -1,7 +1,9 @@
+export { UsersPage } from "./users";
+export { StatePage } from "./state";
 export { LoginPage } from "./login";
 export { BillsPage } from "./bills";
 export { IncomesPage } from "./incomes";
-export { RegisterPage } from "./register";
 export { SavingsPage } from "./savings";
-export { CategoriesPage } from "./categories";
+export { RegisterPage } from "./register";
 export { DashboardPage } from "./dashboard";
+export { CategoriesPage } from "./categories";

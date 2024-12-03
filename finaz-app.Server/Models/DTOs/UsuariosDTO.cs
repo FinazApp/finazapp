@@ -9,5 +9,6 @@
         public required string Nombre { get; set; }
         public required string CorreoElectronico { get; set; }
         public string Rol { get; set; }
+        public string FotoPerfil { get; set; }
     }
 }

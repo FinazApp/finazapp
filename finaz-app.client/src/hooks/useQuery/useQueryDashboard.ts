@@ -8,3 +8,10 @@ export const useFetchDashboardSummary = (startDate: string, endDate: string) => 
     queryFn: () => DashboardApi.summary(startDate, endDate),
   });
 };
+
+export const useFetchRecomendacion = () => {
+  return useQuery({
+    queryKey: [Tags.RECOMENDACIONES],
+    queryFn: DashboardApi.recomendaciones
+  });
+};

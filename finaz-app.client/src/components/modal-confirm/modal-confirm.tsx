@@ -13,6 +13,8 @@ export interface IModalConfirmProps {
   confirmText?: string;
   onClose?: () => void;
   onConfirm: () => void;
+  deleteIcon?: string;
+  restoreIcon?: string;
   type: "delete" | "restore";
 }
 
@@ -24,15 +26,17 @@ const ModalConfirm = ({
   onConfirm,
   confirmText,
   description,
+  deleteIcon = "ti ti-alert-triangle",
+  restoreIcon = "ti ti-plug",
 }: IModalConfirmProps) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog variant="outlined" role="alertdialog">
         <DialogTitle>
           {type === "delete" ? (
-            <i className="ti ti-alert-triangle" style={{ width: 24, height: 24 }}></i>
+            <i className={deleteIcon} style={{ fontSize: 24 }}></i>
           ) : (
-            <i className="ti ti-plug" style={{ width: 24, height: 24 }}></i>
+            <i className={restoreIcon} style={{ fontSize: 24 }}></i>
           )}
           {title}
         </DialogTitle>
