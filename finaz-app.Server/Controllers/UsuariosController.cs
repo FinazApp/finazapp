@@ -214,5 +214,93 @@ namespace finaz_app.Server.Controllers
                 return false;
             }
         }
+
+        [HttpGet("profile/photo")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetProfilePhoto()
+        {
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido.");
+            }
+
+            var user = await _context.Usuarios.FindAsync(userID);
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            return Ok(new { FotoPerfil = user.FotoPerfil });
+        }
+        [HttpPut("profile/photo")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateProfilePhoto([FromBody] string base64Photo)
+        {
+            var userID = JwtHelper.ObtenerIdDeJwt(HttpContext);
+            if (userID == null)
+            {
+                return Unauthorized("No se ha proporcionado un JWT válido.");
+            }
+
+            var user = await _context.Usuarios.FindAsync(userID);
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            try
+            {
+                user.FotoPerfil = base64Photo;
+                await _context.SaveChangesAsync();
+                return Ok("Foto de perfil actualizada correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar la foto de perfil: {ex.Message}");
+            }
+        }
+        
+        [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            // Validar el modelo de entrada
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Verificar si el correo ya está registrado
+            var existingUser = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.CorreoElectronico == request.Correo);
+            if (existingUser != null)
+            {
+                return Conflict("El correo electrónico ya está en uso.");
+            }
+
+            // Crear un nuevo usuario con los datos de la solicitud
+            var newUser = new Usuario
+            {
+                Nombre = request.Nombre,
+                CorreoElectronico = request.Correo,
+                Rol = "User", // Por defecto el rol es "User"
+                FotoPerfil = "data:image/png;base64,...", // Base64 de la foto predeterminada (ajustar según sea necesario)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password) // Hash de la contraseña
+            };
+
+            // Agregar el nuevo usuario a la base de datos
+            _context.Usuarios.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            // Retornar la respuesta con la ubicación del nuevo recurso
+            return CreatedAtAction(nameof(GetUserById), new { id = newUser.UsuarioId }, newUser);
+        }
+
     }
 }

@@ -14,6 +14,8 @@ namespace finaz_app.Server.Models
 
         public required string PasswordHash { get; set; }
 
+        public string FotoPerfil { get; set; }
+        
         [JsonIgnore]
         public string Rol { get; set; } = "User";
 
