@@ -51,12 +51,28 @@ namespace finaz_app.Server.Controllers
         }
         
         [HttpGet("{id}")]
-        public async Task<UsuarioDTO> GetUserById(int id)
+        public async Task<ActionResult<UsuariosDTO>> GetUserById(int id)
         {
             // Lógica para obtener un usuario por ID.
             var user = await _context.Usuarios.FindAsync(id);
-            return user != null ? new UsuarioDTO { UsuarioId = user.UsuarioId, Nombre = user.Nombre, CorreoElectronico = user.CorreoElectronico } : null;
+            
+            if (user == null)
+            {
+                return NotFound(); // Retorna 404 si no se encuentra el usuario.
+            }
+
+            // Mapea el objeto Usuario a un DTO.
+            var userDTO = new UsuariosDTO
+            {
+                UsuarioId = user.UsuarioId,
+                Nombre = user.Nombre,
+                CorreoElectronico = user.CorreoElectronico,
+                Rol = user.Rol // Puedes incluir esta propiedad si consideras que es segura para exponer.
+            };
+
+            return Ok(userDTO);
         }
+
 
         /// <summary>
         /// Obtiene un usuario específico por ID.
@@ -276,7 +292,7 @@ namespace finaz_app.Server.Controllers
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] Usuario request)
         {
             // Validar el modelo de entrada
             if (!ModelState.IsValid)
@@ -286,7 +302,7 @@ namespace finaz_app.Server.Controllers
 
             // Verificar si el correo ya está registrado
             var existingUser = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.CorreoElectronico == request.Correo);
+                .FirstOrDefaultAsync(u => u.CorreoElectronico == request.CorreoElectronico);
             if (existingUser != null)
             {
                 return Conflict("El correo electrónico ya está en uso.");
@@ -296,9 +312,9 @@ namespace finaz_app.Server.Controllers
             var newUser = new Usuario
             {
                 Nombre = request.Nombre,
-                CorreoElectronico = request.Correo,
+                CorreoElectronico = request.CorreoElectronico,
                 Rol = "User", // Por defecto el rol es "User"
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password) // Hash de la contraseña
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash) // Hash de la contraseña
             };
 
             // Agregar el nuevo usuario a la base de datos

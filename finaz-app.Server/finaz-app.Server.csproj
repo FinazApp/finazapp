@@ -36,10 +36,6 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
-  
-  <ItemGroup>
-      <Compile Include="Server\Models\DTOs\UsuariosDTO.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\reportes\" />
