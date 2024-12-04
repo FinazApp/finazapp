@@ -8,6 +8,7 @@
         public int UsuarioId { get; set; }
         public required string Nombre { get; set; }
         public required string CorreoElectronico { get; set; }
-        public string Rol { get; set; }
+        public string Rol { get; set; } = string.Empty;
+        public string? FotoPerfil { get; set; }
     }
 }
