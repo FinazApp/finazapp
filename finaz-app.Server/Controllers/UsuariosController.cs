@@ -49,6 +49,14 @@ namespace finaz_app.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error en la obtención de datos: {ex.Message}");
             }
         }
+        
+        [HttpGet("{id}")]
+        public async Task<UsuarioDTO> GetUserById(int id)
+        {
+            // Lógica para obtener un usuario por ID.
+            var user = await _context.Usuarios.FindAsync(id);
+            return user != null ? new UsuarioDTO { UsuarioId = user.UsuarioId, Nombre = user.Nombre, CorreoElectronico = user.CorreoElectronico } : null;
+        }
 
         /// <summary>
         /// Obtiene un usuario específico por ID.
@@ -264,7 +272,7 @@ namespace finaz_app.Server.Controllers
                 return StatusCode(500, $"Error al actualizar la foto de perfil: {ex.Message}");
             }
         }
-        
+
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -290,7 +298,6 @@ namespace finaz_app.Server.Controllers
                 Nombre = request.Nombre,
                 CorreoElectronico = request.Correo,
                 Rol = "User", // Por defecto el rol es "User"
-                FotoPerfil = "data:image/png;base64,...", // Base64 de la foto predeterminada (ajustar según sea necesario)
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password) // Hash de la contraseña
             };
 
