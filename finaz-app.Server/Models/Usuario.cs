@@ -15,8 +15,6 @@ namespace finaz_app.Server.Models
         public required string CorreoElectronico { get; set; }
 
         public required string PasswordHash { get; set; }
-
-        public string FotoPerfil { get; set; } = "default.png";
         
         [JsonIgnore]
         public string Rol { get; set; } = "User";
