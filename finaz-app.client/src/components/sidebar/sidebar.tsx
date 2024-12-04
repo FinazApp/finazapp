@@ -114,14 +114,26 @@ const Sidebar = () => {
               icon={<i className="ti ti-home-2" style={{ fontSize: 20 }}></i>}
             />
             <NavLink
+              to="/state"
+              title="Estado"
+              icon={<i className="ti ti-activity" style={{ fontSize: 20 }}></i>}
+            />
+            <NavLink
               to="/incomes"
               title="Ingresos"
-              icon={<i className="ti ti-pig-money" style={{ fontSize: 20 }}></i>}
+              icon={
+                <i className="ti ti-pig-money" style={{ fontSize: 20 }}></i>
+              }
             />
             <NavLink
               to="/bills"
               title="Gastos"
-              icon={<i className="ti ti-currency-dollar" style={{ fontSize: 20 }}></i>}
+              icon={
+                <i
+                  className="ti ti-currency-dollar"
+                  style={{ fontSize: 20 }}
+                ></i>
+              }
             />
             <NavLink
               to="/savings"
@@ -134,19 +146,25 @@ const Sidebar = () => {
               title="Categorías"
               icon={<i className="ti ti-category" style={{ fontSize: 20 }}></i>}
             />
-            <NavLink
-              to="/users"
-              title="Usuarios"
-              icon={<i className="ti ti-users" style={{ fontSize: 20 }}></i>}
-            />
+            {user?.rol === "admin" && (
+              <NavLink
+                to="/users"
+                title="Usuarios"
+                icon={<i className="ti ti-users" style={{ fontSize: 20 }}></i>}
+              />
+            )}
           </List>
         </Box>
         <Divider />
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Avatar
-            variant="outlined"
             size="sm"
-            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+            variant="outlined"
+            alt="FotoPerfilUsuario"
+            src={
+              user?.fotoPerfil ??
+              "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
+            }
           />
           <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography level="title-sm">{user?.nombre ?? ""}</Typography>

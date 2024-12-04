@@ -16,3 +16,11 @@ export const useFetchOneSaving = (id: number) => {
     queryFn: () => SavingsApi.getById(id),
   });
 };
+
+export const useFetchBalance = () => {
+  return useQuery({
+    refetchInterval: 10000,
+    queryFn: SavingsApi.balance,
+    queryKey: [Tags.SAVINGS_BALANCE],
+  });
+};

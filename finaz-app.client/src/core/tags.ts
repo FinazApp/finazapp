@@ -9,6 +9,9 @@ export const LOGIN_USER = "LOGIN_USER";
 export const LOGOUT_USER = "LOGOUT_USER";
 export const REGISTER_USER = "REGISTER_USER";
 export const SAVINGS_FONDO = "SAVINGS_FONDO";
+export const RECOMENDACIONES = "RECOMENDACIONES";
+export const SAVINGS_BALANCE = "SAVINGS_BALANCE";
+export const USER_CHANGE_ROLE = "USER_CHANGE_ROLE";
 export const DASHBOARD_SUMMARY = "DASHBOARD_SUMMARY";
 
 //--------------------------------------------------------------------------------------//

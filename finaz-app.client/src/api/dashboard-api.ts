@@ -1,5 +1,5 @@
 import { Endpoints } from "@core";
-import { IDashboardBalance } from "@interfaces";
+import { IDashboardBalance, IRecomendacion } from "@interfaces";
 
 import API from "./api";
 
@@ -10,6 +10,10 @@ const DashboardApi = {
     },
     generateReport: async ({ startDate, endDate }: { startDate: string, endDate: string }) => {
         const result = await API().post<{ url: string }>(`${Endpoints.REPORT_CSV}?inicioFecha=${startDate}&finFecha=${endDate}`);
+        return result.data;
+    },
+    recomendaciones: async () => {
+        const result = await API().get<IRecomendacion>(Endpoints.RECOMENDACIONES);
         return result.data;
     },
 }

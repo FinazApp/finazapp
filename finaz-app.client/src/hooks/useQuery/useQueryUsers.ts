@@ -8,3 +8,10 @@ export const useFetchUserMe = () => {
     queryKey: [Tags.USER_ME],
   });
 };
+
+export const useFetchUsers = () => {
+  return useQuery({
+    queryFn: UsersApi.getAll,
+    queryKey: [Tags.USERS],
+  });
+};

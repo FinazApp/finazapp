@@ -52,15 +52,18 @@ namespace finaz_app.Server.Controllers
                     return NotFound("Usuario no encontrado.");
                 }
 
-                var ingresos = await _appContext.Ingresos
+                var totalIngresos = (await _appContext.Ingresos
                     .Where(i => i.CreadoPor == usuario.UsuarioId && !i.isDeleted)
-                    .ToListAsync();
+                    .ToListAsync()).Sum(i => i.Monto);
+
+                var totalAhorros = (await _appContext.MetasAhorro
+                    .Where(i => i.CreadoPor == usuario.UsuarioId && !i.isDeleted)
+                    .ToListAsync()).Sum(i => i.MontoAhorrado);
 
                 var gastos = await _appContext.Gastos
                     .Where(g => g.CreadoPor == usuario.UsuarioId && !g.isDeleted)
                     .ToListAsync();
 
-                decimal totalIngresos = ingresos.Sum(i => i.Monto);
                 decimal totalGastos = gastos.Sum(g => g.Monto);
 
                 var categoriasGastos = await _appContext.Categorias
@@ -70,8 +73,9 @@ namespace finaz_app.Server.Controllers
                 var recomendaciones = new
                 {
                     mensaje = "Aquí están tus recomendaciones financieras basadas en tus ingresos y gastos.",
-                    totalIngresos,
                     totalGastos,
+                    totalAhorros,
+                    totalIngresos,
                     recomendacionIngreso = totalIngresos < 1000 ? "Considera aumentar tus ingresos. Busca formas de diversificar tus fuentes de ingresos." : "Tus ingresos son estables. Sigue manteniéndolos y busca formas de incrementarlos con el tiempo.",
                     recomendacionGasto = totalGastos > totalIngresos ? "Estás gastando más de lo que ingresas. Considera ajustar tus hábitos de gasto." : "Tus gastos están equilibrados, pero sigue monitoreando tus gastos para mantener este balance.",
                     recomendacionAhorro = totalGastos < totalIngresos ? "¡Excelente! Podrías empezar a ahorrar o invertir el excedente para mejorar tu futuro financiero." : "Intenta reducir tus gastos para ahorrar algo de dinero cada mes. Es fundamental crear un fondo de emergencia.",

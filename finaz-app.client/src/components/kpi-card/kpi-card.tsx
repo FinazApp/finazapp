@@ -1,5 +1,4 @@
 import React from "react";
-import millify from "millify";
 import { PercentageKpi } from "@interfaces";
 import Typography from "@mui/joy/Typography";
 import CardContent from "@mui/joy/CardContent";
@@ -26,7 +25,12 @@ const KPICard = ({ title, value, data, color = "primary" }: IKPICardProps) => {
         </CircularProgress>
         <CardContent>
           <Typography level="body-md">{title}</Typography>
-          <Typography level="h2">{millify(value, { precision: 2 })}</Typography>
+          <Typography level="h2">
+            {new Intl.NumberFormat("es-DO", {
+              style: "currency",
+              currency: "DOP",
+            }).format(value)}
+          </Typography>
         </CardContent>
       </CardContent>
     </Card>

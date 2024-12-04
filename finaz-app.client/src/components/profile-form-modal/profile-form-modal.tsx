@@ -22,22 +22,25 @@ export interface IProfileFormModalProps {
 
 type FormValues = {
   nombre: string;
+  fotoPerfil: string;
   correoElectronico: string;
 };
 
 const validationSchema = Yup.object({
   nombre: Yup.string().required("Nombre requerido"),
-  correoElectronico: Yup.string().required("Correo electrónico requerida"),
+  fotoPerfil: Yup.string().required("Foto de perfil requerida"),
+  correoElectronico: Yup.string().required("Correo electrónico requerido"),
 });
 
 const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
-  const { user } = useAuth();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { user, logout } = useAuth();
 
   const updateUser = useUpdateUser();
 
   const initialValues = React.useMemo(() => {
     if (user) return user;
-    return { nombre: "", correoElectronico: "", rol: "" };
+    return { nombre: "", correoElectronico: "", fotoPerfil: "", rol: "" };
   }, [user]);
 
   return (
@@ -58,13 +61,15 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                 },
                 onSuccess: () => {
                   onClose();
+                  logout();
                   actions.resetForm();
                 },
               }),
               {
                 error: (e) => e,
                 loading: "Actualizando el perfil de usuario...",
-                success: "Perfil de usuario actualizado correctamente.",
+                success:
+                  "Perfil de usuario actualizado correctamente. Tu sesión sera cerrada.",
               }
             );
           }}
@@ -84,16 +89,19 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                   sx={{ width: 150, borderRadius: "100%" }}
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
-                    srcSet="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286&dpr=2 2x"
+                    src={formik.values.fotoPerfil}
+                    srcSet={formik.values.fotoPerfil}
                     loading="lazy"
-                    alt=""
+                    alt="FotoPerfilUsuario"
                   />
                   <IconButton
                     aria-label="upload new picture"
                     size="sm"
                     variant="outlined"
                     color="neutral"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
                     sx={{
                       bgcolor: "background.body",
                       position: "absolute",
@@ -106,6 +114,24 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                   >
                     <i className="ti ti-edit" style={{ fontSize: 20 }}></i>
                   </IconButton>
+                  <input
+                    type="file"
+                    ref={fileInputRef} // Asocia el input al botón
+                    onChange={(event) => {
+                      const file = event.target?.files?.[0]; // Obtiene el archivo seleccionado
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          formik.setFieldValue("fotoPerfil", reader.result);
+                        };
+                        reader.onerror = (error) => {
+                          console.error("Error al leer el archivo:", error);
+                        };
+                        reader.readAsDataURL(file); // Convierte el archivo
+                      }
+                    }}
+                    style={{ display: "none" }} // Oculta el input
+                  />
                 </AspectRatio>
               </Stack>
               <Stack gap={2} direction="row" flexWrap="wrap">
@@ -125,9 +151,14 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                   startDecorator={<i className="ti ti-mail"></i>}
                 />
               </Stack>
-              <Button type="submit" loading={false} fullWidth>
-                Guardar cambios
-              </Button>
+              <Stack sx={{ mt: 2 }} gap={2} direction="row">
+                <Button type="submit" loading={false} fullWidth>
+                  Guardar cambios
+                </Button>
+                <Button type="button" color="danger" loading={false} fullWidth>
+                  Eliminar cuenta
+                </Button>
+              </Stack>
             </Form>
           )}
         </Formik>
