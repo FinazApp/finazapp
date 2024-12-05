@@ -12,6 +12,8 @@ describe('Eliminar cuenta', () => {
     it('Verificar botón de eliminar', () => {
         cy.contains('Editar', { timeout: 6000 }).should('be.visible');
         cy.get('button').contains('Eliminar cuenta').click();
+        cy.contains('ADVERTENCIA', { timeout: 6000 }).should('be.visible');
+        cy.get('.MuiDialogActions-root > .MuiButton-variantSolid').click();
     })
 
     it('Verificar cuenta eliminada', () => {
