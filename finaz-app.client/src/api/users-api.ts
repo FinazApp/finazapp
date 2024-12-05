@@ -16,6 +16,10 @@ const UsersApi = {
         const result = await API().patch<IUser>(Endpoints.USERS, user);
         return result.data;
     },
+    delete: async () => {
+        const result = await API().delete(Endpoints.USERS);
+        return result.data;
+    },
     changeRole: async (data: IUserChangeRole) => {
         const result = await API().post(Endpoints.USER_CHANGE_ROLE, data);
         return result.data;

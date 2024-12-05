@@ -23,3 +23,14 @@ export const useChangeRoleUser = () => {
     }
   });
 };
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: UsersApi.delete,
+    mutationKey: [Tags.USERS, Tags.MUTATION_DELETE],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [Tags.USERS] })
+    }
+  });
+};
