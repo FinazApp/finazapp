@@ -63,6 +63,14 @@ namespace finaz_app.Server.Controllers
                 decimal totalIngresos = ingresos.Sum(i => i.Monto);
                 decimal totalGastos = gastos.Sum(g => g.Monto);
 
+                if (totalIngresos == 0 && totalGastos == 0)
+                {
+                    return Ok(new
+                    {
+                        mensaje = "No hay suficientes datos para generar recomendaciones. Agrega ingresos y gastos para obtener recomendaciones."
+                    });
+                }                
+
                 var categoriasGastos = await _appContext.Categorias
                     .Where(c => c.CreadoPor == usuario.UsuarioId && !c.isDeleted)
                     .ToListAsync();
