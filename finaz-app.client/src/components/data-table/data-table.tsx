@@ -1,6 +1,7 @@
 import React from "react";
-import { Flex } from "styled-system/jsx";
-
+import { isFunction } from "radash";
+import { Center, Flex } from "styled-system/jsx";
+import { Icon, IconClick } from "@tabler/icons-react";
 import {
   flexRender,
   useReactTable,
@@ -12,15 +13,33 @@ import {
   AccessorKeyColumnDef,
 } from "@tanstack/react-table";
 
-import { Pagination, Table, Text } from "@components";
+import {
+  Text,
+  Table,
+  IconButton,
+  Pagination,
+  IconButtonProps,
+} from "@components";
+
+export type Action = {
+  icon: Icon;
+  title: string;
+  onClick?: () => void;
+  colorPalette?: IconButtonProps["colorPalette"];
+};
 
 export interface IDataTableProps<T extends object> {
   data: T[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: AccessorKeyColumnDef<T, any>[];
+  tableActions?: ((data: T) => Action[]) | Action[];
 }
 
-const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
+const DataTable = <T extends object>({
+  data,
+  columns,
+  tableActions,
+}: IDataTableProps<T>) => {
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -41,6 +60,11 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
     // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
   });
 
+  const actions = React.useCallback(
+    (data: T) => (isFunction(tableActions) ? tableActions(data) : tableActions),
+    [tableActions]
+  );
+
   return (
     <Table.Root variant="outline" size="sm">
       <Table.Head>
@@ -56,6 +80,13 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
                     )}
               </Table.Header>
             ))}
+            {!!actions({} as never)?.length && (
+              <Table.Header>
+                <Center>
+                  <IconClick size="22" style={{ height: 22, width: 22 }} />
+                </Center>
+              </Table.Header>
+            )}
           </Table.Row>
         ))}
       </Table.Head>
@@ -67,6 +98,24 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </Table.Cell>
             ))}
+            {!!actions(row.original)?.length && (
+              <Table.Cell width="1" whiteSpace="nowrap">
+                {actions(row.original)?.map(
+                  ({ icon: ActionIcon, colorPalette, onClick, title }) => (
+                    <IconButton
+                      size="xs"
+                      key={title}
+                      title={title}
+                      variant="ghost"
+                      onClick={onClick}
+                      colorPalette={colorPalette || "accent"}
+                    >
+                      <ActionIcon size="20" style={{ height: 20, width: 20 }} />
+                    </IconButton>
+                  )
+                )}
+              </Table.Cell>
+            )}
           </Table.Row>
         ))}
       </Table.Body>
@@ -103,7 +152,7 @@ const DataTable = <T extends object>({ columns, data }: IDataTableProps<T>) => {
           >
             {[10, 20, 30, 40, 50].map((pageSize) => (
               <option key={pageSize} value={pageSize}>
-                Show {pageSize}
+                Mostrar {pageSize}
               </option>
             ))}
           </select>

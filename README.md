@@ -28,8 +28,7 @@ El objetivo principal en la rama `dev` es continuar con el desarrollo y mejora c
 
 ### Pruebas y validación
 
-- Las pruebas unitarias y de integración se realizan con **Jest**, **React Testing Library** y **Cypress** en el frontend.
-- En el backend, se están ejecutando pruebas con **xUnit** y **TestServer**.
+- Las pruebas se realizan con **Cypress** en el frontend.
 - Se utiliza **Postman** para validar los endpoints y asegurar su correcto funcionamiento.
 
 ## Estado de desarrollo
@@ -75,7 +74,7 @@ Esta rama `dev` es el entorno de desarrollo activo, donde se prueban y validan n
 - **Frontend**: React.js + TypeScript
 - **Backend**: ASP.NET Core
 - **Base de datos**: SQL Server LocalDB
-- **Pruebas**: Jest, React Testing Library, Cypress, xUnit, TestServer, Postman
+- **Pruebas**: Cypress, Postman
 
 ## Repositorio y gestión
 

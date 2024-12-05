@@ -1,43 +1,30 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
-import { Box, Flex } from "styled-system/jsx";
+import { IIncomes } from "@interfaces";
+import { Box } from "styled-system/jsx";
 import { FormatNumber } from "@ark-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IconClick, IconPlus } from "@tabler/icons-react";
+import { IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 
+import { Reducers } from "@core";
+import { useDeleteIncomes, useFetchIncomes } from "@hooks";
 import { Button, DataTable, Header, IncomeFormDrawer } from "@components";
+import toast from "react-hot-toast";
 
-type Product = {
-  id: number;
-  price: number;
-  name: string;
-  category: string;
-};
-
-const products: Product[] = Array.from({ length: 50 }, (_, index) => {
-  return {
-    id: index,
-    price: parseInt(faker.commerce.price(), 10),
-    name: faker.commerce.product(),
-    category: faker.helpers.arrayElement(["Hogar", "Vehículo", "Supermercado"]),
-  };
-});
-
-const columnHelper = createColumnHelper<Product>();
+const columnHelper = createColumnHelper<IIncomes>();
 
 const columns = [
-  columnHelper.accessor("name", {
-    id: "name",
+  columnHelper.accessor("nombre", {
+    id: "nombre",
     header: "Nombre",
     cell: (info) => <b>{info.getValue()}</b>,
   }),
-  columnHelper.accessor("category", {
+  columnHelper.accessor("categoria.nombre", {
     id: "category",
     header: "Categoría",
   }),
-  columnHelper.accessor("price", {
-    id: "price",
-    header: "Precio",
+  columnHelper.accessor("monto", {
+    id: "amount",
+    header: "Monto",
     cell: (info) => (
       <FormatNumber
         style="currency"
@@ -46,35 +33,27 @@ const columns = [
       />
     ),
   }),
-  columnHelper.accessor("id", {
-    id: "id",
-    header: () => <IconClick size="20" style={{ height: 20, width: 20 }} />,
-    cell: () => (
-      <Flex gap="2" justifyContent="center">
-        <Button size="xs" variant="ghost" colorPalette="accent">
-          Editar
-        </Button>
-        <Button size="xs" variant="ghost" colorPalette="red">
-          Eliminar
-        </Button>
-      </Flex>
-    ),
-  }),
 ];
 
 const IncomesPage = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const incomes = useFetchIncomes();
+  const deleteIncome = useDeleteIncomes();
+
+  const [state, dispatch] = React.useReducer(Reducers.DrawersReducer, {
+    id: 0,
+    open: false,
+  });
 
   return (
     <>
       <Header
         title="Ingresos"
-        subtitle="Listado de"
+        subtitle="{{breadcrumb}}"
         rightContent={
           <Button
             variant="subtle"
             colorPalette="accent"
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => dispatch({ type: "OPEN_DRAWER", payload: 0 })}
           >
             <IconPlus size="22" style={{ height: 22, width: 22 }} />
             Crear nuevo ingreso
@@ -82,9 +61,36 @@ const IncomesPage = () => {
         }
       />
       <Box bg="Background" borderRadius="lg" boxShadow="lg">
-        <DataTable<Product> data={products} columns={columns} />
+        <DataTable<IIncomes>
+          data={incomes.data ?? []}
+          columns={columns}
+          tableActions={(data) => [
+            {
+              title: "Editar",
+              icon: IconPencil,
+              onClick: () =>
+                dispatch({ type: "OPEN_DRAWER", payload: data.ingresosId }),
+            },
+            {
+              icon: IconTrash,
+              title: "Eliminar",
+              onClick: () => {
+                return toast.promise(deleteIncome.mutateAsync(data.ingresosId), {
+                  error: (e) => e,
+                  loading: `Eliminando ingreso ${data.nombre}...`,
+                  success: `Ingreso ${data.nombre} eliminado correctamente.`
+                });
+              },
+              colorPalette: "red",
+            },
+          ]}
+        />
       </Box>
-      <IncomeFormDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+      <IncomeFormDrawer
+        id={state.id}
+        open={state.open}
+        onOpenChange={() => dispatch({ type: "CLOSE_DRAWER" })}
+      />
     </>
   );
 };

@@ -1,29 +1,26 @@
 import React from "react";
 import { Box, Flex } from "styled-system/jsx";
 import {
-  IconCurrencyDollar,
+  IconX,
   IconHome2,
   IconPigMoney,
+  IconCurrencyDollar,
 } from "@tabler/icons-react";
 
 import { NavLink } from "../navlink";
-import { Avatar, Heading, Text } from "../park-ui";
+import { Drawer } from "../park-ui/drawer";
+import { Avatar, Heading, IconButton, Text } from "../park-ui";
 
-const Sidebar = () => {
+type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
+
+export interface SidebarProps {
+  (): React.JSX.Element;
+  Drawer: React.FC<DrawerRootProps>;
+}
+
+const SidebarContent = () => {
   return (
-    <Flex
-      w="64"
-      h="full"
-      bg="Background"
-      boxShadow="lg"
-      flexDirection="column"
-      justifyContent="space-between"
-    >
-      <Box p="4">
-        <Heading as="h2" size="2xl">
-          FinazApp
-        </Heading>
-      </Box>
+    <>
       <Flex id="Navbar" flexDir="column" flex={1} gap="2" px="4">
         <NavLink to="/" title="Inicio" icon={IconHome2} />
         <NavLink to="/incomes" title="Ingresos" icon={IconPigMoney} />
@@ -40,7 +37,51 @@ const Sidebar = () => {
           </Text>
         </Box>
       </Flex>
+    </>
+  );
+};
+
+const Sidebar: SidebarProps = () => {
+  return (
+    <Flex
+      w="64"
+      h="full"
+      bg="Background"
+      boxShadow="lg"
+      flexDirection="column"
+      justifyContent="space-between"
+      display={{ lgDown: "none", lg: "flex" }}
+    >
+      <Box p="4">
+        <Heading as="h2" size="2xl">
+          FinazApp
+        </Heading>
+      </Box>
+      <SidebarContent />
     </Flex>
+  );
+};
+
+Sidebar.Drawer = ({ children, ...props }) => {
+  return (
+    <Drawer.Root variant="left" {...props}>
+      <Drawer.Backdrop />
+      <Drawer.Positioner>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>FinazApp</Drawer.Title>
+            <Drawer.CloseTrigger asChild position="absolute" top="3" right="4">
+              <IconButton variant="ghost">
+                <IconX />
+              </IconButton>
+            </Drawer.CloseTrigger>
+          </Drawer.Header>
+          <Drawer.Body className="p-0 m-0">
+            <SidebarContent />
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Positioner>
+    </Drawer.Root>
   );
 };
 

@@ -1,1 +1,1 @@
-export { default as BillPage } from "./bill";
+export { default as BillsPage } from "./bills";

@@ -1,5 +1,5 @@
-export * from "./incomes";
-export * from "./dashboard";
-export * from "./bills";
-export * from "./Register";
-export * from "./Login";
+export { LoginPage } from "./login";
+export { BillsPage } from "./bills";
+export { IncomesPage } from "./incomes";
+export { RegisterPage } from "./register";
+export { DashboardPage } from "./dashboard";

@@ -1,1 +1,1 @@
-export { default as RegisterPage } from "./Register";
+export { default as RegisterPage } from "./register";
