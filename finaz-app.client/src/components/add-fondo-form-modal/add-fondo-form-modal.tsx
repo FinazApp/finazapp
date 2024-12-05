@@ -27,7 +27,6 @@ type FormValues = {
 
 const validationSchema = Yup.object({
   nuevoFondo: Yup.number().required("Requerido").positive("Monto requerido"),
-  montoAhorrado: Yup.number().required("Requerido").positive("Monto requerido"),
 });
 
 const model = {
