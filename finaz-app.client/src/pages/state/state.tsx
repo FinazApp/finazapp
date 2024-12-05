@@ -55,19 +55,25 @@ const StatePage = () => {
       color: "danger",
       title: "Gastos totales",
       value: recommendation.data?.totalGastos ?? 0,
-      message: recommendation.data?.recomendacionGasto,
+      message:
+        recommendation.data?.recomendacionGasto ??
+        "Sin recomendación, sigue usando tu nueva cuenta.",
     },
     {
       color: "success",
       title: "Ingresos totales",
       value: recommendation.data?.totalIngresos ?? 0,
-      message: recommendation.data?.recomendacionIngreso,
+      message:
+        recommendation.data?.recomendacionIngreso ??
+        "Sin recomendación, sigue usando tu nueva cuenta.",
     },
     {
       color: "primary",
       title: "Ahorros totales",
       value: recommendation.data?.totalAhorros ?? 0,
-      message: recommendation.data?.recomendacionAhorro,
+      message:
+        recommendation.data?.recomendacionAhorro ??
+        "Sin recomendación, sigue usando tu nueva cuenta.",
     },
   ];
 
@@ -75,11 +81,15 @@ const StatePage = () => {
     return [
       {
         title: "Ingresos mensuales",
-        description: recommendation.data?.recomendacionIngresoMensual ?? "",
+        description:
+          recommendation.data?.recomendacionIngresoMensual ??
+          "Sin recomendación, sigue usando tu nueva cuenta.",
       },
       {
         title: "Deudas",
-        description: recommendation.data?.recomendacionDeuda ?? "",
+        description:
+          recommendation.data?.recomendacionDeuda ??
+          "Sin recomendación, sigue usando tu nueva cuenta.",
       },
     ];
   }, [recommendation.data]);
@@ -134,14 +144,18 @@ const StatePage = () => {
         Otras recomendaciones
       </Typography>
       <DataTable columns={columns} tableActions={[]} data={data} />
-      <Typography level="h4" component="h1">
-        Recomendaciones por categoría
-      </Typography>
-      <DataTable
-        tableActions={[]}
-        columns={columnsCategoria}
-        data={recommendation.data?.recomendacionGastosPorCategoria ?? []}
-      />
+      {!!recommendation.data?.recomendacionGastosPorCategoria?.length && (
+        <>
+          <Typography level="h4" component="h1">
+            Recomendaciones por categoría
+          </Typography>
+          <DataTable
+            tableActions={[]}
+            columns={columnsCategoria}
+            data={recommendation.data?.recomendacionGastosPorCategoria ?? []}
+          />
+        </>
+      )}
     </>
   );
 };
