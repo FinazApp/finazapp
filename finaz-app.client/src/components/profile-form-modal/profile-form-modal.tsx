@@ -1,5 +1,4 @@
 import React from "react";
-import * as Yup from "yup";
 import Stack from "@mui/joy/Stack";
 import Modal from "@mui/joy/Modal";
 import toast from "react-hot-toast";
@@ -26,12 +25,6 @@ type FormValues = {
   correoElectronico: string;
 };
 
-const validationSchema = Yup.object({
-  nombre: Yup.string().required("Nombre requerido"),
-  fotoPerfil: Yup.string().required("Foto de perfil requerida"),
-  correoElectronico: Yup.string().required("Correo electrónico requerido"),
-});
-
 const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { user, logout } = useAuth();
@@ -52,7 +45,6 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
         <Formik<FormValues>
           enableReinitialize
           initialValues={initialValues}
-          validationSchema={validationSchema}
           onSubmit={(values, actions) => {
             return toast.promise(
               updateUser.mutateAsync(values, {
@@ -116,9 +108,9 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                   </IconButton>
                   <input
                     type="file"
-                    ref={fileInputRef} // Asocia el input al botón
+                    ref={fileInputRef}
                     onChange={(event) => {
-                      const file = event.target?.files?.[0]; // Obtiene el archivo seleccionado
+                      const file = event.target?.files?.[0];
                       if (file) {
                         const reader = new FileReader();
                         reader.onload = () => {
@@ -127,10 +119,10 @@ const ProfileFormModal = ({ open, onClose }: IProfileFormModalProps) => {
                         reader.onerror = (error) => {
                           console.error("Error al leer el archivo:", error);
                         };
-                        reader.readAsDataURL(file); // Convierte el archivo
+                        reader.readAsDataURL(file);
                       }
                     }}
-                    style={{ display: "none" }} // Oculta el input
+                    style={{ display: "none" }}
                   />
                 </AspectRatio>
               </Stack>
