@@ -30,7 +30,6 @@ jobs:
         run: |
           mkdir -p $HOME/.aspnet/https
           dotnet dev-certs https --trust --export-path "$HOME/.aspnet/https/finaz-app.client.pem" --format Pem --no-password
-
       - name: Build .NET project
         run: dotnet build ./finaz-app.Server/finaz-app.Server.csproj --configuration Release
 
@@ -43,11 +42,19 @@ jobs:
         run: |
           cd finaz-app.client
           npm install
-
       - name: Build frontend
         run: |
           cd finaz-app.client
           npm run build
+
+      - name: Start server in the background
+        run: |
+          cd finaz-app.Server
+          nohup dotnet run --urls https://localhost:5173 > output.log 2>&1 &
+
+      - name: Wait for server to be available
+        run: |
+          sleep 30
 
       - name: Run Cypress tests
         run: |
