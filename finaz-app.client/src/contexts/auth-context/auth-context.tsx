@@ -1,7 +1,9 @@
 import React from "react";
+import Box from "@mui/joy/Box";
 import { IUser } from "@interfaces";
 import toast from "react-hot-toast";
 import { useFetchUserMe, useLogout } from "@hooks";
+import CircularProgress from "@mui/joy/CircularProgress";
 
 interface IAuthContextProps {
   isLogged: boolean;
@@ -58,6 +60,22 @@ const Provider = ({ children }: React.PropsWithChildren) => {
     });
   }, [logoutUser]);
 
+  const renderLoading = React.useCallback(() => {
+    return (
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          height: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -66,9 +84,7 @@ const Provider = ({ children }: React.PropsWithChildren) => {
         isLogged: !!Object.keys(state?.user ?? {}).length,
       }}
     >
-      {userMe.isPending && !userMe.data
-        ? "Cargando datos del usuario..."
-        : children}
+      {userMe.isPending && !userMe.data ? renderLoading() : children}
     </AuthContext.Provider>
   );
 };

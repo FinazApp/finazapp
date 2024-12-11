@@ -19,6 +19,7 @@ import {
   SavingsFormModal,
 } from "@components";
 import { useDeleteSaving, useFetchSavings, useRestoreSaving } from "@hooks";
+import dayjs from "dayjs";
 
 const columnHelper = createColumnHelper<ISavingGoal>();
 
@@ -55,6 +56,7 @@ const columns = [
   columnHelper.accessor("fechaMeta", {
     id: "categoriaId",
     header: "Fecha final",
+    cell: (info) => <span>{dayjs(info.getValue()).format("DD-MM-YYYY")}</span>,
   }),
   columnHelper.accessor("isDeleted", {
     id: "isDeleted",

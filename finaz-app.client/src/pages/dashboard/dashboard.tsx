@@ -235,6 +235,9 @@ const DashboardPage = () => {
           </Stack>
         </Grid>
         <Grid size={8}>
+          <Typography level="title-lg" mb={1} component="h1">
+            Ultimas transacciones
+          </Typography>
           <DataTable
             columns={columns}
             tableActions={[]}

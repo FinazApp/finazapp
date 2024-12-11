@@ -40,6 +40,10 @@ namespace finaz_app.Server.Controllers
                 var fin = DateTime.ParseExact(finFecha, "dd/MM/yyyy", null);
 
                 // Datos en el rango
+                var metasAhorros = await _context.MetasAhorro
+                    .Where(m => m.CreadoPor == userID && !m.isDeleted && m.FechaCreacion >= inicio && m.FechaCreacion <= fin)
+                    .ToListAsync();
+
                 var ingresosRango = await _context.Ingresos
                     .Where(i => i.CreadoPor == userID && !i.isDeleted && i.FechaCreacion >= inicio && i.FechaCreacion <= fin)
                     .ToListAsync();
@@ -60,7 +64,8 @@ namespace finaz_app.Server.Controllers
                 // Calcular totales y balance
                 var totalIngresosRango = ingresosRango.Sum(i => i.Monto);
                 var totalGastosRango = gastosRango.Sum(g => g.Monto);
-                var balanceRango = totalIngresosRango - totalGastosRango;
+                var totalMetasAhorrosRango = metasAhorros.Sum(g => g.MontoAhorrado);
+                var balanceRango = (totalIngresosRango - totalGastosRango) - totalMetasAhorrosRango;
 
                 var totalIngresosPasado = ingresosPasado.Sum(i => i.Monto);
                 var totalGastosPasado = gastosPasado.Sum(g => g.Monto);
@@ -75,6 +80,7 @@ namespace finaz_app.Server.Controllers
                 var ultimosMovimientos = ingresosRango
                     .Select(i => new { i.Nombre, i.Monto, Tipo = "Ingreso", i.FechaCreacion })
                     .Concat(gastosRango.Select(g => new { g.Nombre, g.Monto, Tipo = "Gasto", g.FechaCreacion }))
+                    .Concat(metasAhorros.Select(m => new { m.Nombre, Monto = m.MontoAhorrado, Tipo = "Fondo de Meta de Ahorro", m.FechaCreacion }))
                     .OrderByDescending(m => m.FechaCreacion)
                     .Take(10)
                     .ToList();
