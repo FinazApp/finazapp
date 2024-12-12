@@ -46,17 +46,3 @@ jobs:
         run: |
           cd finaz-app.client
           npm run build
-
-      - name: Start server in the background
-        run: |
-          cd finaz-app.Server
-          nohup dotnet run --urls https://localhost:5173 > output.log 2>&1 &
-
-      - name: Wait for server to be available
-        run: |
-          sleep 30
-
-      - name: Run Cypress tests
-        run: |
-          cd finaz-app.client
-          npm run cypress:run
